@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — LearnFlow LMS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="auth-page">
+
+    <!-- Hero Panel -->
+    <div class="auth-hero">
+      <div class="hero-badge"><span></span> Now Live</div>
+      <h1 class="hero-title">
+        Learn Without<br /><em>Limits.</em>
+      </h1>
+      <p class="hero-desc">
+        LearnFlow connects teachers and students in a seamless virtual
+        classroom experience. Create, share, and grow — together.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">2k+</span>
+          <span class="stat-label">Students</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">150+</span>
+          <span class="stat-label">Teachers</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">400+</span>
+          <span class="stat-label">Classes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="auth-panel">
+      <div class="auth-card">
+
+        <div class="auth-logo">
+          <div class="logo-icon">🎓</div>
+          <span class="logo-text">LearnFlow</span>
+        </div>
+
+        <h2 class="auth-heading">Create your account</h2>
+        <p class="auth-subheading">Join thousands of learners and educators today.</p>
+
+        <div class="alert alert-error" id="alertBox">
+          <span>⚠️</span><span id="alertMsg"></span>
+        </div>
+        <div class="alert alert-success" id="successBox">
+          <span>✅</span><span id="successMsg"></span>
+        </div>
+
+        <form id="registerForm" novalidate>
+
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input class="form-input" type="text" id="name" placeholder="Jane Doe" autocomplete="name" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input class="form-input" type="email" id="email" placeholder="jane@example.com" autocomplete="email" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-input" type="password" id="password" placeholder="Minimum 6 characters" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">I am a…</label>
+            <div class="role-selector">
+              <button type="button" class="role-btn active" data-role="student" id="roleStudent">
+                <span class="role-icon">📚</span> Student
+              </button>
+              <button type="button" class="role-btn" data-role="teacher" id="roleTeacher">
+                <span class="role-icon">🏫</span> Teacher
+              </button>
+            </div>
+            <input type="hidden" id="role" value="student" />
+          </div>
+
+          <button class="btn-primary" type="submit" id="submitBtn">
+            Create Account
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Already have an account? <a href="login.html">Sign in</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    const token = localStorage.getItem('lms_token');
+    const user = JSON.parse(localStorage.getItem('lms_user') || 'null');
+    if (token && user) {
+      window.location.href = user.role === 'teacher' ? 'teacher-dashboard.html' : 'student-dashboard.html';
+    }
+
+    // Role selector
+    const roleBtns = document.querySelectorAll('.role-btn');
+    const roleInput = document.getElementById('role');
+    roleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        roleBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        roleInput.value = btn.dataset.role;
+      });
+    });
+
+    // Alerts
+    function showError(msg) {
+      const el = document.getElementById('alertBox');
+      document.getElementById('alertMsg').textContent = msg;
+      el.classList.add('show', 'alert-error');
+      el.classList.remove('alert-success');
+      document.getElementById('successBox').classList.remove('show');
+    }
+    function showSuccess(msg) {
+      const el = document.getElementById('successBox');
+      document.getElementById('successMsg').textContent = msg;
+      el.classList.add('show');
+      document.getElementById('alertBox').classList.remove('show');
+    }
+
+    // Submit
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const role = roleInput.value;
+
+      if (!name || !email || !password) return showError('Please fill in all fields.');
+      if (password.length < 6) return showError('Password must be at least 6 characters.');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span> Creating account…';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || 'Registration failed.');
+
+        localStorage.setItem('lms_token', data.token);
+        localStorage.setItem('lms_user', JSON.stringify(data.user));
+        showSuccess('Account created! Redirecting…');
+
+        setTimeout(() => {
+          window.location.href = data.user.role === 'teacher' ? 'teacher-dashboard.html' : 'student-dashboard.html';
+        }, 1000);
+
+      } catch (err) {
+        showError(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

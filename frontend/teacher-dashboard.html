@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Dashboard — LearnFlow LMS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="dashboard-page">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="auth-logo" style="margin:0">
+          <div class="logo-icon">🎓</div>
+          <span class="logo-text">LearnFlow</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-tag teacher">Teacher</span>
+        <div class="user-chip">
+          <div class="user-avatar" id="userInitial">?</div>
+          <span class="user-name" id="userName">Loading…</span>
+        </div>
+        <button class="btn-logout" id="logoutBtn">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="page-header">
+        <h1 class="page-title">Teacher Dashboard</h1>
+        <p class="page-subtitle">Create and manage your virtual classes.</p>
+      </div>
+
+      <!-- Create Class -->
+      <div class="create-section">
+        <h2 class="section-title">📝 Create New Class</h2>
+        <p class="section-subtitle">Fill in the details below to schedule a new class for your students.</p>
+
+        <div class="alert alert-error" id="createAlert" style="display:none">
+          <span>⚠️</span><span id="createAlertMsg"></span>
+        </div>
+        <div class="alert alert-success" id="createSuccess" style="display:none">
+          <span>✅</span><span id="createSuccessMsg"></span>
+        </div>
+
+        <form id="createForm" novalidate>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="classTitle">Class Title</label>
+              <input class="form-input" type="text" id="classTitle" placeholder="e.g. Advanced Mathematics — Chapter 5" required />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="meetingLink">Meeting Link</label>
+              <input class="form-input" type="url" id="meetingLink" placeholder="https://meet.google.com/abc-defg-hij" required />
+            </div>
+          </div>
+          <button type="submit" class="btn-create" id="createBtn">
+            <span>＋</span> Create Class
+          </button>
+        </form>
+      </div>
+
+      <!-- Classes List -->
+      <div class="classes-section">
+        <div class="classes-header">
+          <h2 class="section-title" style="margin-bottom:0">My Classes</h2>
+          <span class="classes-count" id="classesCount">Loading…</span>
+        </div>
+
+        <div class="classes-grid" id="classesGrid">
+          <div class="empty-state">
+            <div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div>
+            <p>Loading classes…</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Auth guard
+    const token = localStorage.getItem('lms_token');
+    const user = JSON.parse(localStorage.getItem('lms_user') || 'null');
+    if (!token || !user) { window.location.href = 'login.html'; }
+    else if (user.role !== 'teacher') { window.location.href = 'student-dashboard.html'; }
+
+    // Populate user info
+    document.getElementById('userName').textContent = user.name;
+    document.getElementById('userInitial').textContent = user.name.charAt(0).toUpperCase();
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('lms_token');
+      localStorage.removeItem('lms_user');
+      window.location.href = 'login.html';
+    });
+
+    // Helpers
+    const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+
+    function showAlert(id, msgId, msg) {
+      document.getElementById(id).style.display = 'flex';
+      document.getElementById(msgId).textContent = msg;
+    }
+    function hideAlerts() {
+      ['createAlert', 'createSuccess'].forEach(id => document.getElementById(id).style.display = 'none');
+    }
+
+    function timeAgo(date) {
+      const diff = (Date.now() - new Date(date)) / 1000;
+      if (diff < 60) return 'Just now';
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return `${Math.floor(diff / 86400)}d ago`;
+    }
+
+    // Fetch classes
+    async function loadClasses() {
+      try {
+        const res = await fetch('/api/classes/all', { headers: authHeaders });
+        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        const data = await res.json();
+
+        const grid = document.getElementById('classesGrid');
+        document.getElementById('classesCount').textContent =
+          `${data.count} ${data.count === 1 ? 'class' : 'classes'}`;
+
+        if (data.count === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🏫</div>
+              <div class="empty-title">No classes yet</div>
+              <div class="empty-desc">Create your first class above to get started.</div>
+            </div>`;
+          return;
+        }
+
+        grid.innerHTML = data.classes.map((cls, i) => `
+          <div class="class-card" style="animation-delay:${i * 0.05}s">
+            <div class="card-tag">CLASS</div>
+            <div class="card-title">${escapeHtml(cls.title)}</div>
+            <div class="card-teacher">🕒 Created ${timeAgo(cls.createdAt)}</div>
+            <div class="card-actions">
+              <a class="btn-join" href="${escapeHtml(cls.meetingLink)}" target="_blank" rel="noopener">
+                🔗 Join Meeting
+              </a>
+              <button class="btn-delete" onclick="deleteClass('${cls._id}')">🗑 Delete</button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        document.getElementById('classesGrid').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Failed to load classes</div>
+            <div class="empty-desc">${err.message}</div>
+          </div>`;
+      }
+    }
+
+    // Create class
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlerts();
+      const btn = document.getElementById('createBtn');
+      const title = document.getElementById('classTitle').value.trim();
+      const meetingLink = document.getElementById('meetingLink').value.trim();
+
+      if (!title || !meetingLink) {
+        return showAlert('createAlert', 'createAlertMsg', 'Please fill in all fields.');
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span> Creating…';
+
+      try {
+        const res = await fetch('/api/classes/create', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ title, meetingLink }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || 'Failed to create class.');
+
+        showAlert('createSuccess', 'createSuccessMsg', 'Class created successfully!');
+        document.getElementById('classTitle').value = '';
+        document.getElementById('meetingLink').value = '';
+        loadClasses();
+
+      } catch (err) {
+        showAlert('createAlert', 'createAlertMsg', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>＋</span> Create Class';
+      }
+    });
+
+    // Delete class
+    async function deleteClass(id) {
+      if (!confirm('Delete this class? This cannot be undone.')) return;
+      try {
+        const res = await fetch(`/api/classes/${id}`, { method: 'DELETE', headers: authHeaders });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        loadClasses();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    loadClasses();
+  </script>
+</body>
+</html>
