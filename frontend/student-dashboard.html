@@ -133,7 +133,8 @@
       try {
         const res = await fetch('/api/classes/all', { headers: authHeaders });
         if (res.status === 401) { window.location.href = 'login.html'; return; }
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
         allClasses = data.classes;
         renderClasses(allClasses);
       } catch (err) {

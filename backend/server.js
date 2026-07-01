@@ -20,9 +20,14 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 
-// Fallback: serve login page for unknown routes (Express 5 wildcard syntax)
+// 404 handler for unknown API routes — return JSON, not HTML
+app.all('/api/{*any}', (req, res) => {
+  res.status(404).json({ success: false, message: 'API endpoint not found.' });
+});
+
+// Fallback: serve homepage for unknown non-API routes (SPA-style)
 app.get('/{*any}', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/login.html'));
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // Connect to MongoDB

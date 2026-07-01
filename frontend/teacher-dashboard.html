@@ -122,7 +122,8 @@
       try {
         const res = await fetch('/api/classes/all', { headers: authHeaders });
         if (res.status === 401) { window.location.href = 'login.html'; return; }
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
 
         const grid = document.getElementById('classesGrid');
         document.getElementById('classesCount').textContent =
@@ -183,7 +184,8 @@
           headers: authHeaders,
           body: JSON.stringify({ title, meetingLink }),
         });
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
 
         if (!res.ok) throw new Error(data.message || 'Failed to create class.');
 
@@ -205,7 +207,8 @@
       if (!confirm('Delete this class? This cannot be undone.')) return;
       try {
         const res = await fetch(`/api/classes/${id}`, { method: 'DELETE', headers: authHeaders });
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
         if (!res.ok) throw new Error(data.message);
         loadClasses();
       } catch (err) {

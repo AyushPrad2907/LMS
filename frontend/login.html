@@ -117,7 +117,12 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         });
-        const data = await res.json();
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error('Server returned an invalid response. Please try again.');
+        }
 
         if (!res.ok) throw new Error(data.message || 'Login failed.');
 
