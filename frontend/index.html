@@ -216,7 +216,7 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 22px;
       list-style: none;
     }
 
@@ -593,6 +593,85 @@
 
     .trust-icon { font-size: 16px; }
     .trust-divider { width: 1px; height: 16px; background: var(--border); }
+
+    /* ── AUTO-SLIDING IMAGE BANNER ── */
+    .slider-section { padding: 90px 24px 40px; }
+
+    .slider-header { text-align: center; max-width: 600px; margin: 0 auto 40px; }
+    .slider-header .section-tag { justify-content: center; }
+    .slider-header .section-desc { margin: 0 auto; }
+
+    .slider-banner {
+      max-width: 1120px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      position: relative;
+      background: var(--surface);
+    }
+
+    .slider-banner::before,
+    .slider-banner::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 80px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .slider-banner::before { left: 0; background: linear-gradient(90deg, var(--bg) 0%, transparent 100%); }
+    .slider-banner::after { right: 0; background: linear-gradient(270deg, var(--bg) 0%, transparent 100%); }
+
+    .slider-track {
+      display: flex;
+      width: max-content;
+      animation: sliderScroll 26s linear infinite;
+    }
+
+    .slider-banner:hover .slider-track { animation-play-state: paused; }
+
+    .slider-slide {
+      position: relative;
+      flex-shrink: 0;
+      width: 480px;
+      height: 262px;
+      margin-right: 16px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .slider-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .slider-caption {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      padding: 18px 20px;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .slider-caption strong {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .slider-caption span { font-size: 12px; color: rgba(255,255,255,0.75); }
+
+    @keyframes sliderScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @media (max-width: 768px) {
+      .slider-slide { width: 300px; height: 164px; margin-right: 12px; }
+      .slider-banner::before, .slider-banner::after { width: 40px; }
+      .slider-track { animation-duration: 18s; }
+    }
 
     /* ── STATS STRIP ── */
     .stats-strip {
@@ -1193,6 +1272,8 @@
       <li><a href="#how">How It Works</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="courses.html">Courses</a></li>
+      <li><a href="quizzes.html">Quizzes</a></li>
+      <li><a href="workshop.html">Workshop</a></li>
       <li><a href="#roles">For You</a></li>
       <li><a href="#testimonials">Reviews</a></li>
     </ul>
@@ -1221,6 +1302,8 @@
     <a href="#how" onclick="closeMobile()">How It Works</a>
     <a href="#features" onclick="closeMobile()">Features</a>
     <a href="courses.html" onclick="closeMobile()">Courses</a>
+    <a href="quizzes.html" onclick="closeMobile()">Quizzes</a>
+    <a href="workshop.html" onclick="closeMobile()">Workshop</a>
     <a href="#roles" onclick="closeMobile()">For You</a>
     <a href="register.html" style="color:var(--accent);font-weight:700;">Get Started →</a>
   </div>
@@ -1279,6 +1362,55 @@
       <div class="trust-item"><span class="trust-icon">🔬</span> Workshops Available</div>
       <div class="trust-divider"></div>
       <div class="trust-item"><span class="trust-icon">📞</span> student@implexedu.in</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- AUTO-SLIDING IMAGE BANNER -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="slider-section">
+    <div class="slider-header">
+      <div class="section-tag">Explore</div>
+      <h2 class="section-title">One platform,<br />every learning path.</h2>
+      <p class="section-desc">From school foundations to competitive exam mastery — see what's inside IMPLEXEDU.</p>
+    </div>
+
+    <div class="slider-banner">
+      <div class="slider-track">
+        <div class="slider-slide">
+          <img src="images/slide1-school.jpg" alt="School Programs" />
+          <div class="slider-caption"><strong>📘 School Programs</strong><span>Class 5 to 10 · Hindi & English Medium</span></div>
+        </div>
+        <div class="slider-slide">
+          <img src="images/slide2-competitive.jpg" alt="Competitive Exams" />
+          <div class="slider-caption"><strong>🏆 Competitive Exams</strong><span>Banking · SSC · TET · State PCS</span></div>
+        </div>
+        <div class="slider-slide">
+          <img src="images/slide3-upsc.jpg" alt="UPSC Preparation" />
+          <div class="slider-caption"><strong>⚖️ UPSC Preparation</strong><span>Prelims · Mains · Hindi & English Medium</span></div>
+        </div>
+        <div class="slider-slide">
+          <img src="images/slide4-coding.jpg" alt="Coding & Tech" />
+          <div class="slider-caption"><strong>💻 Coding & Tech</strong><span>Java · PHP · C++ · WordPress</span></div>
+        </div>
+        <!-- duplicate set for seamless loop -->
+        <div class="slider-slide">
+          <img src="images/slide1-school.jpg" alt="School Programs" />
+          <div class="slider-caption"><strong>📘 School Programs</strong><span>Class 5 to 10 · Hindi & English Medium</span></div>
+        </div>
+        <div class="slider-slide">
+          <img src="images/slide2-competitive.jpg" alt="Competitive Exams" />
+          <div class="slider-caption"><strong>🏆 Competitive Exams</strong><span>Banking · SSC · TET · State PCS</span></div>
+        </div>
+        <div class="slider-slide">
+          <img src="images/slide3-upsc.jpg" alt="UPSC Preparation" />
+          <div class="slider-caption"><strong>⚖️ UPSC Preparation</strong><span>Prelims · Mains · Hindi & English Medium</span></div>
+        </div>
+        <div class="slider-slide">
+          <img src="images/slide4-coding.jpg" alt="Coding & Tech" />
+          <div class="slider-caption"><strong>💻 Coding & Tech</strong><span>Java · PHP · C++ · WordPress</span></div>
+        </div>
+      </div>
     </div>
   </section>
 
