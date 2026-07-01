@@ -6,36 +6,34 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const classRoutes = require('./routes/classes');
+const enrollmentRoutes = require('./routes/enrollments');
+const courseRoutes = require('./routes/courses');
+const Course = require('./models/Course');
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
-
-// Serve frontend static files
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/courses', courseRoutes);
 
-// 404 handler for unknown API routes — return JSON, not HTML
 app.all('/api/{*any}', (req, res) => {
   res.status(404).json({ success: false, message: 'API endpoint not found.' });
 });
 
-// Fallback: serve homepage for unknown non-API routes (SPA-style)
 app.get('/{*any}', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/login.html'));
 });
 
-// Connect to MongoDB
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 5000;
 
 if (!MONGO_URI) {
-  console.error('❌ MONGO_URI is missing in .env');
+  console.error('MONGO_URI is missing in .env');
   process.exit(1);
 }
 
@@ -50,41 +48,59 @@ const mongoOptions = {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const defaultCourses = [
+  { courseId: 'math-5', name: '5th Fundamental', track: 'Hindi Medium', level: 'School', fee: 1000 },
+  { courseId: 'math-6', name: '6th Fundamental', track: 'Hindi Medium', level: 'School', fee: 1500 },
+  { courseId: 'math-11', name: 'Class 11 Science', track: 'English Medium', level: 'Higher Secondary', fee: 6000 },
+  { courseId: 'neet', name: 'NEET Preparation', track: 'Bilingual', level: 'Competitive', fee: 25000 },
+  { courseId: 'upsc', name: 'UPSC Mains', track: 'English Medium', level: 'Competitive', fee: 30000 },
+  { courseId: 'spoken', name: 'English Spoken', track: 'English Medium', level: 'Professional', fee: 3000 },
+];
+
+async function seedDefaultCourses() {
+  await Promise.all(
+    defaultCourses.map((course) =>
+      Course.updateOne({ courseId: course.courseId }, { $setOnInsert: course }, { upsert: true })
+    )
+  );
+}
+
 async function connectToMongoWithRetry(maxRetries = 5) {
   for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
     try {
       await mongoose.connect(MONGO_URI, mongoOptions);
-      console.log('✅ Connected to MongoDB Atlas');
+      console.log('Connected to MongoDB Atlas');
       return;
     } catch (err) {
       const waitMs = attempt * 2000;
-      console.error(`❌ MongoDB connection failed (attempt ${attempt}/${maxRetries}):`, err.message);
+      console.error(`MongoDB connection failed (attempt ${attempt}/${maxRetries}):`, err.message);
 
       if (attempt === maxRetries) {
         throw err;
       }
 
-      console.log(`⏳ Retrying MongoDB connection in ${waitMs / 1000}s...`);
+      console.log(`Retrying MongoDB connection in ${waitMs / 1000}s...`);
       await sleep(waitMs);
     }
   }
 }
 
 mongoose.connection.on('disconnected', () => {
-  console.warn('⚠️ MongoDB disconnected. Waiting for automatic reconnection...');
+  console.warn('MongoDB disconnected. Waiting for automatic reconnection...');
 });
 
 mongoose.connection.on('reconnected', () => {
-  console.log('🔄 MongoDB reconnected');
+  console.log('MongoDB reconnected');
 });
 
 mongoose.connection.on('error', (err) => {
-  console.error('❌ MongoDB runtime error:', err.message);
+  console.error('MongoDB runtime error:', err.message);
 });
 
 connectToMongoWithRetry()
+  .then(() => seedDefaultCourses())
   .then(() => {
-    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
   .catch(() => {
     process.exit(1);

@@ -31,8 +31,37 @@
     <main class="main">
       <div class="page-header">
         <h1 class="page-title">Student Dashboard</h1>
-        <p class="page-subtitle">Browse and join all available classes.</p>
+        <p class="page-subtitle">Browse classes, pick a course, and enroll from one place.</p>
       </div>
+
+      <!-- Course Selector -->
+      <section class="create-section course-selector">
+        <div class="section-title">Course Selector</div>
+        <p class="section-subtitle">Choose a course below and enroll instantly after sign-in.</p>
+
+        <div class="course-selector-grid">
+          <div class="form-group">
+            <label class="form-label" for="courseSelect">Select Course</label>
+            <select class="form-input" id="courseSelect"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="courseTrack">Course Details</label>
+            <input class="form-input" id="courseTrack" type="text" readonly />
+          </div>
+        </div>
+
+        <div class="course-selector-meta" id="courseMeta"></div>
+
+        <button class="btn-create" id="enrollCourseBtn" type="button">Enroll in Selected Course</button>
+      </section>
+
+      <!-- Enrolled Courses -->
+      <section class="create-section">
+        <div class="section-title">My Enrollments</div>
+        <p class="section-subtitle">Courses you enroll in will appear here for quick access.</p>
+        <div class="enrollments-grid" id="enrollmentsGrid"></div>
+      </section>
 
       <!-- Search Bar -->
       <div style="margin-bottom: 32px;">
@@ -83,6 +112,7 @@
     const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 
     let allClasses = [];
+    let availableCourses = [];
 
     function timeAgo(date) {
       const diff = (Date.now() - new Date(date)) / 1000;
@@ -94,6 +124,108 @@
 
     function escapeHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderCourseSelector() {
+      const select = document.getElementById('courseSelect');
+      const track = document.getElementById('courseTrack');
+      const meta = document.getElementById('courseMeta');
+
+      if (availableCourses.length === 0) {
+        select.innerHTML = '<option value="">No courses available</option>';
+        track.value = '';
+        meta.textContent = 'No active courses were found in the database.';
+        return;
+      }
+
+      select.innerHTML = availableCourses.map(course => (
+        `<option value="${course.courseId}">${escapeHtml(course.name)} • ${escapeHtml(course.track)}</option>`
+      )).join('');
+
+      const updateSelection = () => {
+        const selected = availableCourses.find(course => course.courseId === select.value) || availableCourses[0];
+        track.value = `${selected.track} • ${selected.level} • ₹${selected.fee.toLocaleString('en-IN')}`;
+        meta.textContent = `Selected: ${selected.name} • ${selected.level}`;
+      };
+
+      select.addEventListener('change', updateSelection);
+      updateSelection();
+    }
+
+    function renderEnrollments(enrollments) {
+      const grid = document.getElementById('enrollmentsGrid');
+
+      if (enrollments.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1; padding: 32px 20px;">
+            <div class="empty-icon" style="font-size: 44px;">🎓</div>
+            <div class="empty-title">No enrollments yet</div>
+            <div class="empty-desc">Pick a course above to enroll and start learning.</div>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = enrollments.map((course) => `
+        <div class="enrollment-card">
+          <div class="enrollment-title">${escapeHtml(course.courseName)}</div>
+          <div class="enrollment-meta">${escapeHtml(course.track)} • ${escapeHtml(course.level)}</div>
+          <div class="enrollment-fee">₹${Number(course.fee).toLocaleString('en-IN')}</div>
+        </div>
+      `).join('');
+    }
+
+    async function loadEnrollments() {
+      try {
+        const res = await fetch('/api/enrollments/mine', { headers: authHeaders });
+        if (res.status === 401) { window.location.href = 'login.html'; return []; }
+        const data = await res.json();
+        const enrollments = data.enrollments || [];
+        renderEnrollments(enrollments);
+        return enrollments;
+      } catch (error) {
+        document.getElementById('enrollmentsGrid').innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1; padding: 32px 20px;">
+            <div class="empty-icon" style="font-size: 44px;">⚠️</div>
+            <div class="empty-title">Failed to load enrollments</div>
+            <div class="empty-desc">Please refresh the page and try again.</div>
+          </div>`;
+        return [];
+      }
+    }
+
+    async function enrollSelectedCourse() {
+      const selectedId = document.getElementById('courseSelect').value;
+      const selected = availableCourses.find(course => course.courseId === selectedId);
+      if (!selected) return;
+
+      const btn = document.getElementById('enrollCourseBtn');
+      btn.disabled = true;
+      btn.textContent = 'Enrolling...';
+
+      try {
+        const res = await fetch('/api/enrollments/enroll', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({
+            courseId: selected.courseId,
+            courseName: selected.name,
+            track: selected.track,
+            level: selected.level,
+            fee: selected.fee,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Enrollment failed.');
+
+        await loadEnrollments();
+        alert(`Enrolled in ${selected.name} successfully.`);
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enroll in Selected Course';
+      }
     }
 
     function renderClasses(classes) {
@@ -147,6 +279,19 @@
       }
     }
 
+    async function loadCourses() {
+      try {
+        const res = await fetch('/api/courses/all', { headers: authHeaders });
+        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        const data = await res.json();
+        availableCourses = data.courses || [];
+        renderCourseSelector();
+      } catch (error) {
+        const meta = document.getElementById('courseMeta');
+        meta.textContent = 'Failed to load courses from the database.';
+      }
+    }
+
     // Live search
     document.getElementById('searchInput').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase();
@@ -157,6 +302,10 @@
       renderClasses(filtered);
     });
 
+    document.getElementById('enrollCourseBtn').addEventListener('click', enrollSelectedCourse);
+
+    loadCourses();
+    loadEnrollments();
     loadClasses();
   </script>
 </body>

@@ -63,6 +63,56 @@
         </form>
       </div>
 
+      <!-- Manage Courses -->
+      <div class="create-section">
+        <h2 class="section-title">🎓 Manage Courses</h2>
+        <p class="section-subtitle">Create and maintain the courses students can enroll in.</p>
+
+        <div class="alert alert-error" id="courseAlert" style="display:none">
+          <span>⚠️</span><span id="courseAlertMsg"></span>
+        </div>
+        <div class="alert alert-success" id="courseSuccess" style="display:none">
+          <span>✅</span><span id="courseSuccessMsg"></span>
+        </div>
+
+        <form id="courseForm" novalidate>
+          <input type="hidden" id="courseMongoId" />
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="courseId">Course ID</label>
+              <input class="form-input" type="text" id="courseId" placeholder="e.g. neet-prep" required />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="courseName">Course Name</label>
+              <input class="form-input" type="text" id="courseName" placeholder="e.g. NEET Preparation" required />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="courseTrack">Track</label>
+              <input class="form-input" type="text" id="courseTrack" placeholder="e.g. English Medium" required />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="courseLevel">Level</label>
+              <input class="form-input" type="text" id="courseLevel" placeholder="e.g. Competitive" required />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="courseFee">Fee</label>
+              <input class="form-input" type="number" id="courseFee" placeholder="25000" required min="0" />
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" for="courseIsActive">Status</label>
+              <select class="form-input" id="courseIsActive">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-create" id="courseBtn">
+            <span>＋</span> Save Course
+          </button>
+          <button type="button" class="btn-logout" id="courseResetBtn" style="margin-left:12px;">Reset</button>
+        </form>
+      </div>
+
       <!-- Classes List -->
       <div class="classes-section">
         <div class="classes-header">
@@ -74,6 +124,21 @@
           <div class="empty-state">
             <div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div>
             <p>Loading classes…</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Courses List -->
+      <div class="classes-section" style="margin-top:40px;">
+        <div class="classes-header">
+          <h2 class="section-title" style="margin-bottom:0">All Courses</h2>
+          <span class="classes-count" id="coursesCount">Loading…</span>
+        </div>
+
+        <div class="classes-grid" id="coursesGrid">
+          <div class="empty-state">
+            <div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div>
+            <p>Loading courses…</p>
           </div>
         </div>
       </div>
@@ -100,6 +165,7 @@
 
     // Helpers
     const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+    let allCourses = [];
 
     function showAlert(id, msgId, msg) {
       document.getElementById(id).style.display = 'flex';
@@ -108,6 +174,9 @@
     function hideAlerts() {
       ['createAlert', 'createSuccess'].forEach(id => document.getElementById(id).style.display = 'none');
     }
+    function hideCourseAlerts() {
+      ['courseAlert', 'courseSuccess'].forEach(id => document.getElementById(id).style.display = 'none');
+    }
 
     function timeAgo(date) {
       const diff = (Date.now() - new Date(date)) / 1000;
@@ -115,6 +184,38 @@
       if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
       if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
       return `${Math.floor(diff / 86400)}d ago`;
+    }
+
+    function renderCourses() {
+      const grid = document.getElementById('coursesGrid');
+      document.getElementById('coursesCount').textContent =
+        `${allCourses.length} ${allCourses.length === 1 ? 'course' : 'courses'}`;
+
+      if (allCourses.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🎓</div>
+            <div class="empty-title">No courses yet</div>
+            <div class="empty-desc">Add a course to make it available for students.</div>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = allCourses.map((course, i) => `
+        <div class="class-card" style="animation-delay:${i * 0.05}s">
+          <div class="card-tag">${course.isActive ? 'ACTIVE' : 'INACTIVE'}</div>
+          <div class="card-title">${escapeHtml(course.name)}</div>
+          <div class="card-teacher">ID: ${escapeHtml(course.courseId)} • ${escapeHtml(course.track)}</div>
+          <div class="card-teacher">${escapeHtml(course.level)} • ₹${Number(course.fee).toLocaleString('en-IN')}</div>
+          <div class="card-actions">
+            <button class="btn-join" type="button" onclick="editCourse('${course._id}')">Edit</button>
+            <button class="btn-join" type="button" onclick="toggleCourse('${course._id}', ${!course.isActive})">
+              ${course.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+            <button class="btn-delete" type="button" onclick="deleteCourse('${course._id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     // Fetch classes
@@ -163,6 +264,23 @@
       }
     }
 
+    async function loadCourses() {
+      try {
+        const res = await fetch('/api/courses/all', { headers: authHeaders });
+        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        const data = await res.json();
+        allCourses = data.courses || [];
+        renderCourses();
+      } catch (err) {
+        document.getElementById('coursesGrid').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Failed to load courses</div>
+            <div class="empty-desc">${err.message}</div>
+          </div>`;
+      }
+    }
+
     // Create class
     document.getElementById('createForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -202,6 +320,54 @@
       }
     });
 
+    document.getElementById('courseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideCourseAlerts();
+      const btn = document.getElementById('courseBtn');
+      const mongoId = document.getElementById('courseMongoId').value.trim();
+      const payload = {
+        courseId: document.getElementById('courseId').value.trim(),
+        name: document.getElementById('courseName').value.trim(),
+        track: document.getElementById('courseTrack').value.trim(),
+        level: document.getElementById('courseLevel').value.trim(),
+        fee: Number(document.getElementById('courseFee').value),
+        isActive: document.getElementById('courseIsActive').value === 'true',
+      };
+
+      if (!payload.courseId || !payload.name || !payload.track || !payload.level || Number.isNaN(payload.fee)) {
+        return showAlert('courseAlert', 'courseAlertMsg', 'Please fill in all course fields.');
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span> Saving…';
+
+      try {
+        const res = await fetch(mongoId ? `/api/courses/${mongoId}` : '/api/courses/create', {
+          method: mongoId ? 'PUT' : 'POST',
+          headers: authHeaders,
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to save course.');
+
+        showAlert('courseSuccess', 'courseSuccessMsg', data.message);
+        document.getElementById('courseForm').reset();
+        document.getElementById('courseMongoId').value = '';
+        loadCourses();
+      } catch (err) {
+        showAlert('courseAlert', 'courseAlertMsg', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>＋</span> Save Course';
+      }
+    });
+
+    document.getElementById('courseResetBtn').addEventListener('click', () => {
+      document.getElementById('courseForm').reset();
+      document.getElementById('courseMongoId').value = '';
+      hideCourseAlerts();
+    });
+
     // Delete class
     async function deleteClass(id) {
       if (!confirm('Delete this class? This cannot be undone.')) return;
@@ -216,11 +382,60 @@
       }
     }
 
+    async function deleteCourse(id) {
+      if (!confirm('Delete this course? This cannot be undone.')) return;
+      try {
+        const res = await fetch(`/api/courses/${id}`, { method: 'DELETE', headers: authHeaders });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to delete course.');
+        loadCourses();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function editCourse(id) {
+      const course = allCourses.find(item => item._id === id);
+      if (!course) return;
+      document.getElementById('courseMongoId').value = course._id;
+      document.getElementById('courseId').value = course.courseId;
+      document.getElementById('courseName').value = course.name;
+      document.getElementById('courseTrack').value = course.track;
+      document.getElementById('courseLevel').value = course.level;
+      document.getElementById('courseFee').value = course.fee;
+      document.getElementById('courseIsActive').value = String(course.isActive);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function toggleCourse(id, isActive) {
+      try {
+        const course = allCourses.find(item => item._id === id);
+        if (!course) return;
+        const res = await fetch(`/api/courses/${id}`, {
+          method: 'PUT',
+          headers: authHeaders,
+          body: JSON.stringify({
+            name: course.name,
+            track: course.track,
+            level: course.level,
+            fee: course.fee,
+            isActive,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to update course.');
+        loadCourses();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
     function escapeHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     loadClasses();
+    loadCourses();
   </script>
 </body>
 </html>
