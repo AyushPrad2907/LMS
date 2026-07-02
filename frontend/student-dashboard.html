@@ -177,6 +177,64 @@
 
     @media(max-width:640px) { .enroll-grid { grid-template-columns:1fr; } .enroll-grid .full { grid-column:1; } .modal-body { padding:20px; } .modal-header { padding:20px; } }
     @media(max-width:480px) { .courses-grid { grid-template-columns:1fr; } .modal-price { font-size:20px; } }
+
+    /* ══════════════════════════════════════════════
+       MOBILE RESPONSIVE (ADDED — no existing rules changed)
+    ══════════════════════════════════════════════ */
+    body { overflow-x: hidden; }
+
+    @media (max-width: 1024px) {
+      .courses-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+      .classes-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .topbar { flex-wrap: wrap; gap: 12px; }
+      .topbar-left, .topbar-right { width: 100%; }
+      .topbar-right { flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+      .user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
+
+    @media (max-width: 768px) {
+      .logo-text { font-size: 18px; }
+      .page-title { font-size: 22px; }
+      .page-subtitle { font-size: 13px; }
+
+      .filter-bar { gap: 8px; }
+      .filter-chip { font-size: 11px; padding: 5px 12px; }
+      .filter-search { flex: 1 1 100%; max-width: 100%; min-width: 0; }
+
+      .courses-grid { grid-template-columns: 1fr; gap: 12px; }
+      .course-card { padding: 16px; }
+      .cc-name { font-size: 14px; }
+      .cc-price { font-size: 18px; }
+
+      .classes-section { margin-top: 32px; }
+      .classes-header { flex-wrap: wrap; gap: 10px; }
+      .classes-grid { grid-template-columns: 1fr; gap: 14px; }
+      .class-card { padding: 18px; }
+
+      .modal-wrap { padding: 12px; }
+      .modal-box { border-radius: 16px; max-height: 92vh; overflow-y: auto; }
+      .modal-header-top { flex-wrap: wrap; gap: 10px; }
+      .modal-price, .modal-price-label { text-align: left; }
+      .modal-actions { flex-direction: column; }
+      .modal-actions .btn-cancel, .modal-actions .btn-submit-enroll { flex: none; width: 100%; }
+
+      .btn-courses-link, .role-tag { font-size: 11px; padding: 6px 10px; }
+      .btn-logout { font-size: 12px; padding: 7px 12px; }
+
+      .enroll-summary { padding: 14px 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .modal-course-name { font-size: 16px; }
+      .summary-val { max-width: 55%; font-size: 12px; }
+      .cc-detail { font-size: 11px; }
+      .empty-state { padding: 40px 20px; }
+      .empty-icon { font-size: 42px; }
+      .classes-count { font-size: 11px; padding: 4px 10px; }
+    }
   </style>
 </head>
 <body>
