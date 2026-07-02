@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — IMPLEXEDU</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3);
+      color: #fb7185; border-radius: 100px; padding: 6px 16px;
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 20px;
+    }
+    .admin-badge span { width: 8px; height: 8px; background: #f43f5e; border-radius: 50%; }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+
+    <!-- Hero Panel -->
+    <div class="auth-hero">
+      <div class="hero-badge"><span></span> Restricted Access</div>
+      <h1 class="hero-title">
+        Admin<br /><em>Control Panel.</em>
+      </h1>
+      <p class="hero-desc">
+        Review enrollment requests, verify payments, and approve or reject
+        student applications. This area is for authorized administrators only.
+      </p>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="auth-panel">
+      <div class="auth-card">
+
+        <div class="admin-badge"><span></span> Admin Only</div>
+
+        <div class="auth-logo">
+          <div class="logo-icon">🛡️</div>
+          <span class="logo-text">IMPLEXEDU</span>
+        </div>
+
+        <h2 class="auth-heading">Admin Sign In</h2>
+        <p class="auth-subheading">Enter your admin credentials to access the dashboard.</p>
+
+        <div class="alert alert-error" id="alertBox">
+          <span>⚠️</span><span id="alertMsg"></span>
+        </div>
+        <div class="alert alert-success" id="successBox">
+          <span>✅</span><span id="successMsg"></span>
+        </div>
+
+        <form id="adminLoginForm" novalidate>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Admin Email</label>
+            <input class="form-input" type="email" id="email" placeholder="admin@implexedu.in" autocomplete="username" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-input" type="password" id="password" placeholder="Your password" autocomplete="current-password" required />
+          </div>
+
+          <button class="btn-primary" type="submit" id="submitBtn">
+            Sign In to Admin Panel
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Not an admin? <a href="login.html">Go to student / teacher login</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Separate storage keys — completely independent from student/teacher auth (lms_token / lms_user)
+    const adminToken = localStorage.getItem('admin_token');
+    const adminUser  = JSON.parse(localStorage.getItem('admin_user') || 'null');
+    if (adminToken && adminUser) {
+      window.location.href = 'admin-dashboard.html';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('alertBox');
+      document.getElementById('alertMsg').textContent = msg;
+      el.classList.add('show');
+      document.getElementById('successBox').classList.remove('show');
+    }
+    function showSuccess(msg) {
+      const el = document.getElementById('successBox');
+      document.getElementById('successMsg').textContent = msg;
+      el.classList.add('show');
+      document.getElementById('alertBox').classList.remove('show');
+    }
+
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) return showError('Please fill in all fields.');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span> Signing in…';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error('Server returned an invalid response. Please try again.');
+        }
+
+        if (!res.ok) throw new Error(data.message || 'Login failed.');
+
+        localStorage.setItem('admin_token', data.token);
+        localStorage.setItem('admin_user', JSON.stringify(data.admin));
+        showSuccess('Login successful! Redirecting…');
+
+        setTimeout(() => {
+          window.location.href = 'admin-dashboard.html';
+        }, 800);
+
+      } catch (err) {
+        showError(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Sign In to Admin Panel';
+      }
+    });
+  </script>
+</body>
+</html>

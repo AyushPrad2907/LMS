@@ -82,6 +82,39 @@
 
     .modal-body { padding:28px 32px; }
 
+    /* PAYMENT (UPI QR) BOX */
+    .payment-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .payment-qr-wrap { width: 150px; height: 150px; flex-shrink: 0; }
+    .payment-qr-img { width: 150px; height: 150px; border-radius: 10px; background: #fff; padding: 8px; display: none; }
+    .payment-qr-loading { width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; text-align: center; padding: 8px; }
+    .payment-info-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .payment-info-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.6; }
+    .btn-pay-upi {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.35); color: #4ade80;
+      border-radius: 8px; padding: 10px 18px; font-family: var(--font-body); font-size: 13px; font-weight: 700;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .btn-pay-upi:hover { background: rgba(34,197,94,0.25); }
+    .payment-upi-id { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+    .payment-verify-box { grid-column: 1/-1; background: rgba(245,166,35,0.06); border: 1px solid rgba(245,166,35,0.2); border-radius: 10px; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }
+    .payment-verify-title { grid-column: 1/-1; font-size: 12px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+
+    /* MY ENROLLED COURSES — status badges */
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 100px; padding: 4px 12px; font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+    .status-note { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+
     .modal-close { background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; padding:4px; transition:color 0.2s; }
     .modal-close:hover { color:var(--text); }
 
@@ -249,6 +282,9 @@
       .empty-state { padding: 40px 20px; }
       .empty-icon { font-size: 42px; }
       .classes-count { font-size: 11px; padding: 4px 10px; }
+      .payment-box { flex-direction: column; align-items: stretch; text-align: center; }
+      .payment-qr-wrap { margin: 0 auto; }
+      .payment-verify-box { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -303,6 +339,17 @@
       <div class="courses-grid" id="coursesGrid"></div>
     </div>
 
+    <!-- MY ENROLLED COURSES -->
+    <div class="classes-section" id="myEnrollmentsSection" style="margin-top:0;margin-bottom:40px;">
+      <div class="classes-header">
+        <h2 class="section-title" style="margin-bottom:0">🎓 My Enrolled Courses</h2>
+        <span class="classes-count" id="myEnrollmentsCount">Loading…</span>
+      </div>
+      <div class="classes-grid" id="myEnrollmentsGrid">
+        <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading your enrollments…</p></div>
+      </div>
+    </div>
+
     <!-- LIVE CLASSES -->
     <div style="margin-bottom:24px;">
       <input class="form-input" type="text" id="searchInput" placeholder="🔍  Search live classes by title or teacher…" style="max-width:480px;" />
@@ -341,6 +388,20 @@
       </div>
 
       <div class="modal-body">
+        <!-- NEW: Dynamic UPI payment QR -->
+        <div class="payment-box" id="paymentBox">
+          <div class="payment-qr-wrap">
+            <img id="upiQrImage" class="payment-qr-img" src="" alt="UPI QR Code" />
+            <div id="qrLoading" class="payment-qr-loading">Loading QR…</div>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <div class="payment-info-title">📲 Pay via UPI</div>
+            <p class="payment-info-desc">Scan the QR or tap the button to pay <strong id="qrAmount">₹0</strong> using any UPI app. Then fill in the payment verification details below.</p>
+            <a id="payUpiBtn" href="#" class="btn-pay-upi">💸 Pay using UPI</a>
+            <div class="payment-upi-id">UPI ID: 7859088239@okbizaxis</div>
+          </div>
+        </div>
+
         <div class="alert alert-error" id="enrollAlert" style="display:none; margin-bottom:16px;"><span>⚠️</span><span id="enrollAlertMsg"></span></div>
 
         <form id="enrollForm" novalidate>
@@ -455,6 +516,25 @@
               </div>
             </div>
 
+            <!-- NEW: Passport photo + payment verification -->
+            <div class="form-group full">
+              <div class="payment-verify-box">
+                <div class="payment-verify-title">📎 Payment Verification</div>
+                <div class="form-group full" style="grid-column:1/-1;">
+                  <label class="form-label">Passport Size Photo *</label>
+                  <input class="form-input" type="file" id="ePassportPhoto" accept="image/*" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">UTR / Transaction Number *</label>
+                  <input class="form-input" type="text" id="eUTR" placeholder="e.g. 312345678901" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Payment Screenshot *</label>
+                  <input class="form-input" type="file" id="ePaymentScreenshot" accept="image/*" required />
+                </div>
+              </div>
+            </div>
+
           </div><!-- /enroll-grid -->
 
           <!-- Summary -->
@@ -542,6 +622,16 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 });
 
 const authHeaders = { 'Content-Type':'application/json', Authorization:`Bearer ${token}` };
+
+// NEW: converts a File (from a <input type="file">) into a base64 data URL for storage
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 /* ══════════════════════════════════════════════
    COURSE DATA (80+ courses)
@@ -750,6 +840,39 @@ function openEnroll(courseId) {
 
   document.getElementById('enrollModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  loadPaymentQR(c);
+}
+
+// ── NEW: fetch dynamic UPI QR for the selected course's price ──
+async function loadPaymentQR(course) {
+  const img = document.getElementById('upiQrImage');
+  const loading = document.getElementById('qrLoading');
+  const payBtn = document.getElementById('payUpiBtn');
+  const amountEl = document.getElementById('qrAmount');
+
+  img.style.display = 'none';
+  loading.style.display = 'flex';
+  loading.textContent = 'Loading QR…';
+  amountEl.textContent = `₹${course.fee.toLocaleString('en-IN')}`;
+  payBtn.href = '#';
+
+  try {
+    const res = await fetch('/api/payment/generate-qr', {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ courseId: course.id, courseName: course.name, fee: course.fee }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || 'Could not load QR.');
+
+    img.src = data.qrImage;
+    img.style.display = 'block';
+    loading.style.display = 'none';
+    payBtn.href = data.upiLink;
+  } catch (err) {
+    loading.textContent = 'Could not load QR. Please refresh and try again.';
+  }
 }
 
 function closeModal() {
@@ -826,9 +949,67 @@ document.getElementById('enrollForm').addEventListener('submit', async e => {
   if (!/^\d{6}$/.test(pin)) { showEnrollAlert('Enter a valid 6-digit PIN code.'); return; }
   if (isReferred && (!refName || !refPhone)) { showEnrollAlert('Please enter referrer name and phone number.'); return; }
 
+  // NEW: payment verification fields
+  const passportPhotoFile    = document.getElementById('ePassportPhoto').files[0];
+  const utrNumber             = document.getElementById('eUTR').value.trim();
+  const paymentScreenshotFile = document.getElementById('ePaymentScreenshot').files[0];
+
+  if (!passportPhotoFile)    { showEnrollAlert('Please upload a passport size photo.'); return; }
+  if (!utrNumber)             { showEnrollAlert('Please enter the UTR / transaction number.'); return; }
+  if (!paymentScreenshotFile) { showEnrollAlert('Please upload the payment screenshot.'); return; }
+
   const btn = document.getElementById('submitEnrollBtn');
   btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> Submitting Enrollment…';
+
+  // NEW: submit enrollment (student details + payment proof) to the backend before generating the slip
+  try {
+    const [passportPhoto, paymentScreenshot] = await Promise.all([
+      fileToBase64(passportPhotoFile),
+      fileToBase64(paymentScreenshotFile),
+    ]);
+
+    const submitRes = await fetch('/api/enrollments/submit', {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({
+        courseId: c.id,
+        courseName: c.name,
+        track: medium,
+        level: CAT_LABELS[c.cat],
+        fee: c.fee,
+        studentDetails: {
+          fullName, dob, father, mother, email, aadhar, mobile, altMobile,
+          whatsapp, pin, address, school, class: cls, medium, source,
+          refName, refPhone,
+        },
+        passportPhoto,
+        utrNumber,
+        paymentScreenshot,
+      }),
+    });
+
+    let submitData;
+    try {
+      submitData = await submitRes.json();
+    } catch {
+      throw new Error('Server returned an invalid response. Please try again.');
+    }
+    if (!submitRes.ok || !submitData.success) {
+      throw new Error(submitData.message || 'Could not submit enrollment. Please try again.');
+    }
+  } catch (err) {
+    showEnrollAlert(err.message);
+    btn.disabled = false;
+    btn.innerHTML = '✅ Submit & Download Receipt';
+    return;
+  }
+
   btn.innerHTML = '<span class="loading-spinner"></span> Generating Receipt…';
+
+  // ══════════════════════════════════════════════
+  // EXISTING ENROLLMENT SLIP GENERATION — UNCHANGED
+  // ══════════════════════════════════════════════
 
   // Fill success card
   const enrollId = 'IMP-' + Date.now().toString().slice(-8);
@@ -883,7 +1064,8 @@ document.getElementById('enrollForm').addEventListener('submit', async e => {
 
     // Show success message
     closeModal();
-    showDashAlert(`✅ Enrollment successful! Receipt downloaded as JPG. Enrollment ID: ${enrollId}`, 'success');
+    showDashAlert(`✅ Enrollment submitted successfully. Our officials will contact you within 72 hours after payment verification. (Enrollment ID: ${enrollId})`, 'success');
+    loadMyEnrollments();
 
   } catch (err) {
     showEnrollAlert('Could not generate receipt. Please try again.');
@@ -966,6 +1148,50 @@ document.getElementById('searchInput').addEventListener('input', e => {
 });
 
 loadClasses();
+
+/* ══════════════════════════════════════════════
+   NEW: MY ENROLLED COURSES (status tracking)
+══════════════════════════════════════════════ */
+const STATUS_STYLE = {
+  Pending:  { color: '#f5a623', bg: 'rgba(245,166,35,0.12)', label: '⏳ Pending' },
+  Approved: { color: '#22c55e', bg: 'rgba(34,197,94,0.12)',  label: '✅ Approved' },
+  Rejected: { color: '#f43f5e', bg: 'rgba(244,63,94,0.12)',  label: '❌ Rejected' },
+};
+
+function renderMyEnrollments(enrollments) {
+  const grid = document.getElementById('myEnrollmentsGrid');
+  document.getElementById('myEnrollmentsCount').textContent = `${enrollments.length} ${enrollments.length===1?'enrollment':'enrollments'}`;
+
+  if (!enrollments.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🎓</div><div class="empty-title">No enrollments yet</div><div class="empty-desc">Enroll in a course above to see its status here.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = enrollments.map(en => {
+    const s = STATUS_STYLE[en.status] || STATUS_STYLE.Pending;
+    return `
+      <div class="class-card">
+        <div class="card-tag">${escHtml(en.level)} · ${escHtml(en.track)}</div>
+        <div class="card-title">${escHtml(en.courseName)}</div>
+        <div class="status-badge" style="background:${s.bg};color:${s.color};">${s.label}</div>
+        ${en.status === 'Pending' ? `<p class="status-note">Verification Pending — our officials will contact you within 72 hours.</p>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadMyEnrollments() {
+  try {
+    const res = await fetch('/api/enrollments/mine', { headers: authHeaders });
+    if (res.status === 401) { window.location.href = 'login.html'; return; }
+    const data = await res.json();
+    renderMyEnrollments(data.enrollments || []);
+  } catch {
+    document.getElementById('myEnrollmentsGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load enrollments</div><div class="empty-desc">Check your connection and refresh.</div></div>`;
+  }
+}
+
+loadMyEnrollments();
 </script>
 </body>
 </html>

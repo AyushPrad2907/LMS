@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — IMPLEXEDU</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .logo-text { font-size: 20px; }
+
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; align-items:center; }
+    .filter-chip { background:var(--surface2); border:1px solid var(--border); border-radius:100px; padding:6px 16px; font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .filter-chip:hover { border-color:rgba(108,99,255,0.4); color:var(--text); }
+    .filter-chip.active { background:rgba(108,99,255,0.15); border-color:var(--accent); color:var(--text); }
+
+    .req-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:18px; }
+
+    .req-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; position:relative; overflow:hidden; }
+    .req-status-strip { position:absolute; top:0; left:0; right:0; height:3px; }
+    .req-status-Pending  .req-status-strip { background:linear-gradient(90deg,#f5a623,#e8920f); }
+    .req-status-Approved .req-status-strip { background:linear-gradient(90deg,#22c55e,#16a34a); }
+    .req-status-Rejected .req-status-strip { background:linear-gradient(90deg,#f43f5e,#e11d48); }
+
+    .req-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; }
+    .req-course { font-family:var(--font-head); font-size:16px; font-weight:800; margin-bottom:4px; }
+    .req-meta { font-size:12px; color:var(--text-muted); }
+    .req-fee { font-family:var(--font-head); font-size:18px; font-weight:800; color:var(--accent2); text-align:right; flex-shrink:0; }
+
+    .status-badge { display:inline-flex; align-items:center; gap:6px; border-radius:100px; padding:4px 12px; font-size:11px; font-weight:700; }
+    .status-Pending  { background:rgba(245,166,35,0.12); color:#f5a623; }
+    .status-Approved { background:rgba(34,197,94,0.12);  color:#22c55e; }
+    .status-Rejected { background:rgba(244,63,94,0.12);  color:#f43f5e; }
+
+    .req-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; margin:16px 0; }
+    .req-field-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:2px; }
+    .req-field-val { font-size:13px; font-weight:600; word-break:break-word; }
+
+    .req-images { display:flex; gap:12px; margin:16px 0; }
+    .req-img-box { flex:1; text-align:center; }
+    .req-img-box img { width:100%; max-width:140px; height:100px; object-fit:cover; border-radius:8px; border:1px solid var(--border); cursor:zoom-in; background:var(--surface2); }
+    .req-img-label { font-size:10px; color:var(--text-muted); margin-top:6px; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; }
+
+    .req-actions { display:flex; gap:8px; margin-top:16px; }
+    .btn-approve, .btn-reject, .btn-ignore {
+      flex:1; border:none; border-radius:8px; padding:10px; font-family:var(--font-body);
+      font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s;
+    }
+    .btn-approve { background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.35); color:#4ade80; }
+    .btn-approve:hover { background:rgba(34,197,94,0.28); }
+    .btn-reject { background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.35); color:#fb7185; }
+    .btn-reject:hover { background:rgba(244,63,94,0.28); }
+    .btn-ignore { background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); }
+    .btn-ignore:hover { color:var(--text); border-color:rgba(255,255,255,0.2); }
+    .req-actions button:disabled { opacity:0.5; cursor:not-allowed; }
+
+    .empty-state { text-align:center; padding:60px 40px; color:var(--text-muted); grid-column:1/-1; }
+    .empty-icon { font-size:56px; margin-bottom:16px; opacity:0.4; }
+    .empty-title { font-family:var(--font-head); font-size:20px; font-weight:700; color:var(--text); margin-bottom:6px; }
+
+    /* Lightbox for viewing full-size images */
+    .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999; align-items:center; justify-content:center; padding:24px; cursor:zoom-out; }
+    .lightbox.open { display:flex; }
+    .lightbox img { max-width:90vw; max-height:90vh; border-radius:12px; }
+
+    @media (max-width:640px) { .req-grid { grid-template-columns:1fr; } .req-fields { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="dashboard-page">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="auth-logo" style="margin:0; text-decoration:none; display:flex; align-items:center; gap:10px;">
+        <div class="logo-icon">🛡️</div>
+        <span class="logo-text">IMPLEXEDU Admin</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="role-tag" style="background:rgba(244,63,94,0.12);color:#fb7185;border:1px solid rgba(244,63,94,0.3);">Admin</span>
+      <div class="user-chip">
+        <div class="user-avatar" id="adminInitial">?</div>
+        <span class="user-name" id="adminName">Loading…</span>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <h1 class="page-title">Enrollment Requests</h1>
+      <p class="page-subtitle">Review student payment proofs and approve or reject enrollment requests.</p>
+    </div>
+
+    <div class="alert alert-error" id="dashAlert" style="display:none;margin-bottom:24px;"><span>⚠️</span><span id="dashAlertMsg"></span></div>
+    <div class="alert alert-success" id="dashSuccess" style="display:none;margin-bottom:24px;"><span>✅</span><span id="dashSuccessMsg"></span></div>
+
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-chip active" data-status="all">All</button>
+      <button class="filter-chip" data-status="Pending">⏳ Pending</button>
+      <button class="filter-chip" data-status="Approved">✅ Approved</button>
+      <button class="filter-chip" data-status="Rejected">❌ Rejected</button>
+    </div>
+
+    <div class="req-grid" id="reqGrid">
+      <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading enrollment requests…</p></div>
+    </div>
+  </main>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')">
+  <img id="lightboxImg" src="" alt="Preview" />
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   ADMIN AUTH (completely separate from student/teacher auth)
+══════════════════════════════════════════════ */
+const adminToken = localStorage.getItem('admin_token');
+const adminUser  = JSON.parse(localStorage.getItem('admin_user') || 'null');
+if (!adminToken || !adminUser) { window.location.href = 'admin-login.html'; }
+
+document.getElementById('adminName').textContent = adminUser ? adminUser.name : '';
+document.getElementById('adminInitial').textContent = adminUser ? adminUser.name.charAt(0).toUpperCase() : '?';
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('admin_token');
+  localStorage.removeItem('admin_user');
+  window.location.href = 'admin-login.html';
+});
+
+const adminHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` };
+
+function escHtml(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showDashAlert(msg, type = 'error') {
+  const boxId = type === 'success' ? 'dashSuccess' : 'dashAlert';
+  const msgId = type === 'success' ? 'dashSuccessMsg' : 'dashAlertMsg';
+  document.getElementById(msgId).textContent = msg;
+  document.getElementById(boxId).style.display = 'flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => { document.getElementById(boxId).style.display = 'none'; }, 6000);
+}
+
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+/* ══════════════════════════════════════════════
+   LOAD + RENDER ENROLLMENT REQUESTS
+══════════════════════════════════════════════ */
+let allRequests = [];
+let activeStatus = 'all';
+
+async function loadRequests() {
+  try {
+    const res = await fetch('/api/admin/enrollments', { headers: adminHeaders });
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      window.location.href = 'admin-login.html';
+      return;
+    }
+    const data = await res.json();
+    allRequests = data.enrollments || [];
+    renderRequests();
+  } catch {
+    document.getElementById('reqGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load requests</div><p>Check your connection and refresh.</p></div>`;
+  }
+}
+
+function renderRequests() {
+  const grid = document.getElementById('reqGrid');
+  const filtered = activeStatus === 'all' ? allRequests : allRequests.filter(r => r.status === activeStatus);
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No requests found</div><p>Nothing matches this filter yet.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(r => {
+    const sd = r.studentDetails || {};
+    const submitted = new Date(r.createdAt).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    const disabled = r.status !== 'Pending';
+
+    return `
+      <div class="req-card req-status-${r.status}">
+        <div class="req-status-strip"></div>
+
+        <div class="req-top">
+          <div>
+            <div class="req-course">${escHtml(r.courseName)}</div>
+            <div class="req-meta">${escHtml(r.track)} · ${escHtml(r.level)}</div>
+          </div>
+          <div>
+            <div class="req-fee">₹${Number(r.fee).toLocaleString('en-IN')}</div>
+            <span class="status-badge status-${r.status}">${r.status}</span>
+          </div>
+        </div>
+
+        <div class="req-fields">
+          <div><div class="req-field-label">Student Name</div><div class="req-field-val">${escHtml(sd.fullName || (r.userId && r.userId.name) || '—')}</div></div>
+          <div><div class="req-field-label">Email</div><div class="req-field-val">${escHtml(sd.email || (r.userId && r.userId.email) || '—')}</div></div>
+          <div><div class="req-field-label">Phone</div><div class="req-field-val">${escHtml(sd.mobile || '—')}</div></div>
+          <div><div class="req-field-label">UTR Number</div><div class="req-field-val">${escHtml(r.utrNumber || '—')}</div></div>
+          <div style="grid-column:1/-1;"><div class="req-field-label">Submitted On</div><div class="req-field-val">${escHtml(submitted)}</div></div>
+        </div>
+
+        <div class="req-images">
+          <div class="req-img-box">
+            <img src="${r.passportPhoto || ''}" alt="Passport Photo" onclick="openLightbox('${r.passportPhoto || ''}')" />
+            <div class="req-img-label">Passport Photo</div>
+          </div>
+          <div class="req-img-box">
+            <img src="${r.paymentScreenshot || ''}" alt="Payment Screenshot" onclick="openLightbox('${r.paymentScreenshot || ''}')" />
+            <div class="req-img-label">Payment Screenshot</div>
+          </div>
+        </div>
+
+        <div class="req-actions">
+          <button class="btn-approve" ${disabled ? 'disabled' : ''} onclick="updateStatus('${r._id}', 'Approved')">✅ Approve</button>
+          <button class="btn-reject" ${disabled ? 'disabled' : ''} onclick="updateStatus('${r._id}', 'Rejected')">❌ Reject</button>
+          <button class="btn-ignore" onclick="ignoreRequest()">🙈 Ignore</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// "Ignore" makes no status change at all — request stays Pending.
+function ignoreRequest() {
+  showDashAlert('Request left unchanged — status remains Pending.', 'success');
+}
+
+async function updateStatus(id, status) {
+  try {
+    const res = await fetch(`/api/admin/enrollments/${id}/status`, {
+      method: 'PUT',
+      headers: adminHeaders,
+      body: JSON.stringify({ status }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || 'Could not update status.');
+
+    showDashAlert(`Enrollment marked as ${status}.`, 'success');
+    await loadRequests();
+  } catch (err) {
+    showDashAlert(err.message);
+  }
+}
+
+document.getElementById('filterBar').addEventListener('click', e => {
+  const chip = e.target.closest('.filter-chip');
+  if (!chip) return;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeStatus = chip.dataset.status;
+  renderRequests();
+});
+
+loadRequests();
+</script>
+</body>
+</html>
