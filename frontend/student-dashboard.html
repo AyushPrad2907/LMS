@@ -3,310 +3,896 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Dashboard — LearnFlow LMS</title>
+  <title>Student Dashboard — IMPLEXEDU</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── EXTRA DASHBOARD STYLES ── */
+    .logo-text { font-size: 22px; background: linear-gradient(135deg,#fff 0%,#a89fff 50%,#f5a623 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+    /* COURSE FILTER BAR */
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; align-items:center; }
+    .filter-chip { background:var(--surface2); border:1px solid var(--border); border-radius:100px; padding:6px 16px; font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .filter-chip:hover { border-color:rgba(108,99,255,0.4); color:var(--text); }
+    .filter-chip.active { background:rgba(108,99,255,0.15); border-color:var(--accent); color:var(--text); }
+    .filter-search { flex:1; min-width:200px; max-width:340px; }
+
+    /* COURSE CARDS GRID */
+    .courses-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:4px; }
+
+    .course-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:14px;
+      padding:20px; cursor:pointer; transition:all 0.25s; position:relative; overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+    .course-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; opacity:0; transition:opacity 0.25s; }
+    .course-card:hover { border-color:rgba(108,99,255,0.35); transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.3); }
+    .course-card:hover::before { opacity:1; }
+
+    .cc-cat { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:8px; }
+    .cc-name { font-family:var(--font-head); font-size:15px; font-weight:700; margin-bottom:6px; line-height:1.3; }
+    .cc-medium { font-size:11px; font-weight:600; padding:2px 10px; border-radius:100px; display:inline-flex; align-items:center; width:fit-content; margin-bottom:12px; }
+    .medium-hindi  { background:rgba(245,166,35,0.12); color:var(--accent2); border:1px solid rgba(245,166,35,0.25); }
+    .medium-english{ background:rgba(108,99,255,0.12); color:#a89fff; border:1px solid rgba(108,99,255,0.25); }
+    .medium-bi     { background:rgba(34,211,238,0.1); color:#67e8f9; border:1px solid rgba(34,211,238,0.2); }
+    .medium-gen    { background:rgba(255,255,255,0.06); color:var(--text-muted); border:1px solid var(--border); }
+
+    .cc-details { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; flex:1; }
+    .cc-detail { font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+
+    .cc-price { font-family:var(--font-head); font-size:20px; font-weight:800; margin-bottom:12px; }
+    .cc-enroll-btn {
+      width:100%; background:linear-gradient(135deg,var(--accent),#8b80ff); color:white;
+      border:none; border-radius:9px; padding:10px; font-family:var(--font-body);
+      font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-top:auto;
+    }
+    .cc-enroll-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(108,99,255,0.4); }
+
+    /* Accent colors */
+    .acc-purple::before { background:linear-gradient(90deg,#6c63ff,#8b80ff); }
+    .acc-orange::before { background:linear-gradient(90deg,#f5a623,#e8920f); }
+    .acc-cyan::before   { background:linear-gradient(90deg,#22d3ee,#0891b2); }
+    .acc-green::before  { background:linear-gradient(90deg,#22c55e,#16a34a); }
+    .acc-rose::before   { background:linear-gradient(90deg,#f43f5e,#e11d48); }
+    .acc-violet::before { background:linear-gradient(90deg,#a855f7,#7c3aed); }
+    .acc-amber::before  { background:linear-gradient(90deg,#f59e0b,#d97706); }
+    .acc-teal::before   { background:linear-gradient(90deg,#14b8a6,#0d9488); }
+
+    /* ENROLLMENT MODAL */
+    .modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:500; overflow-y:auto; }
+    .modal-backdrop.open { display:block; }
+    .modal-wrap { min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:24px; }
+
+    .modal-box {
+      background:var(--surface); border:1px solid var(--border); border-radius:20px;
+      width:100%; max-width:640px; overflow:hidden; position:relative;
+      animation:fadeUp 0.3s ease;
+    }
+
+    .modal-header {
+      background:linear-gradient(135deg,rgba(108,99,255,0.15),rgba(245,166,35,0.08));
+      border-bottom:1px solid var(--border); padding:28px 32px;
+    }
+
+    .modal-header-top { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:4px; }
+    .modal-kicker { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin-bottom:8px; }
+    .modal-course-name { font-family:var(--font-head); font-size:19px; font-weight:800; }
+    .modal-course-meta { font-size:13px; color:var(--text-muted); margin-top:4px; }
+    .modal-price { font-family:var(--font-head); font-size:26px; font-weight:800; text-align:right; flex-shrink:0; }
+    .modal-price-label { font-size:11px; color:var(--text-muted); text-align:right; }
+
+    .modal-body { padding:28px 32px; }
+
+    .modal-close { background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; padding:4px; transition:color 0.2s; }
+    .modal-close:hover { color:var(--text); }
+
+    /* Form grid inside modal */
+    .enroll-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .enroll-grid .full { grid-column:1/-1; }
+
+    .enroll-grid .form-group { margin-bottom:0; }
+
+    .referred-box { display:none; grid-column:1/-1; }
+    .referred-box.show { display:contents; }
+
+    /* Summary box */
+    .enroll-summary {
+      background:var(--surface2); border:1px solid var(--border); border-radius:12px;
+      padding:16px 20px; margin:20px 0 0;
+    }
+    .enroll-summary-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:12px; }
+    .summary-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; }
+    .summary-row:last-child { border-top:1px solid var(--border); padding-top:8px; margin-top:4px; margin-bottom:0; }
+    .summary-label { color:var(--text-muted); }
+    .summary-val { font-weight:600; text-align:right; max-width:60%; }
+    .summary-fee { font-family:var(--font-head); font-size:16px; font-weight:800; color:var(--accent2); }
+
+    .modal-actions { display:flex; gap:12px; margin-top:20px; }
+    .btn-cancel { flex:1; background:transparent; border:1px solid var(--border); border-radius:10px; padding:12px; font-family:var(--font-body); font-size:14px; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
+    .btn-cancel:hover { border-color:rgba(255,255,255,0.2); color:var(--text); }
+    .btn-submit-enroll { flex:2; background:linear-gradient(135deg,var(--accent),#8b80ff); color:white; border:none; border-radius:10px; padding:13px; font-family:var(--font-body); font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .btn-submit-enroll:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(108,99,255,0.4); }
+    .btn-submit-enroll:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+    /* SUCCESS CARD (for download) */
+    #successCard {
+      font-family:'Syne',sans-serif;
+      background:linear-gradient(135deg,#0a0a12 0%,#12121e 100%);
+      border:2px solid rgba(108,99,255,0.4);
+      border-radius:16px;
+      padding:32px 36px;
+      color:#f0f0f8;
+      width:720px;
+      position:fixed;
+      left:-9999px;
+      top:0;
+    }
+
+    #successCard .sc-logo { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+    #successCard .sc-logo-icon { width:40px; height:40px; background:linear-gradient(135deg,#6c63ff,#f5a623); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+    #successCard .sc-logo-text { font-size:22px; font-weight:800; }
+    #successCard .sc-logo-sub { font-size:10px; color:#7a7a9a; text-transform:uppercase; letter-spacing:0.1em; }
+
+    #successCard .sc-badge { background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:10px 16px; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+    #successCard .sc-badge-icon { font-size:20px; }
+    #successCard .sc-badge-text { font-size:15px; font-weight:700; color:#4ade80; }
+
+    #successCard .sc-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#7a7a9a; margin-bottom:16px; }
+
+    #successCard .sc-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    #successCard .sc-field { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:10px 14px; }
+    #successCard .sc-field-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#7a7a9a; margin-bottom:3px; }
+    #successCard .sc-field-val { font-size:13px; font-weight:600; color:#f0f0f8; }
+
+    #successCard .sc-course-box { background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.25); border-radius:10px; padding:14px 18px; margin-bottom:16px; }
+    #successCard .sc-course-name { font-size:16px; font-weight:800; margin-bottom:4px; }
+    #successCard .sc-course-meta { font-size:12px; color:#7a7a9a; }
+    #successCard .sc-fee { font-size:22px; font-weight:800; color:#f5a623; margin-top:8px; }
+
+    #successCard .sc-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.07); padding-top:14px; font-size:11px; color:#7a7a9a; }
+    #successCard .sc-ref { font-weight:700; color:#6c63ff; }
+
+    /* CLASSES SECTION */
+    .classes-section { margin-top: 48px; }
+    .classes-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+    .classes-count { background:var(--surface2); border:1px solid var(--border); border-radius:100px; padding:4px 14px; font-size:13px; color:var(--text-muted); }
+    .classes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+    .class-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; transition:all 0.25s; position:relative; overflow:hidden; animation:fadeUp 0.3s ease both; }
+    .class-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent2)); opacity:0; transition:opacity 0.25s; }
+    .class-card:hover { border-color:rgba(108,99,255,0.3); transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.3); }
+    .class-card:hover::before { opacity:1; }
+    .card-tag { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin-bottom:12px; }
+    .card-title { font-family:var(--font-head); font-size:18px; font-weight:700; margin-bottom:8px; }
+    .card-teacher { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; }
+    .card-actions { display:flex; gap:10px; }
+    .btn-join { flex:1; background:rgba(108,99,255,0.15); border:1px solid rgba(108,99,255,0.3); color:var(--accent); border-radius:8px; padding:10px 16px; font-family:var(--font-body); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+    .btn-join:hover { background:rgba(108,99,255,0.25); border-color:var(--accent); }
+    .empty-state { text-align:center; padding:60px 40px; color:var(--text-muted); grid-column:1/-1; }
+    .empty-icon { font-size:56px; margin-bottom:16px; opacity:0.4; }
+    .empty-title { font-family:var(--font-head); font-size:20px; font-weight:700; color:var(--text); margin-bottom:6px; }
+    .empty-desc { font-size:14px; }
+
+    /* TOPBAR LINK */
+    .btn-courses-link { text-decoration:none; background:rgba(108,99,255,0.12); border:1px solid rgba(108,99,255,0.25); border-radius:8px; padding:7px 14px; color:var(--accent); font-size:12px; font-weight:600; font-family:var(--font-body); transition:all 0.2s; }
+    .btn-courses-link:hover { background:rgba(108,99,255,0.22); }
+
+    @media(max-width:640px) { .enroll-grid { grid-template-columns:1fr; } .enroll-grid .full { grid-column:1; } .modal-body { padding:20px; } .modal-header { padding:20px; } }
+    @media(max-width:480px) { .courses-grid { grid-template-columns:1fr; } .modal-price { font-size:20px; } }
+  </style>
 </head>
 <body>
-  <div class="dashboard-page">
+<div class="dashboard-page">
 
-    <!-- Top Bar -->
-    <header class="topbar">
-      <div class="topbar-left">
-        <div class="auth-logo" style="margin:0">
-          <div class="logo-icon">🎓</div>
-          <span class="logo-text">LearnFlow</span>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="auth-logo" style="margin:0; text-decoration:none; display:flex; align-items:center; gap:10px;">
+        <div class="logo-icon">🎓</div>
+        <span class="logo-text">IMPLEXEDU</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="courses.html" class="btn-courses-link">📚 All Courses</a>
+      <span class="role-tag student">Student</span>
+      <div class="user-chip">
+        <div class="user-avatar" id="userInitial">?</div>
+        <span class="user-name" id="userName">Loading…</span>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <h1 class="page-title">Student Dashboard</h1>
+      <p class="page-subtitle">Browse 80+ courses, enroll, and join your live classes — all from one place.</p>
+    </div>
+
+    <!-- ALERT -->
+    <div class="alert alert-error" id="dashAlert" style="display:none;margin-bottom:24px;"><span>⚠️</span><span id="dashAlertMsg"></span></div>
+
+    <!-- COURSE CATALOG -->
+    <div class="create-section" style="margin-bottom:40px;">
+      <div class="section-title">📚 Course Catalog</div>
+      <p class="section-subtitle">Click any course to enroll. All fees shown are per month/course.</p>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-chip active" data-cat="all">All (80+)</button>
+        <button class="filter-chip" data-cat="school">School (5–10)</button>
+        <button class="filter-chip" data-cat="higher">Class 11–12</button>
+        <button class="filter-chip" data-cat="university">University</button>
+        <button class="filter-chip" data-cat="competitive">Competitive</button>
+        <button class="filter-chip" data-cat="professional">Professional</button>
+        <input class="form-input filter-search" type="text" id="courseSearchInput" placeholder="🔍 Search courses…" />
+      </div>
+
+      <div class="courses-grid" id="coursesGrid"></div>
+    </div>
+
+    <!-- LIVE CLASSES -->
+    <div style="margin-bottom:24px;">
+      <input class="form-input" type="text" id="searchInput" placeholder="🔍  Search live classes by title or teacher…" style="max-width:480px;" />
+    </div>
+    <div class="classes-section">
+      <div class="classes-header">
+        <h2 class="section-title" style="margin-bottom:0">🔴 Live Classes</h2>
+        <span class="classes-count" id="classesCount">Loading…</span>
+      </div>
+      <div class="classes-grid" id="classesGrid">
+        <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading classes…</p></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ENROLLMENT MODAL                           -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="enrollModal">
+  <div class="modal-wrap">
+    <div class="modal-box">
+
+      <div class="modal-header">
+        <div class="modal-header-top">
+          <div>
+            <div class="modal-kicker">📋 Enrollment Form — IMPLEXEDU</div>
+            <div class="modal-course-name" id="mCourseName">—</div>
+            <div class="modal-course-meta" id="mCourseMeta">—</div>
+          </div>
+          <div>
+            <div class="modal-price" id="mPrice">₹0</div>
+            <div class="modal-price-label">Course Fee</div>
+          </div>
         </div>
       </div>
-      <div class="topbar-right">
-        <span class="role-tag student">Student</span>
-        <div class="user-chip">
-          <div class="user-avatar" id="userInitial">?</div>
-          <span class="user-name" id="userName">Loading…</span>
-        </div>
-        <button class="btn-logout" id="logoutBtn">Sign Out</button>
-      </div>
-    </header>
 
-    <!-- Main -->
-    <main class="main">
-      <div class="page-header">
-        <h1 class="page-title">Student Dashboard</h1>
-        <p class="page-subtitle">Browse classes, pick a course, and enroll from one place.</p>
-      </div>
+      <div class="modal-body">
+        <div class="alert alert-error" id="enrollAlert" style="display:none; margin-bottom:16px;"><span>⚠️</span><span id="enrollAlertMsg"></span></div>
 
-      <!-- Course Selector -->
-      <section class="create-section course-selector">
-        <div class="section-title">Course Selector</div>
-        <p class="section-subtitle">Choose a course below and enroll instantly after sign-in.</p>
+        <form id="enrollForm" novalidate>
+          <div class="enroll-grid">
 
-        <div class="course-selector-grid">
-          <div class="form-group">
-            <label class="form-label" for="courseSelect">Select Course</label>
-            <select class="form-input" id="courseSelect"></select>
+            <!-- Row 1 -->
+            <div class="form-group">
+              <label class="form-label">Student Full Name *</label>
+              <input class="form-input" type="text" id="eFullName" placeholder="Rahul Kumar Sharma" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date of Birth *</label>
+              <input class="form-input" type="date" id="eDOB" required />
+            </div>
+
+            <!-- Row 2 -->
+            <div class="form-group">
+              <label class="form-label">Father's Name *</label>
+              <input class="form-input" type="text" id="eFather" placeholder="Ram Kumar Sharma" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mother's Name *</label>
+              <input class="form-input" type="text" id="eMother" placeholder="Sita Devi Sharma" required />
+            </div>
+
+            <!-- Row 3 -->
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input class="form-input" type="email" id="eEmail" placeholder="rahul@email.com" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Aadhar Card Number *</label>
+              <input class="form-input" type="text" id="eAadhar" placeholder="XXXX XXXX XXXX" maxlength="14" required />
+            </div>
+
+            <!-- Row 4 -->
+            <div class="form-group">
+              <label class="form-label">Mobile Number *</label>
+              <input class="form-input" type="tel" id="eMobile" placeholder="10-digit mobile" maxlength="10" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Alternate Number</label>
+              <input class="form-input" type="tel" id="eAltMobile" placeholder="Optional" maxlength="10" />
+            </div>
+
+            <!-- Row 5 -->
+            <div class="form-group">
+              <label class="form-label">WhatsApp Number *</label>
+              <input class="form-input" type="tel" id="eWhatsApp" placeholder="Same as mobile or different" maxlength="10" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">PIN Code *</label>
+              <input class="form-input" type="text" id="ePIN" placeholder="6-digit PIN" maxlength="6" required />
+            </div>
+
+            <!-- Full address -->
+            <div class="form-group full">
+              <label class="form-label">Full Address *</label>
+              <input class="form-input" type="text" id="eAddress" placeholder="House No, Street, Colony, City, State" required />
+            </div>
+
+            <!-- School/College -->
+            <div class="form-group">
+              <label class="form-label">Current School / College *</label>
+              <input class="form-input" type="text" id="eSchool" placeholder="e.g. DAV Public School" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Current Class / Year *</label>
+              <input class="form-input" type="text" id="eClass" placeholder="e.g. Class 12, 2nd Year" required />
+            </div>
+
+            <!-- Preferred Medium -->
+            <div class="form-group">
+              <label class="form-label">Preferred Medium *</label>
+              <select class="form-input" id="eMedium" required>
+                <option value="">Select medium</option>
+                <option value="Hindi Medium">Hindi Medium</option>
+                <option value="English Medium">English Medium</option>
+                <option value="Bilingual">Bilingual</option>
+              </select>
+            </div>
+
+            <!-- How did you hear -->
+            <div class="form-group">
+              <label class="form-label">How did you hear about us? *</label>
+              <select class="form-input" id="eSource" required onchange="toggleReferred()">
+                <option value="">Select source</option>
+                <option value="Social Media">Social Media</option>
+                <option value="Google Search">Google Search</option>
+                <option value="Friend / Family">Friend / Family</option>
+                <option value="School / College">School / College</option>
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="Referred by Teacher / Employee">Referred by Teacher / Employee</option>
+                <option value="Newspaper / Advertisement">Newspaper / Advertisement</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- Referral fields (shown only if referred) -->
+            <div class="referred-box" id="referredBox">
+              <div class="form-group full" style="grid-column:1/-1;">
+                <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:10px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                  <div>
+                    <label class="form-label">Referrer's Name *</label>
+                    <input class="form-input" type="text" id="eRefName" placeholder="Teacher / Employee name" />
+                  </div>
+                  <div>
+                    <label class="form-label">Referrer's Phone *</label>
+                    <input class="form-input" type="tel" id="eRefPhone" placeholder="10-digit number" maxlength="10" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /enroll-grid -->
+
+          <!-- Summary -->
+          <div class="enroll-summary">
+            <div class="enroll-summary-title">Enrollment Summary</div>
+            <div class="summary-row"><span class="summary-label">Course</span><span class="summary-val" id="sumCourse">—</span></div>
+            <div class="summary-row"><span class="summary-label">Medium</span><span class="summary-val" id="sumMedium">—</span></div>
+            <div class="summary-row"><span class="summary-label">Category</span><span class="summary-val" id="sumCat">—</span></div>
+            <div class="summary-row"><span class="summary-label">Fee</span><span class="summary-fee" id="sumFee">₹0</span></div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="courseTrack">Course Details</label>
-            <input class="form-input" id="courseTrack" type="text" readonly />
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn-submit-enroll" id="submitEnrollBtn">✅ Submit & Download Receipt</button>
           </div>
-        </div>
-
-        <div class="course-selector-meta" id="courseMeta"></div>
-
-        <button class="btn-create" id="enrollCourseBtn" type="button">Enroll in Selected Course</button>
-      </section>
-
-      <!-- Enrolled Courses -->
-      <section class="create-section">
-        <div class="section-title">My Enrollments</div>
-        <p class="section-subtitle">Courses you enroll in will appear here for quick access.</p>
-        <div class="enrollments-grid" id="enrollmentsGrid"></div>
-      </section>
-
-      <!-- Search Bar -->
-      <div style="margin-bottom: 32px;">
-        <input
-          class="form-input"
-          type="text"
-          id="searchInput"
-          placeholder="🔍  Search classes by title or teacher…"
-          style="max-width: 480px;"
-        />
+        </form>
       </div>
 
-      <!-- Classes List -->
-      <div class="classes-section">
-        <div class="classes-header">
-          <h2 class="section-title" style="margin-bottom:0">Available Classes</h2>
-          <span class="classes-count" id="classesCount">Loading…</span>
-        </div>
-
-        <div class="classes-grid" id="classesGrid">
-          <div class="empty-state" style="grid-column:1/-1">
-            <div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div>
-            <p>Loading classes…</p>
-          </div>
-        </div>
-      </div>
-    </main>
+    </div>
   </div>
+</div>
 
-  <script>
-    // Auth guard
-    const token = localStorage.getItem('lms_token');
-    const user = JSON.parse(localStorage.getItem('lms_user') || 'null');
-    if (!token || !user) { window.location.href = 'login.html'; }
-    else if (user.role !== 'student') { window.location.href = 'teacher-dashboard.html'; }
+<!-- SUCCESS CARD (off-screen, used for JPG download) -->
+<div id="successCard">
+  <div class="sc-logo">
+    <div class="sc-logo-icon">🎓</div>
+    <div>
+      <div class="sc-logo-text">IMPLEXEDU</div>
+      <div class="sc-logo-sub">An educational unit of I.C. International</div>
+    </div>
+  </div>
+  <div class="sc-badge">
+    <div class="sc-badge-icon">✅</div>
+    <div class="sc-badge-text">Enrollment Successful — Confirmation Receipt</div>
+  </div>
+  <div class="sc-course-box">
+    <div class="sc-course-name" id="sc_course">—</div>
+    <div class="sc-course-meta" id="sc_meta">—</div>
+    <div class="sc-fee" id="sc_fee">₹0</div>
+  </div>
+  <div class="sc-title">Student Details</div>
+  <div class="sc-grid">
+    <div class="sc-field"><div class="sc-field-label">Student Name</div><div class="sc-field-val" id="sc_name">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Date of Birth</div><div class="sc-field-val" id="sc_dob">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Father's Name</div><div class="sc-field-val" id="sc_father">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Mother's Name</div><div class="sc-field-val" id="sc_mother">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Mobile Number</div><div class="sc-field-val" id="sc_mobile">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">WhatsApp Number</div><div class="sc-field-val" id="sc_whatsapp">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Email</div><div class="sc-field-val" id="sc_email">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Aadhar Number</div><div class="sc-field-val" id="sc_aadhar">—</div></div>
+    <div class="sc-field" style="grid-column:1/-1"><div class="sc-field-label">Address</div><div class="sc-field-val" id="sc_address">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">School / College</div><div class="sc-field-val" id="sc_school">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Class / Year</div><div class="sc-field-val" id="sc_class">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Medium</div><div class="sc-field-val" id="sc_medium">—</div></div>
+    <div class="sc-field"><div class="sc-field-label">Heard About Us</div><div class="sc-field-val" id="sc_source">—</div></div>
+    <div class="sc-field" id="sc_ref_box" style="display:none;grid-column:1/-1"><div class="sc-field-label">Referred By</div><div class="sc-field-val" id="sc_ref">—</div></div>
+  </div>
+  <div class="sc-footer">
+    <div>📧 student@implexedu.in &nbsp;·&nbsp; 🌐 www.implexedu.in</div>
+    <div>Enrollment ID: <span class="sc-ref" id="sc_id">—</span></div>
+  </div>
+</div>
 
-    // Populate user info
-    document.getElementById('userName').textContent = user.name;
-    document.getElementById('userInitial').textContent = user.name.charAt(0).toUpperCase();
+<!-- html2canvas CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('lms_token');
-      localStorage.removeItem('lms_user');
-      window.location.href = 'login.html';
+<script>
+/* ══════════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════════ */
+const token = localStorage.getItem('lms_token');
+const user  = JSON.parse(localStorage.getItem('lms_user') || 'null');
+if (!token || !user) { window.location.href = 'login.html'; }
+else if (user.role !== 'student') { window.location.href = 'teacher-dashboard.html'; }
+
+document.getElementById('userName').textContent = user.name;
+document.getElementById('userInitial').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('eEmail').value = user.email || '';
+document.getElementById('eFullName').value = user.name || '';
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('lms_token');
+  localStorage.removeItem('lms_user');
+  window.location.href = 'login.html';
+});
+
+const authHeaders = { 'Content-Type':'application/json', Authorization:`Bearer ${token}` };
+
+/* ══════════════════════════════════════════════
+   COURSE DATA (80+ courses)
+══════════════════════════════════════════════ */
+const COURSES = [
+  /* ── SCHOOL 5-8 Hindi ── */
+  {id:'s01',cat:'school',name:'5th Fundamental',medium:'Hindi',fee:1000,acc:'acc-purple',days:'6 days/week',cls:'2–4 classes/day',dur:'Monthly'},
+  {id:'s02',cat:'school',name:'5th Advance',medium:'Hindi',fee:1500,acc:'acc-orange',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s03',cat:'school',name:'5th Fundamental',medium:'English',fee:1200,acc:'acc-cyan',days:'6 days/week',cls:'2–4 classes/day',dur:'Monthly'},
+  {id:'s04',cat:'school',name:'5th Advance',medium:'English',fee:1600,acc:'acc-green',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s05',cat:'school',name:'6th Fundamental',medium:'Hindi',fee:1500,acc:'acc-violet',days:'6 days/week',cls:'2–4 classes/day',dur:'Monthly'},
+  {id:'s06',cat:'school',name:'6th Fundamental',medium:'English',fee:1500,acc:'acc-rose',days:'6 days/week',cls:'2–4 classes/day',dur:'Monthly'},
+  {id:'s07',cat:'school',name:'7th Advance',medium:'Hindi',fee:1800,acc:'acc-amber',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s08',cat:'school',name:'7th Advance',medium:'English',fee:1800,acc:'acc-teal',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s09',cat:'school',name:'8th Advance',medium:'Hindi',fee:1600,acc:'acc-purple',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s10',cat:'school',name:'8th Advance',medium:'English',fee:2000,acc:'acc-orange',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  /* ── SCHOOL 9-10 ── */
+  {id:'s11',cat:'school',name:'9th Advance',medium:'Hindi',fee:1600,acc:'acc-cyan',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s12',cat:'school',name:'9th Advance',medium:'English',fee:2000,acc:'acc-green',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s13',cat:'school',name:'10th Advance',medium:'Hindi',fee:1800,acc:'acc-violet',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  {id:'s14',cat:'school',name:'10th Advance',medium:'English',fee:2200,acc:'acc-rose',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
+  /* ── CLASS 11 ── */
+  {id:'h01',cat:'higher',name:'11th PCM',medium:'English',fee:4000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h02',cat:'higher',name:'11th PCM',medium:'Hindi',fee:3500,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h03',cat:'higher',name:'11th PCB',medium:'English',fee:3600,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h04',cat:'higher',name:'11th PCB',medium:'Hindi',fee:3500,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h05',cat:'higher',name:'11th Commerce',medium:'English',fee:3200,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h06',cat:'higher',name:'11th Arts',medium:'English',fee:2800,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h07',cat:'higher',name:'11th Arts',medium:'Hindi',fee:2400,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h08',cat:'higher',name:'11th PCM IIT Integrated',medium:'English',fee:5000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h09',cat:'higher',name:'11th PCB NEET Integrated',medium:'English',fee:5000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h10',cat:'higher',name:'11th PCB NEET Integrated',medium:'Hindi',fee:4500,acc:'acc-amber',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  /* ── CLASS 12 ── */
+  {id:'h11',cat:'higher',name:'12th PCM',medium:'English',fee:4500,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h12',cat:'higher',name:'12th PCM',medium:'Hindi',fee:4000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h13',cat:'higher',name:'12th PCB',medium:'English',fee:4500,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h14',cat:'higher',name:'12th PCB',medium:'Hindi',fee:4000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h15',cat:'higher',name:'12th Commerce',medium:'English',fee:3200,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h16',cat:'higher',name:'12th Arts',medium:'English',fee:3500,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h17',cat:'higher',name:'12th Arts',medium:'Hindi',fee:3000,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h18',cat:'higher',name:'12th PCM IIT Integrated',medium:'English',fee:5500,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h19',cat:'higher',name:'12th PCB NEET Integrated',medium:'English',fee:5500,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  {id:'h20',cat:'higher',name:'12th PCB NEET Integrated',medium:'Hindi',fee:5000,acc:'acc-amber',days:'6 days/week',cls:'3–4 classes/day',dur:'Monthly'},
+  /* ── SPECIAL EDU PLANS ── */
+  {id:'h21',cat:'higher',name:'11th PCM Special Edu Plan',medium:'English',fee:18000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'h22',cat:'higher',name:'11th PCB Special Edu Plan',medium:'English',fee:15000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'h23',cat:'higher',name:'12th PCM Special Edu Plan',medium:'English',fee:22000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'h24',cat:'higher',name:'12th PCB Special Edu Plan',medium:'English',fee:18000,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'h25',cat:'higher',name:'Integrated PCB 1-Year NEET Plan',medium:'English',fee:15000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'h26',cat:'higher',name:'Integrated PCM 1-Year IIT Plan',medium:'English',fee:25000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  /* ── UNIVERSITY UG ── */
+  {id:'u01',cat:'university',name:'Graduation Arts',medium:'Bilingual',fee:16000,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'8 Months'},
+  {id:'u02',cat:'university',name:'Graduation Commerce',medium:'Bilingual',fee:20000,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'8 Months'},
+  {id:'u03',cat:'university',name:'Graduation Physics (H)',medium:'Bilingual',fee:24000,acc:'acc-cyan',days:'6 days/week',cls:'3–4 classes/day',dur:'8 Months'},
+  {id:'u04',cat:'university',name:'Graduation Chemistry (H)',medium:'Bilingual',fee:20000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'8 Months'},
+  {id:'u05',cat:'university',name:'Graduation Mathematics (H)',medium:'Bilingual',fee:28000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'8 Months'},
+  /* ── UNIVERSITY PG ── */
+  {id:'u06',cat:'university',name:'M.Com',medium:'Bilingual',fee:8000,acc:'acc-amber',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u07',cat:'university',name:'M.Sc Physics',medium:'Bilingual',fee:8000,acc:'acc-cyan',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u08',cat:'university',name:'M.Sc Chemistry',medium:'Bilingual',fee:8000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u09',cat:'university',name:'M.Sc Mathematics',medium:'Bilingual',fee:10000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u10',cat:'university',name:'MA History',medium:'Bilingual',fee:5500,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u11',cat:'university',name:'MA Political Science',medium:'Bilingual',fee:5500,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u12',cat:'university',name:'MA Sociology',medium:'Bilingual',fee:5500,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u13',cat:'university',name:'MA Philosophy',medium:'Bilingual',fee:5500,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u14',cat:'university',name:'MA Psychology',medium:'Bilingual',fee:5500,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  {id:'u15',cat:'university',name:'MA Geology',medium:'Bilingual',fee:6000,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'1 Year'},
+  /* ── BANKING ── */
+  {id:'c01',cat:'competitive',name:'Banking Clerk',medium:'General',fee:6000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c02',cat:'competitive',name:'Banking PO',medium:'General',fee:10000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  /* ── UPSC ── */
+  {id:'c03',cat:'competitive',name:'UPSC Pre — Hindi Medium',medium:'Hindi',fee:10000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c04',cat:'competitive',name:'UPSC Pre — English Medium',medium:'English',fee:15000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c05',cat:'competitive',name:'UPSC Mains — Hindi Medium',medium:'Hindi',fee:20000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'c06',cat:'competitive',name:'UPSC Mains GS+Optional',medium:'English',fee:20000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'c07',cat:'competitive',name:'UPSC & State PCS',medium:'English',fee:20000,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  /* ── BPSC ── */
+  {id:'c08',cat:'competitive',name:'BPSC Pre — Hindi Medium',medium:'Hindi',fee:6000,acc:'acc-amber',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c09',cat:'competitive',name:'BPSC Pre — English Medium',medium:'English',fee:15000,acc:'acc-amber',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c10',cat:'competitive',name:'BPSC Mains GS+Optional',medium:'English',fee:15000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  /* ── JPSC ── */
+  {id:'c11',cat:'competitive',name:'JPSC Pre — Hindi Medium',medium:'Hindi',fee:6000,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c12',cat:'competitive',name:'JPSC Pre — English Medium',medium:'English',fee:7000,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c13',cat:'competitive',name:'JPSC Mains GS+Optional',medium:'English',fee:15000,acc:'acc-cyan',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  /* ── STATE PCS ── */
+  {id:'c14',cat:'competitive',name:'Combined State Pre — Hindi',medium:'Hindi',fee:15000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c15',cat:'competitive',name:'Combined State PCS Pre — English',medium:'English',fee:15000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c16',cat:'competitive',name:'State Mains Combined PCS',medium:'English',fee:25000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  /* ── TET / BPSC TEACHER ── */
+  {id:'c17',cat:'competitive',name:'C-TET / S-TET (Class 0–5)',medium:'General',fee:3000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c18',cat:'competitive',name:'C-TET / S-TET (Class 6–8)',medium:'General',fee:4000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c19',cat:'competitive',name:'C-TET / S-TET (Class 9–10)',medium:'General',fee:4500,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c20',cat:'competitive',name:'BPSC Teacher (Class 0–5)',medium:'General',fee:5000,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c21',cat:'competitive',name:'BPSC Teacher (Class 6–8)',medium:'General',fee:5500,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c22',cat:'competitive',name:'BPSC Teacher (Class 9–10)',medium:'General',fee:6000,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c23',cat:'competitive',name:'BPSC Teacher (Class 11–12)',medium:'General',fee:7000,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  /* ── DEFENCE / LAW / MGMT ── */
+  {id:'c24',cat:'competitive',name:'NDA Preparation',medium:'General',fee:6000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c25',cat:'competitive',name:'CDS Preparation',medium:'General',fee:12000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c26',cat:'competitive',name:'CLAT',medium:'General',fee:4000,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c27',cat:'competitive',name:'MAT Preparation',medium:'General',fee:8000,acc:'acc-amber',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  {id:'c28',cat:'competitive',name:'CAT Preparation',medium:'General',fee:10000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'4 Months'},
+  /* ── TECH & CODING ── */
+  {id:'p01',cat:'professional',name:'.Net Coding',medium:'English',fee:12000,acc:'acc-cyan',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p02',cat:'professional',name:'PHP Coding',medium:'English',fee:18000,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p03',cat:'professional',name:'Advance Coding',medium:'English',fee:20000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p04',cat:'professional',name:'WordPress CMS',medium:'English',fee:1800,acc:'acc-teal',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p05',cat:'professional',name:'C++ Preparation',medium:'English',fee:18000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p06',cat:'professional',name:'Java Preparation',medium:'English',fee:18000,acc:'acc-green',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  /* ── SKILL / PROFESSIONAL ── */
+  {id:'p07',cat:'professional',name:'English Spoken',medium:'English',fee:3000,acc:'acc-amber',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p08',cat:'professional',name:'Graphic Designing',medium:'English',fee:4000,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p09',cat:'professional',name:'UGC NET Preparation',medium:'General',fee:20000,acc:'acc-purple',days:'6 days/week',cls:'3–4 classes/day',dur:'6 Months'},
+  {id:'p10',cat:'professional',name:'HR Nourishment Program',medium:'English',fee:40000,acc:'acc-cyan',days:'6 days/week',cls:'3–4 classes/day',dur:'Professional'},
+  {id:'p11',cat:'professional',name:'Marketing Nourishment Program',medium:'English',fee:40000,acc:'acc-orange',days:'6 days/week',cls:'3–4 classes/day',dur:'Professional'},
+  {id:'p12',cat:'professional',name:'CS Nourishment Program',medium:'English',fee:40000,acc:'acc-violet',days:'6 days/week',cls:'3–4 classes/day',dur:'Professional'},
+];
+
+const CAT_LABELS = { school:'School (5–10)', higher:'Class 11–12', university:'University', competitive:'Competitive', professional:'Professional' };
+const MED_CLASS  = { Hindi:'medium-hindi', English:'medium-english', Bilingual:'medium-bi', General:'medium-gen' };
+
+/* ══════════════════════════════════════════════
+   RENDER COURSES
+══════════════════════════════════════════════ */
+let activeCat = 'all', courseSearch = '';
+
+function renderCourses() {
+  const grid = document.getElementById('coursesGrid');
+  const filtered = COURSES.filter(c => {
+    const catOk  = activeCat === 'all' || c.cat === activeCat;
+    const q = courseSearch.toLowerCase();
+    const srchOk = !q || c.name.toLowerCase().includes(q) || c.medium.toLowerCase().includes(q) || c.cat.toLowerCase().includes(q);
+    return catOk && srchOk;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div class="empty-title">No courses found</div><div class="empty-desc">Try a different filter or search term.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => `
+    <div class="course-card ${c.acc}" onclick="openEnroll('${c.id}')">
+      <div class="cc-cat" style="color:${catColor(c.cat)}">${CAT_LABELS[c.cat]}</div>
+      <div class="cc-name">${escHtml(c.name)}</div>
+      <div class="cc-medium ${MED_CLASS[c.medium]||'medium-gen'}">${c.medium}</div>
+      <div class="cc-details">
+        <div class="cc-detail">📅 ${c.days} · ${c.cls}</div>
+        <div class="cc-detail">⏱ 45 min/class · ${c.dur}</div>
+      </div>
+      <div class="cc-price">₹${c.fee.toLocaleString('en-IN')}</div>
+      <button class="cc-enroll-btn" onclick="event.stopPropagation();openEnroll('${c.id}')">Enroll Now →</button>
+    </div>
+  `).join('');
+}
+
+function catColor(cat) {
+  return {school:'#6c63ff',higher:'#f5a623',university:'#22d3ee',competitive:'#f43f5e',professional:'#a855f7'}[cat]||'#6c63ff';
+}
+
+// Filters
+document.getElementById('filterBar').addEventListener('click', e => {
+  const chip = e.target.closest('.filter-chip');
+  if (!chip) return;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  activeCat = chip.dataset.cat;
+  renderCourses();
+});
+
+document.getElementById('courseSearchInput').addEventListener('input', e => {
+  courseSearch = e.target.value;
+  renderCourses();
+});
+
+renderCourses();
+
+/* ══════════════════════════════════════════════
+   ENROLL MODAL
+══════════════════════════════════════════════ */
+let selectedCourse = null;
+
+function openEnroll(courseId) {
+  selectedCourse = COURSES.find(c => c.id === courseId);
+  if (!selectedCourse) return;
+  const c = selectedCourse;
+
+  document.getElementById('mCourseName').textContent = c.name;
+  document.getElementById('mCourseMeta').textContent = `${c.medium} · ${CAT_LABELS[c.cat]} · ${c.dur}`;
+  document.getElementById('mPrice').textContent = `₹${c.fee.toLocaleString('en-IN')}`;
+  document.getElementById('sumCourse').textContent = c.name;
+  document.getElementById('sumMedium').textContent = c.medium;
+  document.getElementById('sumCat').textContent = CAT_LABELS[c.cat];
+  document.getElementById('sumFee').textContent = `₹${c.fee.toLocaleString('en-IN')}`;
+
+  // Pre-fill
+  document.getElementById('eFullName').value = user.name || '';
+  document.getElementById('eEmail').value = user.email || '';
+
+  // Reset
+  document.getElementById('enrollAlert').style.display = 'none';
+  document.getElementById('enrollForm').reset();
+  document.getElementById('eFullName').value = user.name || '';
+  document.getElementById('eEmail').value = user.email || '';
+  document.getElementById('referredBox').className = 'referred-box';
+  document.getElementById('eSource').value = '';
+
+  document.getElementById('enrollModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('enrollModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('enrollModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function toggleReferred() {
+  const val = document.getElementById('eSource').value;
+  const box = document.getElementById('referredBox');
+  box.className = val === 'Referred by Teacher / Employee' ? 'referred-box show' : 'referred-box';
+}
+
+/* ══════════════════════════════════════════════
+   FORM SUBMIT → DOWNLOAD JPG
+══════════════════════════════════════════════ */
+document.getElementById('enrollForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const alertEl  = document.getElementById('enrollAlert');
+  const alertMsg = document.getElementById('enrollAlertMsg');
+  alertEl.style.display = 'none';
+
+  const c = selectedCourse;
+
+  // Collect values
+  const fullName  = document.getElementById('eFullName').value.trim();
+  const dob       = document.getElementById('eDOB').value;
+  const father    = document.getElementById('eFather').value.trim();
+  const mother    = document.getElementById('eMother').value.trim();
+  const email     = document.getElementById('eEmail').value.trim();
+  const aadhar    = document.getElementById('eAadhar').value.trim();
+  const mobile    = document.getElementById('eMobile').value.trim();
+  const altMobile = document.getElementById('eAltMobile').value.trim();
+  const whatsapp  = document.getElementById('eWhatsApp').value.trim();
+  const pin       = document.getElementById('ePIN').value.trim();
+  const address   = document.getElementById('eAddress').value.trim();
+  const school    = document.getElementById('eSchool').value.trim();
+  const cls       = document.getElementById('eClass').value.trim();
+  const medium    = document.getElementById('eMedium').value;
+  const source    = document.getElementById('eSource').value;
+  const isReferred = source === 'Referred by Teacher / Employee';
+  const refName   = isReferred ? document.getElementById('eRefName').value.trim() : '';
+  const refPhone  = isReferred ? document.getElementById('eRefPhone').value.trim() : '';
+
+  // Validate
+  const required = [
+    [fullName,'Student name'],
+    [dob,'Date of birth'],
+    [father,"Father's name"],
+    [mother,"Mother's name"],
+    [email,'Email'],
+    [aadhar,'Aadhar number'],
+    [mobile,'Mobile number'],
+    [whatsapp,'WhatsApp number'],
+    [pin,'PIN code'],
+    [address,'Address'],
+    [school,'School / College'],
+    [cls,'Class / Year'],
+    [medium,'Medium'],
+    [source,'How you heard about us'],
+  ];
+
+  for (const [val, label] of required) {
+    if (!val) { showEnrollAlert(`Please fill in: ${label}`); return; }
+  }
+  if (!/^\d{10}$/.test(mobile)) { showEnrollAlert('Enter a valid 10-digit mobile number.'); return; }
+  if (!/^\d{10}$/.test(whatsapp)) { showEnrollAlert('Enter a valid 10-digit WhatsApp number.'); return; }
+  if (!/^\d{6}$/.test(pin)) { showEnrollAlert('Enter a valid 6-digit PIN code.'); return; }
+  if (isReferred && (!refName || !refPhone)) { showEnrollAlert('Please enter referrer name and phone number.'); return; }
+
+  const btn = document.getElementById('submitEnrollBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> Generating Receipt…';
+
+  // Fill success card
+  const enrollId = 'IMP-' + Date.now().toString().slice(-8);
+  const dobFormatted = new Date(dob).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+  document.getElementById('sc_course').textContent  = c.name;
+  document.getElementById('sc_meta').textContent    = `${c.medium} · ${CAT_LABELS[c.cat]} · ${c.dur}`;
+  document.getElementById('sc_fee').textContent     = `₹${c.fee.toLocaleString('en-IN')}`;
+  document.getElementById('sc_name').textContent    = fullName;
+  document.getElementById('sc_dob').textContent     = dobFormatted;
+  document.getElementById('sc_father').textContent  = father;
+  document.getElementById('sc_mother').textContent  = mother;
+  document.getElementById('sc_mobile').textContent  = mobile + (altMobile ? ` / ${altMobile}` : '');
+  document.getElementById('sc_whatsapp').textContent= whatsapp;
+  document.getElementById('sc_email').textContent   = email;
+  document.getElementById('sc_aadhar').textContent  = aadhar;
+  document.getElementById('sc_address').textContent = `${address}, PIN: ${pin}`;
+  document.getElementById('sc_school').textContent  = school;
+  document.getElementById('sc_class').textContent   = cls;
+  document.getElementById('sc_medium').textContent  = medium;
+  document.getElementById('sc_source').textContent  = source;
+  document.getElementById('sc_id').textContent      = enrollId;
+
+  const refBox = document.getElementById('sc_ref_box');
+  if (isReferred) {
+    refBox.style.display = 'block';
+    document.getElementById('sc_ref').textContent = `${refName} — ${refPhone}`;
+  } else {
+    refBox.style.display = 'none';
+  }
+
+  // Move card on-screen temporarily for html2canvas
+  const card = document.getElementById('successCard');
+  card.style.left = '-9999px';
+  card.style.top  = '0px';
+  card.style.position = 'fixed';
+
+  await new Promise(r => setTimeout(r, 200)); // let DOM paint
+
+  try {
+    const canvas = await html2canvas(card, {
+      scale: 2,
+      backgroundColor: '#0a0a12',
+      useCORS: true,
+      logging: false,
     });
 
-    const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+    const link = document.createElement('a');
+    link.download = `IMPLEXEDU_Enrollment_${fullName.replace(/\s+/g,'_')}_${enrollId}.jpg`;
+    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    link.click();
 
-    let allClasses = [];
-    let availableCourses = [];
+    // Show success message
+    closeModal();
+    showDashAlert(`✅ Enrollment successful! Receipt downloaded as JPG. Enrollment ID: ${enrollId}`, 'success');
 
-    function timeAgo(date) {
-      const diff = (Date.now() - new Date(date)) / 1000;
-      if (diff < 60) return 'Just now';
-      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-      return `${Math.floor(diff / 86400)}d ago`;
-    }
+  } catch (err) {
+    showEnrollAlert('Could not generate receipt. Please try again.');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✅ Submit & Download Receipt';
+  }
+});
 
-    function escapeHtml(str) {
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
+function showEnrollAlert(msg) {
+  const el = document.getElementById('enrollAlert');
+  document.getElementById('enrollAlertMsg').textContent = msg;
+  el.style.display = 'flex';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
 
-    function renderCourseSelector() {
-      const select = document.getElementById('courseSelect');
-      const track = document.getElementById('courseTrack');
-      const meta = document.getElementById('courseMeta');
+function showDashAlert(msg, type='error') {
+  const el = document.getElementById('dashAlert');
+  document.getElementById('dashAlertMsg').textContent = msg;
+  el.className = `alert alert-${type} show`;
+  el.style.display = 'flex';
+  window.scrollTo({ top:0, behavior:'smooth' });
+  setTimeout(() => { el.style.display='none'; }, 8000);
+}
 
-      if (availableCourses.length === 0) {
-        select.innerHTML = '<option value="">No courses available</option>';
-        track.value = '';
-        meta.textContent = 'No active courses were found in the database.';
-        return;
-      }
+/* ══════════════════════════════════════════════
+   LIVE CLASSES
+══════════════════════════════════════════════ */
+let allClasses = [];
 
-      select.innerHTML = availableCourses.map(course => (
-        `<option value="${course.courseId}">${escapeHtml(course.name)} • ${escapeHtml(course.track)}</option>`
-      )).join('');
+function timeAgo(date) {
+  const diff = (Date.now() - new Date(date)) / 1000;
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return `${Math.floor(diff/86400)}d ago`;
+}
 
-      const updateSelection = () => {
-        const selected = availableCourses.find(course => course.courseId === select.value) || availableCourses[0];
-        track.value = `${selected.track} • ${selected.level} • ₹${selected.fee.toLocaleString('en-IN')}`;
-        meta.textContent = `Selected: ${selected.name} • ${selected.level}`;
-      };
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-      select.addEventListener('change', updateSelection);
-      updateSelection();
-    }
+function renderClasses(classes) {
+  const grid = document.getElementById('classesGrid');
+  document.getElementById('classesCount').textContent = `${classes.length} ${classes.length===1?'class':'classes'}`;
 
-    function renderEnrollments(enrollments) {
-      const grid = document.getElementById('enrollmentsGrid');
+  if (!classes.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No classes found</div><div class="empty-desc">No classes match your search, or none have been created yet.</div></div>`;
+    return;
+  }
 
-      if (enrollments.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column:1/-1; padding: 32px 20px;">
-            <div class="empty-icon" style="font-size: 44px;">🎓</div>
-            <div class="empty-title">No enrollments yet</div>
-            <div class="empty-desc">Pick a course above to enroll and start learning.</div>
-          </div>`;
-        return;
-      }
+  grid.innerHTML = classes.map((cls, i) => `
+    <div class="class-card" style="animation-delay:${i*0.05}s">
+      <div class="card-tag">LIVE CLASS</div>
+      <div class="card-title">${escHtml(cls.title)}</div>
+      <div class="card-teacher">👤 ${escHtml(cls.teacherName)} &nbsp;·&nbsp; 🕒 ${timeAgo(cls.createdAt)}</div>
+      <div class="card-actions">
+        <a class="btn-join" href="${escHtml(cls.meetingLink)}" target="_blank" rel="noopener">🔗 Join Meeting</a>
+      </div>
+    </div>
+  `).join('');
+}
 
-      grid.innerHTML = enrollments.map((course) => `
-        <div class="enrollment-card">
-          <div class="enrollment-title">${escapeHtml(course.courseName)}</div>
-          <div class="enrollment-meta">${escapeHtml(course.track)} • ${escapeHtml(course.level)}</div>
-          <div class="enrollment-fee">₹${Number(course.fee).toLocaleString('en-IN')}</div>
-        </div>
-      `).join('');
-    }
+async function loadClasses() {
+  try {
+    const res = await fetch('/api/classes/all', { headers: authHeaders });
+    if (res.status === 401) { window.location.href = 'login.html'; return; }
+    const data = await res.json();
+    allClasses = data.classes || [];
+    renderClasses(allClasses);
+  } catch {
+    document.getElementById('classesGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load classes</div><div class="empty-desc">Check your connection and refresh.</div></div>`;
+  }
+}
 
-    async function loadEnrollments() {
-      try {
-        const res = await fetch('/api/enrollments/mine', { headers: authHeaders });
-        if (res.status === 401) { window.location.href = 'login.html'; return []; }
-        const data = await res.json();
-        const enrollments = data.enrollments || [];
-        renderEnrollments(enrollments);
-        return enrollments;
-      } catch (error) {
-        document.getElementById('enrollmentsGrid').innerHTML = `
-          <div class="empty-state" style="grid-column:1/-1; padding: 32px 20px;">
-            <div class="empty-icon" style="font-size: 44px;">⚠️</div>
-            <div class="empty-title">Failed to load enrollments</div>
-            <div class="empty-desc">Please refresh the page and try again.</div>
-          </div>`;
-        return [];
-      }
-    }
+document.getElementById('searchInput').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  renderClasses(allClasses.filter(c => c.title.toLowerCase().includes(q) || c.teacherName.toLowerCase().includes(q)));
+});
 
-    async function enrollSelectedCourse() {
-      const selectedId = document.getElementById('courseSelect').value;
-      const selected = availableCourses.find(course => course.courseId === selectedId);
-      if (!selected) return;
-
-      const btn = document.getElementById('enrollCourseBtn');
-      btn.disabled = true;
-      btn.textContent = 'Enrolling...';
-
-      try {
-        const res = await fetch('/api/enrollments/enroll', {
-          method: 'POST',
-          headers: authHeaders,
-          body: JSON.stringify({
-            courseId: selected.courseId,
-            courseName: selected.name,
-            track: selected.track,
-            level: selected.level,
-            fee: selected.fee,
-          }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Enrollment failed.');
-
-        await loadEnrollments();
-        alert(`Enrolled in ${selected.name} successfully.`);
-      } catch (error) {
-        alert(error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Enroll in Selected Course';
-      }
-    }
-
-    function renderClasses(classes) {
-      const grid = document.getElementById('classesGrid');
-      document.getElementById('classesCount').textContent =
-        `${classes.length} ${classes.length === 1 ? 'class' : 'classes'}`;
-
-      if (classes.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-icon">📭</div>
-            <div class="empty-title">No classes found</div>
-            <div class="empty-desc">No classes match your search, or none have been created yet.</div>
-          </div>`;
-        return;
-      }
-
-      grid.innerHTML = classes.map((cls, i) => `
-        <div class="class-card" style="animation-delay:${i * 0.05}s">
-          <div class="card-tag">CLASS</div>
-          <div class="card-title">${escapeHtml(cls.title)}</div>
-          <div class="card-teacher">
-            👤 ${escapeHtml(cls.teacherName)}
-            &nbsp;·&nbsp; 🕒 ${timeAgo(cls.createdAt)}
-          </div>
-          <div class="card-actions">
-            <a class="btn-join" href="${escapeHtml(cls.meetingLink)}" target="_blank" rel="noopener">
-              🔗 Join Meeting
-            </a>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Fetch all classes
-    async function loadClasses() {
-      try {
-        const res = await fetch('/api/classes/all', { headers: authHeaders });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
-        let data;
-        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
-        allClasses = data.classes;
-        renderClasses(allClasses);
-      } catch (err) {
-        document.getElementById('classesGrid').innerHTML = `
-          <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-icon">⚠️</div>
-            <div class="empty-title">Failed to load classes</div>
-            <div class="empty-desc">${err.message}</div>
-          </div>`;
-      }
-    }
-
-    async function loadCourses() {
-      try {
-        const res = await fetch('/api/courses/all', { headers: authHeaders });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
-        const data = await res.json();
-        availableCourses = data.courses || [];
-        renderCourseSelector();
-      } catch (error) {
-        const meta = document.getElementById('courseMeta');
-        meta.textContent = 'Failed to load courses from the database.';
-      }
-    }
-
-    // Live search
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      const filtered = allClasses.filter(cls =>
-        cls.title.toLowerCase().includes(q) ||
-        cls.teacherName.toLowerCase().includes(q)
-      );
-      renderClasses(filtered);
-    });
-
-    document.getElementById('enrollCourseBtn').addEventListener('click', enrollSelectedCourse);
-
-    loadCourses();
-    loadEnrollments();
-    loadClasses();
-  </script>
+loadClasses();
+</script>
 </body>
 </html>
