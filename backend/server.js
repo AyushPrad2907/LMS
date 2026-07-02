@@ -8,18 +8,24 @@ const authRoutes = require('./routes/auth');
 const classRoutes = require('./routes/classes');
 const enrollmentRoutes = require('./routes/enrollments');
 const courseRoutes = require('./routes/courses');
+const adminRoutes = require('./routes/admin');
+const paymentRoutes = require('./routes/payment');
 const Course = require('./models/Course');
+const Admin = require('./models/Admin');
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+// Raised limit so base64-encoded passport photo + payment screenshot uploads fit in the request body
+app.use(express.json({ limit: '12mb' }));
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.all('/api/{*any}', (req, res) => {
   res.status(404).json({ success: false, message: 'API endpoint not found.' });
@@ -65,6 +71,25 @@ async function seedDefaultCourses() {
   );
 }
 
+// Creates a single admin account from ADMIN_EMAIL / ADMIN_PASSWORD in .env, if one doesn't already exist.
+// There is no public admin registration endpoint — this is the only way an admin account gets created,
+// and the password is hashed automatically by the Admin model's pre-save hook.
+async function seedDefaultAdmin() {
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.warn('ADMIN_EMAIL / ADMIN_PASSWORD not set in .env — skipping default admin seed.');
+    return;
+  }
+
+  const existing = await Admin.findOne({ email: email.toLowerCase().trim() });
+  if (!existing) {
+    await Admin.create({ name: 'Administrator', email, password });
+    console.log(`Default admin account created for ${email}`);
+  }
+}
+
 async function connectToMongoWithRetry(maxRetries = 5) {
   for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
     try {
@@ -98,10 +123,12 @@ mongoose.connection.on('error', (err) => {
 });
 
 connectToMongoWithRetry()
-  .then(() => seedDefaultCourses())
+  .then(() => Promise.all([seedDefaultCourses(), seedDefaultAdmin()]))
   .then(() => {
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
   })
-  .catch(() => {
-    process.exit(1);
-  });
+  .catch((err) => {
+  console.error("❌ STARTUP ERROR:");
+  console.error(err);
+  process.exit(1);
+});
