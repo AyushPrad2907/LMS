@@ -189,10 +189,25 @@
     }
 
     @media (max-width: 900px) {
-      .topbar { flex-wrap: wrap; gap: 12px; }
-      .topbar-left, .topbar-right { width: 100%; }
-      .topbar-right { flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
-      .user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .topbar { flex-wrap: wrap; align-items: flex-start; height: auto; gap: 12px; padding: 14px 16px; }
+      .topbar-left { width: 100%; }
+      .topbar-right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 12px;
+        align-items: center;
+      }
+      .btn-courses-link { justify-self: start; white-space: nowrap; }
+      .role-tag { justify-self: end; white-space: nowrap; }
+      .user-chip { grid-column: 1 / -1; min-width: 0; width: 100%; }
+      .user-name { max-width: 65vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .btn-logout { grid-column: 1 / -1; width: 100%; text-align: center; }
+    }
+
+    @media (max-width: 420px) {
+      .topbar-right { grid-template-columns: 1fr; }
+      .btn-courses-link, .role-tag { justify-self: stretch; text-align: center; }
     }
 
     @media (max-width: 768px) {
