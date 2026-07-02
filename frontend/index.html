@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IMPLEXEDU</title>
+  <link rel="icon" type="image/jpeg" href="images/implexedu-logo.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
@@ -185,11 +186,19 @@
     }
 
     .nav-logo-icon {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      width: 40px; height: 40px;
+      background: #ffffff;
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+
+    .nav-logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .nav-logo-text {
@@ -1513,7 +1522,7 @@
   <!-- ══════════════════════════════════════════ -->
   <nav id="navbar">
     <a href="index.html" class="nav-logo">
-      <div class="nav-logo-icon">🎓</div>
+      <div class="nav-logo-icon"><img src="images/implexedu-logo.jpg" alt="IMPLEXEDU" /></div>
       <div>
         <span class="nav-logo-text">IMPLEXEDU</span>
         <span class="nav-logo-sub">  </span>
@@ -2046,7 +2055,10 @@
     <div class="footer-inner">
       <div class="footer-top">
         <div>
-          <div class="footer-brand-name">IMPLEXEDU</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="nav-logo-icon" style="width:32px;height:32px;border-radius:8px;"><img src="images/implexedu-logo.jpg" alt="IMPLEXEDU" /></div>
+            <div class="footer-brand-name" style="margin-bottom:0;">IMPLEXEDU</div>
+          </div>
           <div class="footer-brand-sub">  </div>
           <p class="footer-brand-desc">Structured learning from Class 5 to UPSC Mains. Expert teachers, weekly tests, notes, and live classes — all in one platform.</p>
         </div>
