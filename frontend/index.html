@@ -1259,6 +1259,73 @@
       .contact-card { padding: 24px; }
     }
 
+    /* ── WHATSAPP FLOATING BUTTON ── */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 300;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(37,211,102,0.45);
+      animation: whatsappBlink 1.6s ease-in-out infinite;
+    }
+
+    .whatsapp-float::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(37,211,102,0.55);
+      animation: whatsappPing 1.6s ease-out infinite;
+      z-index: -1;
+    }
+
+    .whatsapp-float svg { width: 30px; height: 30px; fill: #ffffff; }
+
+    .whatsapp-tooltip {
+      position: absolute;
+      right: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .whatsapp-float:hover .whatsapp-tooltip { opacity: 1; }
+
+    @keyframes whatsappBlink {
+      0%, 100% { box-shadow: 0 8px 24px rgba(37,211,102,0.5); }
+      50% { box-shadow: 0 8px 38px rgba(37,211,102,0.95), 0 0 0 6px rgba(37,211,102,0.18); }
+    }
+
+    @keyframes whatsappPing {
+      0% { transform: scale(1); opacity: 0.55; }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
+
+    @media (max-width: 768px) {
+      .whatsapp-float { width: 52px; height: 52px; bottom: 18px; right: 18px; }
+      .whatsapp-float svg { width: 26px; height: 26px; }
+      .whatsapp-tooltip { display: none; }
+    }
+
     /* ── FOOTER ── */
     footer {
       background: var(--surface);
@@ -2047,6 +2114,22 @@
       </form>
     </div>
   </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- WHATSAPP FLOATING BUTTON -->
+  <!-- ══════════════════════════════════════════ -->
+  <a
+    href="https://wa.me/917859088239?text=Hi%20IMPLEXEDU%2C%20I%27d%20like%20to%20know%20more%20about%20your%20courses."
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Chat with IMPLEXEDU on WhatsApp"
+  >
+    <span class="whatsapp-tooltip">Chat with us 💬</span>
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.34.652 4.52 1.786 6.386L4 29l7.86-1.744A11.94 11.94 0 0 0 16 27c6.627 0 12-5.373 12-12S22.627 3 16.001 3zm0 21.6c-1.94 0-3.75-.523-5.31-1.435l-.38-.223-4.66 1.034 1.06-4.54-.246-.394A9.56 9.56 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16 24.6zm5.85-7.94c-.32-.16-1.9-.94-2.2-1.05-.296-.108-.512-.16-.728.16-.216.32-.836 1.05-1.024 1.266-.188.216-.376.244-.696.084-.32-.16-1.352-.498-2.576-1.588-.952-.85-1.596-1.9-1.784-2.22-.188-.32-.02-.492.14-.652.144-.144.32-.376.48-.564.16-.188.212-.32.32-.536.108-.216.052-.404-.028-.564-.08-.16-.728-1.755-.998-2.404-.264-.632-.532-.548-.728-.556-.188-.008-.404-.01-.62-.01-.216 0-.564.08-.86.4-.296.32-1.128 1.104-1.128 2.692 0 1.588 1.156 3.124 1.316 3.34.16.216 2.276 3.476 5.516 4.874.77.332 1.372.53 1.84.678.774.246 1.478.212 2.036.128.62-.092 1.9-.776 2.168-1.526.268-.75.268-1.392.188-1.526-.08-.134-.296-.216-.616-.376z"/>
+    </svg>
+  </a>
 
   <!-- ══════════════════════════════════════════ -->
   <!-- FOOTER -->
