@@ -27,6 +27,18 @@ const userSchema = new mongoose.Schema(
       enum: ['student', 'teacher'],
       default: 'student',
     },
+
+    // ── NEW: forgot / reset password support ──
+    // Never store the raw token — only its SHA256 hash. select:false keeps it
+    // out of normal query results so it's never accidentally sent to the client.
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      select: false,
+    },
   },
   { timestamps: true }
 );
@@ -43,4 +55,4 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema);  
