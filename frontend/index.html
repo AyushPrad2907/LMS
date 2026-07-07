@@ -1148,6 +1148,127 @@
     .testi-name { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
     .testi-role { font-size: 11px; color: var(--muted); }
 
+    /* ── HR MESSAGE ── */
+    .hr-section {
+      padding: 40px 24px 100px;
+      position: relative;
+    }
+
+    .hr-panel {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .hr-photo-card,
+    .hr-message-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.015) 100%);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.24);
+    }
+
+    .hr-photo-card {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hr-photo-frame {
+      border-radius: 18px;
+      overflow: hidden;
+      aspect-ratio: 3 / 4;
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(245,166,35,0.12));
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .hr-photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hr-photo-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: left;
+    }
+
+    .hr-name {
+      font-family: var(--font-head);
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .hr-role {
+      color: var(--accent2);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hr-note {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hr-message-card {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hr-message-card .section-tag { margin-bottom: 14px; }
+
+    .hr-message-title {
+      font-family: var(--font-head);
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      line-height: 1.08;
+      margin-bottom: 20px;
+    }
+
+    .hr-message-copy {
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 760px;
+    }
+
+    .hr-message-copy p + p { margin-top: 16px; }
+
+    .hr-signature {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 320px;
+    }
+
+    .hr-signature strong {
+      font-family: var(--font-head);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .hr-signature span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
     /* ── CTA ── */
     .cta-section {
       text-align: center;
@@ -1268,6 +1389,11 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
+
+    @media (max-width: 900px) {
+      .hr-panel { grid-template-columns: 1fr; }
+      .hr-message-card { padding: 28px 22px; }
+    }
       background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
       display: flex;
       align-items: center;
@@ -2080,6 +2206,39 @@
       <a href="courses.html" class="btn-green-lg">🟢 View All Courses</a>
       <a href="register.html" class="btn-primary-lg">Create Account →</a>
       <a href="login.html" class="btn-ghost-lg">Sign In</a>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- HR MESSAGE -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="hr-section" id="hr-message">
+    <div class="hr-panel">
+      <div class="hr-photo-card">
+        <div class="hr-photo-frame">
+          <img src="images/hr-shraddha-singh.jpg" alt="Shraddha Singh, Human Resource Manager at ImplexEdu" />
+        </div>
+        <div class="hr-photo-meta">
+          <div class="hr-role">Human Resource Manager</div>
+          <div class="hr-name">Shraddha Singh</div>
+          
+        </div>
+      </div>
+
+      <div class="hr-message-card">
+        <div class="section-tag">Message from HR</div>
+        <h2 class="hr-message-title">A note from the HR team at ImplexEdu</h2>
+        <div class="hr-message-copy">
+          <p>I am Shraddha Singh, Human Resource Manager at ImplexEdu. My responsibilities include overseeing recruitment, onboarding, and addressing employee-related matters.</p>
+          <p>At ImplexEdu, we are committed to fostering a transparent, professional, and supportive work environment for both employees and students. We place strong emphasis on growth, learning, and organizational development.</p>
+          <p>Please feel free to reach out to me directly for any HR-related assistance.</p>
+        </div>
+        <div class="hr-signature">
+          <strong>Regards</strong>
+          <span>Shraddha Singh</span>
+          <span>HR Manager, ImplexEdu</span>
+        </div>
+      </div>
     </div>
   </section>
 
