@@ -1269,6 +1269,11 @@
       font-size: 14px;
     }
 
+    @media (max-width: 900px) {
+      .hr-panel { grid-template-columns: 1fr; }
+      .hr-message-card { padding: 28px 22px; }
+    }
+
     /* ── CTA ── */
     .cta-section {
       text-align: center;
@@ -1389,11 +1394,6 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-
-    @media (max-width: 900px) {
-      .hr-panel { grid-template-columns: 1fr; }
-      .hr-message-card { padding: 28px 22px; }
-    }
       background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
       display: flex;
       align-items: center;
@@ -1625,6 +1625,33 @@
       .testi-card { padding: 20px; border-radius: 14px; }
       .testi-text { font-size: 13px; margin-bottom: 16px; }
 
+      /* HR message */
+      .hr-section { padding: 48px 18px 56px; }
+      .hr-panel { gap: 16px; }
+      .hr-photo-card {
+        max-width: 360px;
+        margin: 0 auto;
+        padding: 14px;
+        align-items: center;
+      }
+      .hr-photo-frame {
+        width: min(100%, 240px);
+        margin: 0 auto;
+      }
+      .hr-photo-meta { text-align: center; }
+      .hr-message-card {
+        padding: 22px 18px;
+        background: #ffffff;
+        border-color: rgba(0,0,0,0.08);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.12);
+      }
+      .hr-message-card .section-tag { color: #6c63ff; }
+      .hr-message-title { color: #111111; font-size: clamp(24px, 7vw, 32px); }
+      .hr-message-copy { color: #111111; font-size: 15px; line-height: 1.7; }
+      .hr-signature { border-top-color: rgba(0,0,0,0.12); }
+      .hr-signature strong { color: #111111; }
+      .hr-signature span { color: #444444; }
+
       /* CTA */
       .cta-section { padding: 56px 18px 64px; }
       .cta-title { font-size: clamp(24px, 8vw, 36px); margin-bottom: 14px; }
@@ -1676,6 +1703,10 @@
 
       .role-emoji { font-size: 32px; }
       .role-title { font-size: 19px; }
+
+      .hr-message-card { padding: 20px 16px; }
+      .hr-photo-frame { width: min(100%, 220px); }
+      .hr-message-title { font-size: clamp(22px, 8vw, 28px); }
 
       .cta-title { font-size: clamp(22px, 9vw, 30px); }
     }
