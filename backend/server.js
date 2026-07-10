@@ -36,14 +36,14 @@ app.use('/api/trial', trialRoutes);
 
 // ==========================================
 
-app.all('/api/*', (req, res) => {
+app.all('/api/{*any}', (req, res) => {
   res.status(404).json({
     success: false,
     message: 'API endpoint not found.',
   });
 });
 
-app.get('*', (req, res) => {
+app.get('/{*any}', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/login.html'));
 });
 
