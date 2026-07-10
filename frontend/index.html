@@ -5,23 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IMPLEXEDU</title>
   <link rel="icon" type="image/jpeg" href="images/implexedu-logo.jpg" />
+  <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #07070f;
-      --surface: #0f0f1e;
-      --surface2: #16162a;
-      --border: rgba(255,255,255,0.07);
+      --bg: #05050a;
+      --surface: #0a0a1a;
+      --surface2: #12122b;
+      --border: rgba(255,255,255,0.08);
       --accent: #6c63ff;
       --accent2: #f5a623;
       --accent3: #22d3ee;
       --green: #22c55e;
-      --green-glow: rgba(34,197,94,0.35);
-      --glow: rgba(108,99,255,0.3);
-      --text: #eeeef8;
-      --muted: #6b6b8a;
+      --green-glow: rgba(34,197,94,0.5);
+      --glow: rgba(108,99,255,0.4);
+      --text: #ffffff;
+      --muted: #a0a0c0;
       --font-head: 'Syne', sans-serif;
       --font-body: 'Instrument Sans', sans-serif;
     }
@@ -374,31 +375,31 @@
     }
 
     .orb-1 {
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(108,99,255,0.16) 0%, transparent 70%);
-      top: -150px; left: 50%;
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(108,99,255,0.25) 0%, transparent 70%);
+      top: -200px; left: 50%;
       transform: translateX(-50%);
       animation: floatOrb 8s ease-in-out infinite;
     }
 
     .orb-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%);
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(245,166,35,0.2) 0%, transparent 70%);
       bottom: 0; right: -100px;
       animation: floatOrb 10s ease-in-out infinite reverse;
     }
 
     .orb-3 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(34,211,238,0.09) 0%, transparent 70%);
-      top: 35%; left: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(34,211,238,0.15) 0%, transparent 70%);
+      top: 35%; left: -120px;
       animation: floatOrb 12s ease-in-out infinite;
     }
 
     /* Green admission orb */
     .orb-4 {
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%);
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(34,197,94,0.15) 0%, transparent 70%);
       bottom: 20%; right: 10%;
       animation: floatOrb 9s ease-in-out infinite 2s;
     }
@@ -414,8 +415,8 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
     }
@@ -533,13 +534,13 @@
       cursor: pointer;
       text-decoration: none;
       transition: all 0.25s;
-      box-shadow: 0 8px 32px rgba(108,99,255,0.35);
+      box-shadow: 0 10px 40px rgba(108,99,255,0.6);
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
-    .btn-primary-lg:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(108,99,255,0.5); }
+    .btn-primary-lg:hover { transform: translateY(-2px); box-shadow: 0 15px 50px rgba(108,99,255,0.8); }
 
     .btn-green-lg {
       background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
@@ -553,18 +554,18 @@
       cursor: pointer;
       text-decoration: none;
       transition: all 0.25s;
-      box-shadow: 0 8px 28px rgba(34,197,94,0.3);
+      box-shadow: 0 10px 40px rgba(34,197,94,0.6);
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
-    .btn-green-lg:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(34,197,94,0.45); }
+    .btn-green-lg:hover { transform: translateY(-2px); box-shadow: 0 15px 50px rgba(34,197,94,0.8); }
 
     .btn-ghost-lg {
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.06);
       color: var(--text);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255,255,255,0.15);
       border-radius: 12px;
       padding: 15px 32px;
       font-family: var(--font-body);
@@ -576,9 +577,10 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      backdrop-filter: blur(10px);
     }
 
-    .btn-ghost-lg:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+    .btn-ghost-lg:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
 
     /* Floating trust badges */
     .hero-trust {
@@ -1055,7 +1057,6 @@
       border-radius: 14px;
       padding: 24px 20px;
       text-align: center;
-      transition: all 0.25s;
       text-decoration: none;
       color: var(--text);
       opacity: 0;
@@ -1825,13 +1826,22 @@
     </p>
 
     <div class="hero-cta">
-      <a href="courses.html" class="btn-green-lg">
-        🟢 Enroll Now — Admissions Open
-      </a>
-      <a href="register.html" class="btn-primary-lg">
-        Create Account →
-      </a>
-    </div>
+
+  <a href="courses.html" class="btn-green-lg">
+    🟢 Enroll Now — Admissions Open
+  </a>
+
+  <a href="register.html" class="btn-primary-lg">
+    Create Account →
+  </a>
+
+  <button
+      class="btn-ghost-lg"
+      onclick="openTrialModal()">
+      🎓 Book FREE Trial Class
+  </button>
+
+</div>
 
     <div class="hero-trust">
       <div class="trust-item"><span class="trust-icon">✅</span> Recognized Institution</div>
@@ -2265,9 +2275,8 @@
           <p>Please feel free to reach out to me directly for any HR-related assistance.</p>
         </div>
         <div class="hr-signature">
-          <strong>Regards</strong>
           <span>Shraddha Singh</span>
-          <span>HR Manager, ImplexEdu</span>
+          <span>HR Manager</span>
         </div>
       </div>
     </div>
@@ -2453,5 +2462,81 @@
       });
     });
   </script>
+  <!-- ===========================
+FREE TRIAL CLASS MODAL
+=========================== -->
+
+<div id="trialModal" class="trial-modal">
+
+    <div class="trial-modal-content">
+
+        <span class="trial-close" onclick="closeTrialModal()">&times;</span>
+
+        <h2>🎓 Book Your FREE Trial Class</h2>
+
+        <p>
+            Fill the form below. Our academic counselor will contact you within 24 hours.
+        </p>
+
+        <form id="trialForm">
+
+            <input
+                type="text"
+                id="trialName"
+                placeholder="Full Name"
+                required
+            >
+
+            <input
+                type="tel"
+                id="trialMobile"
+                placeholder="Mobile Number"
+                maxlength="10"
+                required
+            >
+
+            <input
+                type="tel"
+                id="trialWhatsapp"
+                placeholder="WhatsApp Number"
+                maxlength="10"
+                required
+            >
+
+            <select id="trialClass" required>
+
+                <option value="">Select Class</option>
+
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+
+            </select>
+
+            <select id="trialMedium" required>
+
+                <option value="">Select Medium</option>
+
+                <option>English</option>
+                <option>Hindi</option>
+
+            </select>
+
+            <button type="submit">
+
+                Book FREE Trial Class
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="trial.js"></script>
 </body>
 </html>

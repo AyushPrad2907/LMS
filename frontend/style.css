@@ -629,3 +629,117 @@ body::before {
 @media (max-width: 600px) {
   .classes-grid { grid-template-columns: 1fr; }
 }
+/* =====================================================
+   TRIAL CLASS MODAL
+===================================================== */
+
+.trial-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.trial-modal-content {
+    background: #fff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 18px;
+    padding: 35px;
+    position: relative;
+    animation: trialPopup .35s ease;
+    box-shadow: 0 20px 50px rgba(0,0,0,.25);
+}
+
+@keyframes trialPopup {
+    from {
+        transform: scale(.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.trial-close {
+    position: absolute;
+    right: 18px;
+    top: 15px;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #555;
+    transition: .3s;
+}
+
+.trial-close:hover {
+    color: #e11d48;
+}
+
+.trial-modal-content h2 {
+    text-align: center;
+    color: #1d4ed8;
+    margin-bottom: 10px;
+}
+
+.trial-modal-content p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+#trialForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#trialForm input,
+#trialForm select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: .3s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#trialForm input:focus,
+#trialForm select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.15);
+}
+
+#trialForm button {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 17px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+#trialForm button:hover {
+    background: #15803d;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+
+    .trial-modal-content {
+        padding: 25px;
+    }
+
+}
