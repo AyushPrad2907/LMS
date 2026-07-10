@@ -582,6 +582,63 @@
 
     .btn-ghost-lg:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
 
+    /* Heartbeat & Glow Effect for Trial Button */
+    @keyframes heartbeatGlow {
+      0% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+      15% { transform: scale(1.03); box-shadow: 0 0 20px rgba(239, 68, 68, 0.7); }
+      30% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+      45% { transform: scale(1.03); box-shadow: 0 0 20px rgba(239, 68, 68, 0.7); }
+      100% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+    }
+
+    .btn-trial-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-trial-glow {
+      border: 2px solid #ef4444 !important;
+      animation: heartbeatGlow 2.5s ease-in-out infinite !important;
+      background: rgba(239, 68, 68, 0.1) !important;
+    }
+
+    .btn-new-tag {
+      position: absolute;
+      top: -12px;
+      left: -8px;
+      background: #ef4444;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      z-index: 5;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+      pointer-events: none;
+      font-family: var(--font-head);
+    }
+
+    .btn-trial-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.2;
+    }
+
+    .btn-trial-tagline {
+      font-size: 9px;
+      font-weight: 700;
+      color: #fecaca;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+      opacity: 0.85;
+      font-family: var(--font-head);
+    }
+
     /* Floating trust badges */
     .hero-trust {
       display: flex;
@@ -1835,11 +1892,17 @@
     Create Account →
   </a>
 
-  <button
-      class="btn-ghost-lg"
-      onclick="openTrialModal()">
-      🎓 Book FREE Trial Class
-  </button>
+  <div class="btn-trial-container">
+    <span class="btn-new-tag">NEW</span>
+    <button
+        class="btn-ghost-lg btn-trial-glow"
+        onclick="openTrialModal()">
+        <div class="btn-trial-content">
+          <span style="display: flex; align-items: center; gap: 8px;">🎓 Book FREE Trial Class</span>
+          <span class="btn-trial-tagline">Read first pay later</span>
+        </div>
+    </button>
+  </div>
 
 </div>
 
