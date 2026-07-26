@@ -222,7 +222,12 @@
     async function loadClasses() {
       try {
         const res = await fetch('/api/classes/all', { headers: authHeaders });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        if (res.status === 401) {
+          localStorage.removeItem('lms_token');
+          localStorage.removeItem('lms_user');
+          window.location.href = 'login.html';
+          return;
+        }
         let data;
         try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
 
@@ -267,7 +272,12 @@
     async function loadCourses() {
       try {
         const res = await fetch('/api/courses/all', { headers: authHeaders });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        if (res.status === 401) {
+          localStorage.removeItem('lms_token');
+          localStorage.removeItem('lms_user');
+          window.location.href = 'login.html';
+          return;
+        }
         const data = await res.json();
         allCourses = data.courses || [];
         renderCourses();

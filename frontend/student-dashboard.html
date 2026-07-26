@@ -1133,7 +1133,12 @@ function renderClasses(classes) {
 async function loadClasses() {
   try {
     const res = await fetch('/api/classes/all', { headers: authHeaders });
-    if (res.status === 401) { window.location.href = 'login.html'; return; }
+    if (res.status === 401) {
+      localStorage.removeItem('lms_token');
+      localStorage.removeItem('lms_user');
+      window.location.href = 'login.html';
+      return;
+    }
     const data = await res.json();
     allClasses = data.classes || [];
     renderClasses(allClasses);
@@ -1183,7 +1188,12 @@ function renderMyEnrollments(enrollments) {
 async function loadMyEnrollments() {
   try {
     const res = await fetch('/api/enrollments/mine', { headers: authHeaders });
-    if (res.status === 401) { window.location.href = 'login.html'; return; }
+    if (res.status === 401) {
+      localStorage.removeItem('lms_token');
+      localStorage.removeItem('lms_user');
+      window.location.href = 'login.html';
+      return;
+    }
     const data = await res.json();
     renderMyEnrollments(data.enrollments || []);
   } catch {
