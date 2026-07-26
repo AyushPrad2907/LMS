@@ -248,6 +248,11 @@
       .page-title { font-size: 22px; }
       .page-subtitle { font-size: 13px; }
 
+      /* Responsive Page Header Tabs */
+      .page-header { flex-direction: column; align-items: flex-start !important; width: 100%; gap: 12px; }
+      .page-header .filter-bar { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .page-header .filter-chip { text-align: center; justify-content: center; margin: 0; }
+
       .filter-bar { gap: 8px; }
       .filter-chip { font-size: 11px; padding: 5px 12px; }
       .filter-search { flex: 1 1 100%; max-width: 100%; min-width: 0; }
@@ -312,55 +317,68 @@
 
   <!-- MAIN -->
   <main class="main">
-    <div class="page-header">
-      <h1 class="page-title">Student Dashboard</h1>
-      <p class="page-subtitle">Browse 80+ courses, enroll, and join your live classes — all from one place.</p>
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+      <div>
+        <h1 class="page-title" id="pageTitle">Student Dashboard</h1>
+        <p class="page-subtitle" id="pageSubtitle">Your live classroom hub.</p>
+      </div>
+      <!-- Tab Navigation -->
+      <div class="filter-bar" style="margin-bottom:0; gap:8px;">
+        <button class="filter-chip active" id="tabClassroom" style="border-radius:8px; font-weight:700;">🎓 My Classroom</button>
+        <button class="filter-chip" id="tabCatalog" style="border-radius:8px; font-weight:700;">🔍 Browse Courses</button>
+      </div>
     </div>
 
     <!-- ALERT -->
     <div class="alert alert-error" id="dashAlert" style="display:none;margin-bottom:24px;"><span>⚠️</span><span id="dashAlertMsg"></span></div>
 
-    <!-- COURSE CATALOG -->
-    <div class="create-section" style="margin-bottom:40px;">
-      <div class="section-title">📚 Course Catalog</div>
-      <p class="section-subtitle">Click any course to enroll. All fees shown are per month/course.</p>
-
-      <!-- Filter Bar -->
-      <div class="filter-bar" id="filterBar">
-        <button class="filter-chip active" data-cat="all">All (80+)</button>
-        <button class="filter-chip" data-cat="school">School (5–10)</button>
-        <button class="filter-chip" data-cat="higher">Class 11–12</button>
-        <button class="filter-chip" data-cat="university">University</button>
-        <button class="filter-chip" data-cat="competitive">Competitive</button>
-        <button class="filter-chip" data-cat="professional">Professional</button>
-        <input class="form-input filter-search" type="text" id="courseSearchInput" placeholder="🔍 Search courses…" />
+    <!-- Classroom View (Live Classes + Enrollments) -->
+    <div id="classroomView">
+      <!-- LIVE CLASSES -->
+      <div style="margin-bottom:24px;">
+        <input class="form-input" type="text" id="searchInput" placeholder="🔍  Search live classes by title or teacher…" style="max-width:480px;" />
+      </div>
+      <div class="classes-section" style="margin-top:0; margin-bottom:40px;">
+        <div class="classes-header">
+          <h2 class="section-title" style="margin-bottom:0">🔴 Live Classes</h2>
+          <span class="classes-count" id="classesCount">Loading…</span>
+        </div>
+        <div class="classes-grid" id="classesGrid">
+          <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading classes…</p></div>
+        </div>
       </div>
 
-      <div class="courses-grid" id="coursesGrid"></div>
-    </div>
-
-    <!-- MY ENROLLED COURSES -->
-    <div class="classes-section" id="myEnrollmentsSection" style="margin-top:0;margin-bottom:40px;">
-      <div class="classes-header">
-        <h2 class="section-title" style="margin-bottom:0">🎓 My Enrolled Courses</h2>
-        <span class="classes-count" id="myEnrollmentsCount">Loading…</span>
-      </div>
-      <div class="classes-grid" id="myEnrollmentsGrid">
-        <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading your enrollments…</p></div>
+      <!-- MY ENROLLED COURSES -->
+      <div class="classes-section" id="myEnrollmentsSection" style="margin-top:0;margin-bottom:40px;">
+        <div class="classes-header">
+          <h2 class="section-title" style="margin-bottom:0">🎓 My Enrolled Courses</h2>
+          <span class="classes-count" id="myEnrollmentsCount">Loading…</span>
+        </div>
+        <div class="classes-grid" id="myEnrollmentsGrid">
+          <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading your enrollments…</p></div>
+        </div>
       </div>
     </div>
 
-    <!-- LIVE CLASSES -->
-    <div style="margin-bottom:24px;">
-      <input class="form-input" type="text" id="searchInput" placeholder="🔍  Search live classes by title or teacher…" style="max-width:480px;" />
-    </div>
-    <div class="classes-section">
-      <div class="classes-header">
-        <h2 class="section-title" style="margin-bottom:0">🔴 Live Classes</h2>
-        <span class="classes-count" id="classesCount">Loading…</span>
-      </div>
-      <div class="classes-grid" id="classesGrid">
-        <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading classes…</p></div>
+    <!-- Catalog View (Browse & Enroll) -->
+    <div id="catalogView" style="display:none;">
+      <!-- COURSE CATALOG -->
+      <div class="create-section" style="margin-bottom:40px;">
+        <div class="section-title">📚 Course Catalog</div>
+        <p class="section-subtitle">Click any course to enroll. All fees shown are per month/course.</p>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-chip active" data-cat="all">All (80+)</button>
+          <button class="filter-chip" data-cat="school">School (5–10)</button>
+          <button class="filter-chip" data-cat="higher">Class 11–12</button>
+          <button class="filter-chip" data-cat="university">University</button>
+          <button class="filter-chip" data-cat="competitive">Competitive</button>
+          <button class="filter-chip" data-cat="professional">Professional</button>
+          <input class="form-input filter-search" type="text" id="courseSearchInput" placeholder="🔍 Search courses…" />
+        </div>
+
+        <div class="courses-grid" id="coursesGrid"></div>
       </div>
     </div>
   </main>
@@ -638,6 +656,32 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 });
 
 const authHeaders = { 'Content-Type':'application/json', Authorization:`Bearer ${token}` };
+
+/* ══════════════════════════════════════════════
+   TAB SWITCHING LOGIC
+   ══════════════════════════════════════════════ */
+const tabClassroom = document.getElementById('tabClassroom');
+const tabCatalog   = document.getElementById('tabCatalog');
+const classroomView = document.getElementById('classroomView');
+const catalogView   = document.getElementById('catalogView');
+
+tabClassroom.addEventListener('click', () => {
+  tabClassroom.classList.add('active');
+  tabCatalog.classList.remove('active');
+  classroomView.style.display = 'block';
+  catalogView.style.display = 'none';
+  document.getElementById('pageTitle').textContent = 'Student Dashboard';
+  document.getElementById('pageSubtitle').textContent = 'Your live classroom hub.';
+});
+
+tabCatalog.addEventListener('click', () => {
+  tabCatalog.classList.add('active');
+  tabClassroom.classList.remove('active');
+  classroomView.style.display = 'none';
+  catalogView.style.display = 'block';
+  document.getElementById('pageTitle').textContent = 'Course Catalog';
+  document.getElementById('pageSubtitle').textContent = 'Browse 80+ courses and submit enrollment applications.';
+});
 
 // NEW: converts a File (from a <input type="file">) into a base64 data URL for storage
 function fileToBase64(file) {
