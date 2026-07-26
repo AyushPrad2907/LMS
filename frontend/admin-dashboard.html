@@ -167,7 +167,29 @@
 
       <!-- Course List -->
       <div style="text-align:left;">
-        <h2 class="section-title" style="font-family:var(--font-head); font-size:16px; font-weight:800; margin-bottom:16px; color:var(--text);">All Courses (<span id="coursesCount">0</span>)</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:16px;">
+          <h2 class="section-title" style="font-family:var(--font-head); font-size:16px; font-weight:800; margin-bottom:0; color:var(--text);">All Courses (<span id="coursesCount">0</span>)</h2>
+          
+          <!-- Filters & Search -->
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <input type="text" id="courseSearch" placeholder="🔍 Search name or ID..." style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:12px; color:var(--text); width:180px; box-sizing:border-box;" />
+            
+            <select id="filterLevel" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--text); cursor:pointer;">
+              <option value="all">All Categories</option>
+              <option value="school">School (5–10)</option>
+              <option value="higher">Class 11–12</option>
+              <option value="university">University</option>
+              <option value="competitive">Competitive</option>
+              <option value="professional">Professional</option>
+            </select>
+            
+            <select id="filterStatus" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--text); cursor:pointer;">
+              <option value="all">All Statuses</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Inactive Only</option>
+            </select>
+          </div>
+        </div>
         <div class="req-grid" id="coursesGrid">
           <div class="empty-state"><p>Loading courses…</p></div>
         </div>
@@ -402,19 +424,37 @@ async function loadCourses() {
 
 function renderCourses() {
   const grid = document.getElementById('coursesGrid');
-  document.getElementById('coursesCount').textContent = allCourses.length;
+  const searchVal = document.getElementById('courseSearch').value.toLowerCase().trim();
+  const levelVal = document.getElementById('filterLevel').value;
+  const statusVal = document.getElementById('filterStatus').value;
 
-  if (allCourses.length === 0) {
+  const filtered = allCourses.filter(course => {
+    const matchesSearch = !searchVal || 
+      course.name.toLowerCase().includes(searchVal) || 
+      course.courseId.toLowerCase().includes(searchVal);
+      
+    const matchesLevel = levelVal === 'all' || course.level.toLowerCase() === levelVal.toLowerCase();
+    
+    let matchesStatus = true;
+    if (statusVal === 'active') matchesStatus = course.isActive;
+    else if (statusVal === 'inactive') matchesStatus = !course.isActive;
+    
+    return matchesSearch && matchesLevel && matchesStatus;
+  });
+
+  document.getElementById('coursesCount').textContent = filtered.length;
+
+  if (filtered.length === 0) {
     grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🎓</div>
-        <div class="empty-title">No courses yet</div>
-        <p>Use the form above to add a new course.</p>
+      <div class="empty-state" style="grid-column: 1/-1;">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">No courses found</div>
+        <p>No courses match your current search or filter options.</p>
       </div>`;
     return;
   }
 
-  grid.innerHTML = allCourses.map(course => {
+  grid.innerHTML = filtered.map(course => {
     const feeStr = Number(course.fee).toLocaleString('en-IN');
     return `
       <div class="req-card" style="border-top: 4px solid ${course.isActive ? 'var(--accent)' : 'var(--text-muted)'};">
@@ -445,6 +485,10 @@ function renderCourses() {
     `;
   }).join('');
 }
+
+document.getElementById('courseSearch').addEventListener('input', renderCourses);
+document.getElementById('filterLevel').addEventListener('change', renderCourses);
+document.getElementById('filterStatus').addEventListener('change', renderCourses);
 
 document.getElementById('courseForm').addEventListener('submit', async (e) => {
   e.preventDefault();
