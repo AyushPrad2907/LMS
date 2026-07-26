@@ -988,6 +988,7 @@ document.getElementById('enrollForm').addEventListener('submit', async e => {
   btn.disabled = true;
   btn.innerHTML = '<span class="loading-spinner"></span> Submitting Enrollment…';
 
+  let serverEnrollmentId = '';
   // NEW: submit enrollment (student details + payment proof) to the backend before generating the slip
   try {
     const [passportPhoto, paymentScreenshot] = await Promise.all([
@@ -1024,6 +1025,9 @@ document.getElementById('enrollForm').addEventListener('submit', async e => {
     if (!submitRes.ok || !submitData.success) {
       throw new Error(submitData.message || 'Could not submit enrollment. Please try again.');
     }
+    if (submitData.enrollment && submitData.enrollment._id) {
+      serverEnrollmentId = submitData.enrollment._id;
+    }
   } catch (err) {
     showEnrollAlert(err.message);
     btn.disabled = false;
@@ -1038,7 +1042,7 @@ document.getElementById('enrollForm').addEventListener('submit', async e => {
   // ══════════════════════════════════════════════
 
   // Fill success card
-  const enrollId = 'IMP-' + Date.now().toString().slice(-8);
+  const enrollId = serverEnrollmentId || ('IMP-' + Date.now().toString().slice(-8));
   const dobFormatted = new Date(dob).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
 
   document.getElementById('sc_course').textContent  = c.name;
