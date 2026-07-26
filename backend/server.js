@@ -109,8 +109,12 @@ async function seedDefaultAdmin() {
       email,
       password,
     });
-
     console.log(`Default admin account created for ${email}`);
+  } else {
+    // Sync the password with the environment file if it exists
+    existing.password = password;
+    await existing.save();
+    console.log(`Default admin account password updated/synced for ${email}`);
   }
 }
 
