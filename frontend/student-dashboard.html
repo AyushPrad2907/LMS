@@ -1170,9 +1170,41 @@ async function loadClasses() {
       return;
     }
     const data = await res.json();
-    allClasses = data.classes || [];
+    const dbClasses = data.classes || [];
+
+    // Find live links in approved courses materials
+    const virtualClasses = [];
+    const approved = myEnrollments.filter(en => en.status === 'Approved');
+
+    approved.forEach(en => {
+      const course = serverCourses.find(c => c.courseId === en.courseId);
+      if (course && course.materials) {
+        course.materials.forEach(m => {
+          const url = m.url.toLowerCase();
+          const isLive = url.includes('meet.google.com') || 
+                         url.includes('zoom.us') || 
+                         url.includes('teams.microsoft.com') || 
+                         url.includes('youtube.com/live') ||
+                         url.includes('/live');
+          if (isLive) {
+            virtualClasses.push({
+              _id: m._id,
+              title: `${m.title} (${en.courseName})`,
+              meetingLink: m.url,
+              teacherName: 'Course Instructor',
+              createdAt: m.createdAt || new Date(),
+              isLiveMaterial: true
+            });
+          }
+        });
+      }
+    });
+
+    // Merge and sort
+    allClasses = [...dbClasses, ...virtualClasses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     renderClasses(allClasses);
-  } catch {
+  } catch (err) {
+    console.error('Error loading classes:', err);
     document.getElementById('classesGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load classes</div><div class="empty-desc">Check your connection and refresh.</div></div>`;
   }
 }
@@ -1181,8 +1213,6 @@ document.getElementById('searchInput').addEventListener('input', e => {
   const q = e.target.value.toLowerCase();
   renderClasses(allClasses.filter(c => c.title.toLowerCase().includes(q) || c.teacherName.toLowerCase().includes(q)));
 });
-
-loadClasses();
 
 /* ══════════════════════════════════════════════
    NEW: MY ENROLLED COURSES (status tracking)
@@ -1262,6 +1292,8 @@ function closeMatViewModal() {
   document.getElementById('matViewModal').classList.remove('open');
 }
 
+let myEnrollments = [];
+
 async function loadMyEnrollments() {
   try {
     const res = await fetch('/api/enrollments/mine', { headers: authHeaders });
@@ -1272,14 +1304,21 @@ async function loadMyEnrollments() {
       return;
     }
     const data = await res.json();
-    renderMyEnrollments(data.enrollments || []);
-  } catch {
+    myEnrollments = data.enrollments || [];
+    renderMyEnrollments(myEnrollments);
+  } catch (err) {
+    console.error('Failed to load enrollments:', err);
     document.getElementById('myEnrollmentsGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load enrollments</div><div class="empty-desc">Check your connection and refresh.</div></div>`;
   }
 }
 
-loadMyEnrollments();
-loadServerCourses();
+async function initDashboard() {
+  await loadServerCourses();
+  await loadMyEnrollments();
+  await loadClasses();
+}
+
+initDashboard();
 </script>
 </body>
 </html>
