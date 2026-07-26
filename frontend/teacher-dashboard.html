@@ -172,30 +172,25 @@
             </div>
             <!-- Right: Add material form -->
             <div class="material-form-section">
-              <h4 style="font-size:14px; font-weight:700; margin-bottom:4px;">Upload Material</h4>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:4px;">Add Material Link</h4>
+              <p style="font-size:10px; color:var(--text-muted); margin-bottom:12px;">Paste sharing links of files (e.g. from Google Drive, OneDrive, or YouTube).</p>
               <form id="materialForm" onsubmit="addMaterial(event)">
                 <div class="form-group">
                   <label class="form-label" for="matTitle">Title</label>
-                  <input class="form-input" type="text" id="matTitle" placeholder="e.g. Chapter 1 PDF Note" required />
+                  <input class="form-input" type="text" id="matTitle" placeholder="e.g. Chapter 1 PDF Notes" required />
                 </div>
                 <div class="form-group">
                   <label class="form-label" for="matType">Type</label>
-                  <select class="form-input" id="matType" onchange="toggleMatInput()" required>
-                    <option value="youtube">🎥 YouTube Link</option>
-                    <option value="pdf">📄 PDF Document</option>
-                    <option value="doc">📝 Word Document</option>
-                    <option value="other">📦 Other Link/File</option>
+                  <select class="form-input" id="matType" onchange="updatePlaceholder()" required>
+                    <option value="pdf">📄 PDF Link (Drive/OneDrive)</option>
+                    <option value="doc">📝 Word Document Link</option>
+                    <option value="youtube">🎥 YouTube Video Link</option>
+                    <option value="other">📦 Other Link</option>
                   </select>
                 </div>
-                <!-- YouTube or Link URL input -->
                 <div class="form-group" id="matUrlGroup">
-                  <label class="form-label" for="matUrl">URL</label>
-                  <input class="form-input" type="url" id="matUrl" placeholder="https://youtube.com/watch?v=..." required />
-                </div>
-                <!-- Local file upload input for PDF/Docs -->
-                <div class="form-group" id="matFileGroup" style="display:none">
-                  <label class="form-label" for="matFile">Upload File (Max 150KB)</label>
-                  <input class="form-input" type="file" id="matFile" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                  <label class="form-label" for="matUrl">URL (Public Link)</label>
+                  <input class="form-input" type="url" id="matUrl" placeholder="https://drive.google.com/..." required />
                 </div>
                 <button type="submit" class="btn-mat-add" id="matAddBtn">Add Material</button>
               </form>
@@ -379,29 +374,18 @@
 
     let activeCourseId = null;
 
-    // File to Base64 helper
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Toggle between link and file inputs
-    function toggleMatInput() {
+    // Update placeholder text based on selected material type
+    function updatePlaceholder() {
       const type = document.getElementById('matType').value;
-      if (type === 'pdf' || type === 'doc') {
-        document.getElementById('matUrlGroup').style.display = 'none';
-        document.getElementById('matUrl').required = false;
-        document.getElementById('matFileGroup').style.display = 'block';
-        document.getElementById('matFile').required = true;
+      const urlInput = document.getElementById('matUrl');
+      if (type === 'pdf') {
+        urlInput.placeholder = 'https://drive.google.com/file/d/... or OneDrive link';
+      } else if (type === 'doc') {
+        urlInput.placeholder = 'https://docs.google.com/document/d/... or OneDrive link';
+      } else if (type === 'youtube') {
+        urlInput.placeholder = 'https://youtube.com/watch?v=... or shared video link';
       } else {
-        document.getElementById('matUrlGroup').style.display = 'block';
-        document.getElementById('matUrl').required = true;
-        document.getElementById('matFileGroup').style.display = 'none';
-        document.getElementById('matFile').required = false;
+        urlInput.placeholder = 'https://example.com/resource-link';
       }
     }
 
@@ -518,14 +502,14 @@
     function closeMaterialModal() {
       document.getElementById('materialModal').classList.remove('open');
       document.getElementById('materialForm').reset();
-      toggleMatInput();
+      updatePlaceholder();
       activeCourseId = null;
     }
 
     function renderMaterialsList(materials) {
       const container = document.getElementById('materialsList');
       if (materials.length === 0) {
-        container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:12px; margin:20px 0;">No materials uploaded yet.</p>`;
+        container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:12px; margin:20px 0;">No materials added yet.</p>`;
         return;
       }
 
@@ -551,35 +535,16 @@
 
       const title = document.getElementById('matTitle').value.trim();
       const type = document.getElementById('matType').value;
+      const url = document.getElementById('matUrl').value.trim();
       const btn = document.getElementById('matAddBtn');
 
-      let url = '';
-      if (type === 'youtube' || type === 'other') {
-        url = document.getElementById('matUrl').value.trim();
-      } else {
-        const file = document.getElementById('matFile').files[0];
-        if (!file) {
-          alert('Please select a file to upload.');
-          return;
-        }
-        if (file.size > 150 * 1024) {
-          alert('File is too large. Maximum size allowed is 150 KB.');
-          return;
-        }
-        btn.disabled = true;
-        btn.textContent = 'Processing file…';
-        try {
-          url = await fileToBase64(file);
-        } catch (err) {
-          alert('Failed to read file: ' + err.message);
-          btn.disabled = false;
-          btn.textContent = 'Add Material';
-          return;
-        }
+      if (!title || !url) {
+        alert('Please fill in all fields.');
+        return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Uploading…';
+      btn.textContent = 'Adding…';
 
       try {
         const res = await fetch(`/api/courses/${activeCourseId}/materials`, {
@@ -588,7 +553,7 @@
           body: JSON.stringify({ title, type, url }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Failed to upload material.');
+        if (!res.ok) throw new Error(data.message || 'Failed to add material.');
 
         // Update allCourses array locally
         const course = allCourses.find(c => c._id === activeCourseId);
@@ -598,7 +563,7 @@
 
         renderMaterialsList(data.materials);
         document.getElementById('materialForm').reset();
-        toggleMatInput();
+        updatePlaceholder();
       } catch (err) {
         alert('Error: ' + err.message);
       } finally {
