@@ -38,6 +38,7 @@
     .req-images { display:flex; gap:12px; margin:16px 0; }
     .req-img-box { flex:1; text-align:center; }
     .req-img-box img { width:100%; max-width:140px; height:100px; object-fit:cover; border-radius:8px; border:1px solid var(--border); cursor:zoom-in; background:var(--surface2); }
+    .no-img-placeholder { display:inline-flex; align-items:center; justify-content:center; width:100%; max-width:140px; height:100px; background:var(--surface2); border:1px dashed var(--border); border-radius:8px; color:var(--text-muted); font-size:11px; font-weight:600; }
     .req-img-label { font-size:10px; color:var(--text-muted); margin-top:6px; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; }
 
     .req-actions { display:flex; gap:8px; margin-top:16px; }
@@ -213,11 +214,19 @@ function renderRequests() {
 
         <div class="req-images">
           <div class="req-img-box">
-            <img src="${r.passportPhoto || ''}" alt="Passport Photo" onclick="openLightbox('${r.passportPhoto || ''}')" />
+            ${r.passportPhoto ? `
+              <img src="${r.passportPhoto}" alt="Passport Photo" onclick="openLightbox('${r.passportPhoto}')" />
+            ` : `
+              <div class="no-img-placeholder">⚠️ No Photo</div>
+            `}
             <div class="req-img-label">Passport Photo</div>
           </div>
           <div class="req-img-box">
-            <img src="${r.paymentScreenshot || ''}" alt="Payment Screenshot" onclick="openLightbox('${r.paymentScreenshot || ''}')" />
+            ${r.paymentScreenshot ? `
+              <img src="${r.paymentScreenshot}" alt="Payment Screenshot" onclick="openLightbox('${r.paymentScreenshot}')" />
+            ` : `
+              <div class="no-img-placeholder">⚠️ No Screenshot</div>
+            `}
             <div class="req-img-label">Payment Screenshot</div>
           </div>
         </div>
