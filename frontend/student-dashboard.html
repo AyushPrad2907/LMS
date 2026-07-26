@@ -958,13 +958,13 @@ document.getElementById('enrollForm').addEventListener('submit', async e => {
   if (!utrNumber)             { showEnrollAlert('Please enter the UTR / transaction number.'); return; }
   if (!paymentScreenshotFile) { showEnrollAlert('Please upload the payment screenshot.'); return; }
 
-  const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB in bytes
+  const MAX_FILE_SIZE = 150 * 1024; // 150 KB in bytes
   if (passportPhotoFile.size > MAX_FILE_SIZE) {
-    showEnrollAlert('Passport photo is too large. Maximum size allowed is 1 MB.');
+    showEnrollAlert('Passport photo is too large. Maximum size allowed is 150 KB.');
     return;
   }
   if (paymentScreenshotFile.size > MAX_FILE_SIZE) {
-    showEnrollAlert('Payment screenshot is too large. Maximum size allowed is 1 MB.');
+    showEnrollAlert('Payment screenshot is too large. Maximum size allowed is 150 KB.');
     return;
   }
 
