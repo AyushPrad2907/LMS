@@ -1,19 +1,21 @@
 const express = require('express');
 const Course = require('../models/Course');
-const { protect, restrictTo } = require('../middleware/auth');
+const { protect, restrictTo, protectAdmin, protectUserOrAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/all', protect, async (req, res) => {
+router.get('/all', protectUserOrAdmin, async (req, res) => {
   try {
-    const courses = await Course.find({ isActive: true }).sort({ createdAt: -1 });
+    // Admin should see both active and inactive courses, students/teachers only active ones
+    const query = req.isAdmin ? {} : { isActive: true };
+    const courses = await Course.find(query).sort({ createdAt: -1 });
     res.json({ success: true, count: courses.length, courses });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });
   }
 });
 
-router.post('/create', protect, restrictTo('teacher'), async (req, res) => {
+router.post('/create', protectAdmin, async (req, res) => {
   try {
     const { courseId, name, track, level, fee } = req.body;
 
@@ -39,7 +41,7 @@ router.post('/create', protect, restrictTo('teacher'), async (req, res) => {
   }
 });
 
-router.put('/:id', protect, restrictTo('teacher'), async (req, res) => {
+router.put('/:id', protectAdmin, async (req, res) => {
   try {
     const { name, track, level, fee, isActive } = req.body;
     const course = await Course.findByIdAndUpdate(
@@ -58,7 +60,7 @@ router.put('/:id', protect, restrictTo('teacher'), async (req, res) => {
   }
 });
 
-router.delete('/:id', protect, restrictTo('teacher'), async (req, res) => {
+router.delete('/:id', protectAdmin, async (req, res) => {
   try {
     const course = await Course.findByIdAndDelete(req.params.id);
     if (!course) {

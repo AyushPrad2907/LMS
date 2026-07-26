@@ -73,4 +73,39 @@ const protectAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { protect, restrictTo, protectAdmin };
+const protectUserOrAdmin = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.isAdmin) {
+      const admin = await Admin.findById(decoded.id);
+      if (!admin) {
+        return res.status(401).json({ success: false, message: 'Token invalid. Admin not found.' });
+      }
+      req.admin = admin;
+      req.isAdmin = true;
+      return next();
+    } else {
+      const user = await User.findById(decoded.id).select('-password');
+      if (!user) {
+        return res.status(401).json({ success: false, message: 'Token invalid. User not found.' });
+      }
+      req.user = user;
+      return next();
+    }
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ success: false, message: 'Session expired. Please log in again.' });
+    }
+    return res.status(401).json({ success: false, message: 'Invalid token.' });
+  }
+};
+
+module.exports = { protect, restrictTo, protectAdmin, protectUserOrAdmin };
