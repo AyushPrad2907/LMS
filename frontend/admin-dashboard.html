@@ -42,7 +42,7 @@
     .req-img-label { font-size:10px; color:var(--text-muted); margin-top:6px; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; }
 
     .req-actions { display:flex; gap:8px; margin-top:16px; }
-    .btn-approve, .btn-reject, .btn-ignore {
+    .btn-approve, .btn-reject, .btn-ignore, .btn-undo {
       flex:1; border:none; border-radius:8px; padding:10px; font-family:var(--font-body);
       font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s;
     }
@@ -52,6 +52,8 @@
     .btn-reject:hover { background:rgba(244,63,94,0.28); }
     .btn-ignore { background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); }
     .btn-ignore:hover { color:var(--text); border-color:rgba(255,255,255,0.2); }
+    .btn-undo { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text); }
+    .btn-undo:hover { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.3); }
     .req-actions button:disabled { opacity:0.5; cursor:not-allowed; }
 
     .empty-state { text-align:center; padding:60px 40px; color:var(--text-muted); grid-column:1/-1; }
@@ -232,9 +234,13 @@ function renderRequests() {
         </div>
 
         <div class="req-actions">
-          <button class="btn-approve" ${disabled ? 'disabled' : ''} onclick="updateStatus('${r._id}', 'Approved')">✅ Approve</button>
-          <button class="btn-reject" ${disabled ? 'disabled' : ''} onclick="updateStatus('${r._id}', 'Rejected')">❌ Reject</button>
-          <button class="btn-ignore" onclick="ignoreRequest()">🙈 Ignore</button>
+          ${r.status === 'Pending' ? `
+            <button class="btn-approve" onclick="updateStatus('${r._id}', 'Approved')">✅ Approve</button>
+            <button class="btn-reject" onclick="updateStatus('${r._id}', 'Rejected')">❌ Reject</button>
+            <button class="btn-ignore" onclick="ignoreRequest()">🙈 Ignore</button>
+          ` : `
+            <button class="btn-undo" onclick="updateStatus('${r._id}', 'Pending')">🔄 Undo Action</button>
+          `}
         </div>
       </div>
     `;
