@@ -71,4 +71,48 @@ router.delete('/:id', protect, restrictTo('teacher'), async (req, res) => {
   }
 });
 
+// POST /api/courses/:id/materials - Add study material to a course
+router.post('/:id/materials', protect, restrictTo('teacher'), async (req, res) => {
+  try {
+    const { title, type, url } = req.body;
+    if (!title || !type || !url) {
+      return res.status(400).json({ success: false, message: 'Title, type, and URL/Base64 are required.' });
+    }
+    if (!['youtube', 'pdf', 'doc', 'other'].includes(type)) {
+      return res.status(400).json({ success: false, message: 'Invalid material type.' });
+    }
+
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found.' });
+    }
+
+    course.materials.push({ title, type, url });
+    await course.save();
+
+    res.status(201).json({ success: true, message: 'Material added successfully.', materials: course.materials });
+  } catch (error) {
+    console.error('Add material error:', error);
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
+
+// DELETE /api/courses/:id/materials/:materialId - Delete study material from a course
+router.delete('/:id/materials/:materialId', protect, restrictTo('teacher'), async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found.' });
+    }
+
+    course.materials = course.materials.filter(m => m._id.toString() !== req.params.materialId);
+    await course.save();
+
+    res.json({ success: true, message: 'Material deleted successfully.', materials: course.materials });
+  } catch (error) {
+    console.error('Delete material error:', error);
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
+
 module.exports = router;

@@ -32,6 +32,15 @@ const courseSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    materials: {
+      type: [{
+        title: { type: String, required: true },
+        type: { type: String, enum: ['youtube', 'pdf', 'doc', 'other'], required: true },
+        url: { type: String, required: true }, // Base64 data URL for PDF/doc or Youtube links
+        createdAt: { type: Date, default: Date.now }
+      }],
+      default: []
+    },
   },
   { timestamps: true }
 );

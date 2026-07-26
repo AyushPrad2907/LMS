@@ -5,7 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Teacher Dashboard — LearnFlow LMS</title>
   <link rel="stylesheet" href="style.css" />
-</head>
+  <style>
+    /* Course Selection Modal Overlay */
+    .selection-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px; }
+    .selection-overlay.open { display:flex; }
+    .selection-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; width:100%; max-width:540px; padding:32px; box-shadow:0 20px 50px rgba(0,0,0,0.5); }
+    .selection-title { font-family:var(--font-head); font-size:22px; font-weight:800; margin-bottom:8px; color:var(--text); }
+    .selection-subtitle { font-size:13px; color:var(--text-muted); margin-bottom:24px; }
+    .selection-list { display:flex; flex-direction:column; gap:12px; max-height:280px; overflow-y:auto; margin-bottom:24px; padding-right:6px; }
+    .selection-item { display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; cursor:pointer; transition:all 0.2s; }
+    .selection-item:hover { border-color:var(--accent); background:rgba(108,99,255,0.05); }
+    .selection-item input { width:18px; height:18px; accent-color:var(--accent); cursor:pointer; }
+    .selection-item-info { flex:1; text-align:left; }
+    .selection-item-name { font-size:14px; font-weight:700; color:var(--text); }
+    .selection-item-meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .btn-select-save { width:100%; background:linear-gradient(135deg,var(--accent),#8b80ff); color:white; border:none; border-radius:9px; padding:12px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .btn-select-save:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(108,99,255,0.4); }
+
+    /* Study Materials Modal */
+    .material-modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:900; align-items:center; justify-content:center; padding:20px; }
+    .material-modal-backdrop.open { display:flex; }
+    .material-modal-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; width:100%; max-width:720px; overflow:hidden; display:flex; flex-direction:column; }
+    .material-modal-header { padding:24px 32px; border-bottom:1px solid var(--border); background:linear-gradient(135deg,rgba(108,99,255,0.1),transparent); display:flex; justify-content:space-between; align-items:center; }
+    .material-modal-title { font-family:var(--font-head); font-size:18px; font-weight:800; color:var(--text); }
+    .btn-modal-close { background:transparent; border:none; font-size:24px; color:var(--text-muted); cursor:pointer; }
+    .btn-mat-manage { background:rgba(108,99,255,0.12); color:#a89fff; border:1px solid rgba(108,99,255,0.25); border-radius:8px; padding:6px 12px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-left:auto; }
+    .btn-mat-manage:hover { background:rgba(108,99,255,0.2); }
+    
+    .material-modal-body { padding:28px 32px; display:grid; grid-template-columns:1.2fr 1fr; gap:28px; }
+    .materials-list-section { display:flex; flex-direction:column; gap:12px; max-height:360px; overflow-y:auto; padding-right:6px; }
+    .material-item { display:flex; align-items:center; justify-content:space-between; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; gap:10px; }
+    .material-item-info { flex:1; min-width:0; text-align:left; }
+    .material-item-title { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .material-item-meta { font-size:10px; color:var(--text-muted); margin-top:2px; display:flex; align-items:center; gap:6px; }
+    .btn-mat-delete { background:transparent; border:none; color:#f43f5e; cursor:pointer; font-size:14px; padding:4px; opacity:0.7; transition:opacity 0.2s; }
+    .btn-mat-delete:hover { opacity:1; }
+    .material-form-section { border-left:1px solid var(--border); padding-left:28px; display:flex; flex-direction:column; gap:16px; text-align:left; }
+    .btn-mat-add { width:100%; background:linear-gradient(135deg,var(--accent),#8b80ff); color:white; border:none; border-radius:8px; padding:10px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .btn-mat-add:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(108,99,255,0.3); }
+
+    /* Layout tweaks */
+    @media (max-width: 640px) {
+      .material-modal-body { grid-template-columns: 1fr; }
+      .material-form-section { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 20px; }
+    }
+  </style></head>
 <body>
   <div class="dashboard-page">
 
@@ -128,6 +172,23 @@
         </div>
       </div>
 
+      <!-- My Teaching Courses List -->
+      <div class="classes-section" style="margin-top:40px;">
+        <div class="classes-header">
+          <h2 class="section-title" style="margin-bottom:0">My Teaching Courses</h2>
+          <span class="classes-count" id="myCoursesCount">0 courses</span>
+        </div>
+        <p class="section-subtitle" style="margin-top:4px;">These are the courses you selected to teach. You can upload and manage study materials here.</p>
+
+        <div class="classes-grid" id="myCoursesGrid">
+          <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <div class="empty-title">No teaching courses assigned</div>
+            <div class="empty-desc">Configure the courses you teach to start adding materials.</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Courses List -->
       <div class="classes-section" style="margin-top:40px;">
         <div class="classes-header">
@@ -139,6 +200,67 @@
           <div class="empty-state">
             <div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div>
             <p>Loading courses…</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Selection Overlay for new teachers -->
+      <div class="selection-overlay" id="courseSelectionOverlay">
+        <div class="selection-box">
+          <h3 class="selection-title">📚 Select Your Courses</h3>
+          <p class="selection-subtitle">Choose the course(s) you will be teaching. This will determine which classes you can schedule and where you can upload study materials.</p>
+          <div class="selection-list" id="selectionList">
+            <!-- Dynamically populated -->
+          </div>
+          <button class="btn-select-save" id="saveSelectionBtn">Save & Continue</button>
+        </div>
+      </div>
+
+      <!-- Manage Study Materials Modal -->
+      <div class="material-modal-backdrop" id="materialModal">
+        <div class="material-modal-box">
+          <div class="material-modal-header">
+            <h3 class="material-modal-title" id="materialModalTitle">Manage Study Materials</h3>
+            <button class="btn-modal-close" onclick="closeMaterialModal()">&times;</button>
+          </div>
+          <div class="material-modal-body">
+            <!-- Left: List of materials -->
+            <div>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:12px;">Uploaded Materials</h4>
+              <div class="materials-list-section" id="materialsList">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+            <!-- Right: Add material form -->
+            <div class="material-form-section">
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:4px;">Upload Material</h4>
+              <form id="materialForm" onsubmit="addMaterial(event)">
+                <div class="form-group">
+                  <label class="form-label" for="matTitle">Title</label>
+                  <input class="form-input" type="text" id="matTitle" placeholder="e.g. Chapter 1 PDF Note" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="matType">Type</label>
+                  <select class="form-input" id="matType" onchange="toggleMatInput()" required>
+                    <option value="youtube">🎥 YouTube Link</option>
+                    <option value="pdf">📄 PDF Document</option>
+                    <option value="doc">📝 Word Document</option>
+                    <option value="other">📦 Other Link/File</option>
+                  </select>
+                </div>
+                <!-- YouTube or Link URL input -->
+                <div class="form-group" id="matUrlGroup">
+                  <label class="form-label" for="matUrl">URL</label>
+                  <input class="form-input" type="url" id="matUrl" placeholder="https://youtube.com/watch?v=..." required />
+                </div>
+                <!-- Local file upload input for PDF/Docs -->
+                <div class="form-group" id="matFileGroup" style="display:none">
+                  <label class="form-label" for="matFile">Upload File (Max 150KB)</label>
+                  <input class="form-input" type="file" id="matFile" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                </div>
+                <button type="submit" class="btn-mat-add" id="matAddBtn">Add Material</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -281,6 +403,8 @@
         const data = await res.json();
         allCourses = data.courses || [];
         renderCourses();
+        renderMyTeachingCourses();
+        checkTeacherCourses();
       } catch (err) {
         document.getElementById('coursesGrid').innerHTML = `
           <div class="empty-state">
@@ -443,6 +567,263 @@
     function escapeHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    let activeCourseId = null;
+
+    // File to Base64 helper
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Toggle between link and file inputs
+    function toggleMatInput() {
+      const type = document.getElementById('matType').value;
+      if (type === 'pdf' || type === 'doc') {
+        document.getElementById('matUrlGroup').style.display = 'none';
+        document.getElementById('matUrl').required = false;
+        document.getElementById('matFileGroup').style.display = 'block';
+        document.getElementById('matFile').required = true;
+      } else {
+        document.getElementById('matUrlGroup').style.display = 'block';
+        document.getElementById('matUrl').required = true;
+        document.getElementById('matFileGroup').style.display = 'none';
+        document.getElementById('matFile').required = false;
+      }
+    }
+
+    // Check if teacher has selected courses, if not show overlay
+    function checkTeacherCourses() {
+      if (user.role === 'teacher' && (!user.coursesTaught || user.coursesTaught.length === 0)) {
+        showCourseSelectionOverlay();
+      }
+    }
+
+    // Render course selection overlay list
+    function showCourseSelectionOverlay() {
+      const list = document.getElementById('selectionList');
+      if (allCourses.length === 0) {
+        list.innerHTML = `<p style="text-align:center; color:var(--text-muted);">No active courses available.</p>`;
+        return;
+      }
+      
+      list.innerHTML = allCourses.map(c => {
+        const isChecked = user.coursesTaught && user.coursesTaught.includes(c._id) ? 'checked' : '';
+        return `
+          <label class="selection-item">
+            <input type="checkbox" name="selectedCourse" value="${c._id}" ${isChecked} />
+            <div class="selection-item-info">
+              <div class="selection-item-name">${escapeHtml(c.name)}</div>
+              <div class="selection-item-meta">${escapeHtml(c.level)} · ${escapeHtml(c.track)} · ₹${Number(c.fee).toLocaleString('en-IN')}</div>
+            </div>
+          </label>
+        `;
+      }).join('');
+
+      document.getElementById('courseSelectionOverlay').classList.add('open');
+    }
+
+    // Save selected courses
+    document.getElementById('saveSelectionBtn').addEventListener('click', async () => {
+      const checkboxes = document.querySelectorAll('input[name="selectedCourse"]:checked');
+      const courseIds = Array.from(checkboxes).map(cb => cb.value);
+
+      if (courseIds.length === 0) {
+        alert('Please select at least one course to continue.');
+        return;
+      }
+
+      const btn = document.getElementById('saveSelectionBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const res = await fetch('/api/auth/teacher/courses', {
+          method: 'PUT',
+          headers: authHeaders,
+          body: JSON.stringify({ courseIds }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to update courses.');
+
+        // Update local storage
+        user.coursesTaught = courseIds;
+        localStorage.setItem('lms_user', JSON.stringify(user));
+
+        document.getElementById('courseSelectionOverlay').classList.remove('open');
+        renderMyTeachingCourses();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save & Continue';
+      }
+    });
+
+    // Render My Teaching Courses
+    function renderMyTeachingCourses() {
+      const grid = document.getElementById('myCoursesGrid');
+      const countLabel = document.getElementById('myCoursesCount');
+      
+      const myCourses = allCourses.filter(c => user.coursesTaught && user.coursesTaught.includes(c._id));
+      countLabel.textContent = `${myCourses.length} course${myCourses.length === 1 ? '' : 's'}`;
+
+      if (myCourses.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <div class="empty-title">No teaching courses selected</div>
+            <div class="empty-desc"><button class="btn-undo" style="width:auto; display:inline-block; margin-top:8px;" onclick="showCourseSelectionOverlay()">Select Courses</button></div>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = myCourses.map((c, i) => `
+        <div class="class-card" style="animation-delay:${i * 0.05}s">
+          <div class="card-tag">${c.isActive ? 'ACTIVE' : 'INACTIVE'}</div>
+          <div class="card-title">${escapeHtml(c.name)}</div>
+          <div class="card-teacher">ID: ${escapeHtml(c.courseId)} • ${escapeHtml(c.track)}</div>
+          <div class="card-teacher">${escapeHtml(c.level)} • ₹${Number(c.fee).toLocaleString('en-IN')}</div>
+          <div class="card-actions">
+            <button class="btn-mat-manage" onclick="openMaterialModal('${c._id}')">📚 Manage Materials</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Material Modal Actions
+    function openMaterialModal(courseId) {
+      activeCourseId = courseId;
+      const course = allCourses.find(c => c._id === courseId);
+      if (!course) return;
+
+      document.getElementById('materialModalTitle').textContent = `Manage Materials — ${course.name}`;
+      renderMaterialsList(course.materials || []);
+      document.getElementById('materialModal').classList.add('open');
+    }
+
+    function closeMaterialModal() {
+      document.getElementById('materialModal').classList.remove('open');
+      document.getElementById('materialForm').reset();
+      toggleMatInput();
+      activeCourseId = null;
+    }
+
+    function renderMaterialsList(materials) {
+      const container = document.getElementById('materialsList');
+      if (materials.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:12px; margin:20px 0;">No materials uploaded yet.</p>`;
+        return;
+      }
+
+      const typeIcons = { youtube: '🎥', pdf: '📄', doc: '📝', other: '📦' };
+
+      container.innerHTML = materials.map(m => `
+        <div class="material-item">
+          <div class="material-item-info">
+            <div class="material-item-title">${escapeHtml(m.title)}</div>
+            <div class="material-item-meta">
+              <span>${typeIcons[m.type] || '📦'} ${m.type.toUpperCase()}</span>
+              <a href="${m.url}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:700;">View</a>
+            </div>
+          </div>
+          <button class="btn-mat-delete" onclick="deleteMaterial('${activeCourseId}', '${m._id}')">🗑️</button>
+        </div>
+      `).join('');
+    }
+
+    async function addMaterial(event) {
+      event.preventDefault();
+      if (!activeCourseId) return;
+
+      const title = document.getElementById('matTitle').value.trim();
+      const type = document.getElementById('matType').value;
+      const btn = document.getElementById('matAddBtn');
+
+      let url = '';
+      if (type === 'youtube' || type === 'other') {
+        url = document.getElementById('matUrl').value.trim();
+      } else {
+        const file = document.getElementById('matFile').files[0];
+        if (!file) {
+          alert('Please select a file to upload.');
+          return;
+        }
+        if (file.size > 150 * 1024) {
+          alert('File is too large. Maximum size allowed is 150 KB.');
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Processing file…';
+        try {
+          url = await fileToBase64(file);
+        } catch (err) {
+          alert('Failed to read file: ' + err.message);
+          btn.disabled = false;
+          btn.textContent = 'Add Material';
+          return;
+        }
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Uploading…';
+
+      try {
+        const res = await fetch(`/api/courses/${activeCourseId}/materials`, {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ title, type, url }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to upload material.');
+
+        // Update allCourses array locally
+        const course = allCourses.find(c => c._id === activeCourseId);
+        if (course) {
+          course.materials = data.materials;
+        }
+
+        renderMaterialsList(data.materials);
+        document.getElementById('materialForm').reset();
+        toggleMatInput();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add Material';
+      }
+    }
+
+    async function deleteMaterial(courseId, materialId) {
+      if (!confirm('Are you sure you want to delete this study material?')) return;
+      try {
+        const res = await fetch(`/api/courses/${courseId}/materials/${materialId}`, {
+          method: 'DELETE',
+          headers: authHeaders,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to delete material.');
+
+        // Update allCourses array locally
+        const course = allCourses.find(c => c._id === courseId);
+        if (course) {
+          course.materials = data.materials;
+        }
+
+        renderMaterialsList(data.materials);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Add visual edit button to teacher avatar to re-open selection overlay if desired
+    document.getElementById('userInitial').style.cursor = 'pointer';
+    document.getElementById('userInitial').title = 'Click to manage your teaching courses';
+    document.getElementById('userInitial').addEventListener('click', showCourseSelectionOverlay);
 
     loadClasses();
     loadCourses();

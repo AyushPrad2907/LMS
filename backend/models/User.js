@@ -27,6 +27,13 @@ const userSchema = new mongoose.Schema(
       enum: ['student', 'teacher'],
       default: 'student',
     },
+    coursesTaught: {
+      type: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course'
+      }],
+      default: []
+    },
 
     // ── NEW: forgot / reset password support ──
     // Never store the raw token — only its SHA256 hash. select:false keeps it

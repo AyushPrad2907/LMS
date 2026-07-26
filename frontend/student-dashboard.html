@@ -598,6 +598,22 @@
   </div>
 </div>
 
+<!-- View Study Materials Modal -->
+<div class="modal-backdrop" id="matViewModal">
+  <div class="modal-wrap">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header" style="position: relative;">
+        <div class="modal-kicker">📚 Study Materials</div>
+        <h3 class="modal-course-name" id="matViewCourseName">Course Title</h3>
+        <button class="btn-modal-close" style="position: absolute; right: 24px; top: 24px; font-size: 24px; background: none; border: none; color: var(--text-muted); cursor: pointer;" onclick="closeMatViewModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="matViewBody" style="padding: 24px 32px; max-height: 400px; overflow-y: auto;">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- html2canvas CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -1190,9 +1206,56 @@ function renderMyEnrollments(enrollments) {
         <div class="card-title">${escHtml(en.courseName)}</div>
         <div class="status-badge" style="background:${s.bg};color:${s.color};">${s.label}</div>
         ${en.status === 'Pending' ? `<p class="status-note">Verification Pending — our officials will contact you within 72 hours.</p>` : ''}
+        ${en.status === 'Approved' ? `
+          <button class="cc-enroll-btn" style="background:rgba(108,99,255,0.15); color:#a89fff; border:1px solid rgba(108,99,255,0.3); margin-top:12px; font-size:12px;" onclick="viewStudyMaterials('${en.courseId}', '${escHtml(en.courseName)}')">📖 Access Materials</button>
+        ` : ''}
       </div>
     `;
   }).join('');
+}
+
+let serverCourses = [];
+async function loadServerCourses() {
+  try {
+    const res = await fetch('/api/courses/all', { headers: authHeaders });
+    if (res.ok) {
+      const data = await res.json();
+      serverCourses = data.courses || [];
+    }
+  } catch (err) {
+    console.error('Failed to load server courses:', err);
+  }
+}
+
+function viewStudyMaterials(courseId, courseName) {
+  const course = serverCourses.find(c => c.courseId === courseId);
+  document.getElementById('matViewCourseName').textContent = courseName;
+  const body = document.getElementById('matViewBody');
+  
+  if (!course || !course.materials || course.materials.length === 0) {
+    body.innerHTML = `
+      <div style="text-align:center; color:var(--text-muted); padding:30px 0;">
+        <span style="font-size:36px;">📭</span>
+        <div style="font-size:14px; font-weight:700; margin-top:8px; color:var(--text);">No materials uploaded yet</div>
+        <p style="font-size:12px; margin-top:4px;">Your teacher hasn't uploaded any study materials for this course yet.</p>
+      </div>`;
+  } else {
+    const typeIcons = { youtube: '🎥', pdf: '📄', doc: '📝', other: '📦' };
+    body.innerHTML = course.materials.map(m => `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:10px;">
+        <div style="text-align:left; min-width:0; flex:1; margin-right:12px;">
+          <div style="font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escHtml(m.title)}</div>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">${typeIcons[m.type] || '📦'} ${m.type.toUpperCase()}</div>
+        </div>
+        <a href="${m.url}" target="_blank" style="display:inline-flex; align-items:center; background:var(--accent); color:white; font-size:11px; font-weight:700; text-decoration:none; padding:6px 12px; border-radius:6px;">Open</a>
+      </div>
+    `).join('');
+  }
+  document.getElementById('matViewModal').classList.add('open');
+}
+
+function closeMatViewModal() {
+  document.getElementById('matViewModal').classList.remove('open');
 }
 
 async function loadMyEnrollments() {
@@ -1212,6 +1275,7 @@ async function loadMyEnrollments() {
 }
 
 loadMyEnrollments();
+loadServerCourses();
 </script>
 </body>
 </html>

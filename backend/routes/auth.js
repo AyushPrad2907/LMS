@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
       success: true,
       message: 'Registration successful.',
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, coursesTaught: user.coursesTaught || [] },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -83,7 +83,7 @@ router.post('/login', async (req, res) => {
       success: true,
       message: 'Login successful.',
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, coursesTaught: user.coursesTaught || [] },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });
@@ -174,6 +174,39 @@ router.post('/reset-password/:token', async (req, res) => {
     res.json({ success: true, message: 'Password reset successful. You can now sign in with your new password.' });
   } catch (error) {
     console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
+
+// PUT /api/auth/teacher/courses - Set courses taught by the teacher
+router.put('/teacher/courses', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'teacher') {
+      return res.status(403).json({ success: false, message: 'Access denied. Teachers only.' });
+    }
+
+    const { courseIds } = req.body;
+    if (!Array.isArray(courseIds)) {
+      return res.status(400).json({ success: false, message: 'courseIds must be an array.' });
+    }
+
+    const user = await User.findById(req.user._id);
+    user.coursesTaught = courseIds;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Courses updated successfully.',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        coursesTaught: user.coursesTaught
+      }
+    });
+  } catch (error) {
+    console.error('Update teacher courses error:', error);
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });
   }
 });
