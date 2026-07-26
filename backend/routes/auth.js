@@ -211,4 +211,28 @@ router.put('/teacher/courses', protect, async (req, res) => {
   }
 });
 
+// POST /api/auth/verify-password
+router.post('/verify-password', protect, async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ success: false, message: 'Password is required.' });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Incorrect password.' });
+    }
+
+    res.json({ success: true, message: 'Password verified.' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
+
 module.exports = router;

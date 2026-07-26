@@ -126,9 +126,12 @@
 
       <!-- My Teaching Courses List -->
       <div class="classes-section" style="margin-top:40px;">
-        <div class="classes-header">
-          <h2 class="section-title" style="margin-bottom:0">My Teaching Courses</h2>
-          <span class="classes-count" id="myCoursesCount">0 courses</span>
+        <div class="classes-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 class="section-title" style="margin-bottom:0">My Teaching Courses</h2>
+            <span class="classes-count" id="myCoursesCount">0 courses</span>
+          </div>
+          <button class="btn-select-save" style="margin-top:0; width:auto; padding:8px 16px; font-size:12px;" onclick="promptPasswordForOverlay()">➕ Add / Manage Courses</button>
         </div>
         <p class="section-subtitle" style="margin-top:4px;">These are the courses you selected to teach. You can upload and manage study materials here.</p>
 
@@ -196,6 +199,28 @@
               </form>
             </div>
           </div>
+        </div>
+      <!-- Password Verification Modal -->
+      <div class="material-modal-backdrop" id="pwdVerifyModal">
+        <div class="material-modal-box" style="max-width:400px; padding:24px 28px;">
+          <div class="material-modal-header" style="border:none; padding-bottom:8px;">
+            <h3 class="material-modal-title">🔐 Confirm Password</h3>
+            <button class="btn-modal-close" onclick="closePwdVerifyModal()">&times;</button>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px;">For security, please enter your password to edit your teaching courses.</p>
+          <div class="alert alert-error" id="pwdAlert" style="display:none; margin-bottom:16px;">
+            <span>⚠️</span><span id="pwdAlertMsg"></span>
+          </div>
+          <form id="pwdVerifyForm" onsubmit="verifyPasswordAndOpenOverlay(event)">
+            <div class="form-group" style="margin-bottom:20px;">
+              <label class="form-label" for="verifyPwdInput">Password</label>
+              <input class="form-input" type="password" id="verifyPwdInput" placeholder="••••••••" required style="width:100%; box-sizing:border-box;" />
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:12px;">
+              <button type="button" class="btn-logout" style="background:var(--surface2); margin:0;" onclick="closePwdVerifyModal()">Cancel</button>
+              <button type="submit" class="btn-mat-add" id="verifyPwdBtn" style="margin-top:0;">Verify</button>
+            </div>
+          </form>
         </div>
       </div>
     </main>
@@ -594,10 +619,54 @@
       }
     }
 
+    function promptPasswordForOverlay() {
+      document.getElementById('pwdAlert').style.display = 'none';
+      document.getElementById('verifyPwdInput').value = '';
+      document.getElementById('pwdVerifyModal').classList.add('open');
+    }
+
+    function closePwdVerifyModal() {
+      document.getElementById('pwdVerifyModal').classList.remove('open');
+    }
+
+    async function verifyPasswordAndOpenOverlay(event) {
+      event.preventDefault();
+      const password = document.getElementById('verifyPwdInput').value.trim();
+      const btn = document.getElementById('verifyPwdBtn');
+      const alertBox = document.getElementById('pwdAlert');
+      const alertMsg = document.getElementById('pwdAlertMsg');
+      
+      if (!password) return;
+      
+      btn.disabled = true;
+      btn.textContent = 'Verifying…';
+      alertBox.style.display = 'none';
+      
+      try {
+        const res = await fetch('/api/auth/verify-password', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ password }),
+        });
+        
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Incorrect password.');
+        
+        closePwdVerifyModal();
+        showCourseSelectionOverlay();
+      } catch (err) {
+        alertMsg.textContent = err.message;
+        alertBox.style.display = 'flex';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verify';
+      }
+    }
+
     // Add visual edit button to teacher avatar to re-open selection overlay if desired
     document.getElementById('userInitial').style.cursor = 'pointer';
     document.getElementById('userInitial').title = 'Click to manage your teaching courses';
-    document.getElementById('userInitial').addEventListener('click', showCourseSelectionOverlay);
+    document.getElementById('userInitial').addEventListener('click', promptPasswordForOverlay);
 
     loadClasses();
     loadCourses();
