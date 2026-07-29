@@ -22,7 +22,16 @@ app.use(cors());
 // Raised limit so base64-encoded passport photo + payment screenshot uploads fit in the request body
 app.use(express.json({ limit: '12mb' }));
 
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend'), {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+  }
+}));
 
 // ================= Routes =================
 
