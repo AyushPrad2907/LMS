@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Admin Dashboard — IMPLEXEDU</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=50off_v2" />
   <style>
     .logo-text { font-size: 20px; }
 
@@ -30,6 +33,13 @@
     .status-Pending  { background:rgba(245,166,35,0.12); color:#f5a623; }
     .status-Approved { background:rgba(34,197,94,0.12);  color:#22c55e; }
     .status-Rejected { background:rgba(244,63,94,0.12);  color:#f43f5e; }
+
+    .role-badge-student { background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+    .role-badge-teacher { background:rgba(34,197,94,0.12); color:#4ade80; border:1px solid rgba(34,197,94,0.3); }
+    .role-badge-admin   { background:rgba(244,63,94,0.12); color:#fb7185; border:1px solid rgba(244,63,94,0.3); }
+
+    .user-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; transition:all 0.2s; }
+    .user-card:hover { border-color:rgba(108,99,255,0.3); box-shadow:0 4px 20px rgba(0,0,0,0.3); }
 
     .req-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; margin:16px 0; }
     .req-field-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:2px; }
@@ -68,56 +78,18 @@
     @media (max-width:640px) {
       .req-grid { grid-template-columns:1fr; }
       .req-fields { grid-template-columns:1fr; }
-
-      /* Topbar adjustments */
       .topbar { padding: 12px 16px; flex-wrap: wrap; gap: 12px; }
       .topbar-right { width: 100%; justify-content: space-between; gap: 8px; }
-      .user-name { display: none; } /* Hide text name on mobile, keep avatar initials */
-      
-      /* Page title layout */
+      .user-name { display: none; }
       .page-header { flex-direction: column; align-items: flex-start !important; gap: 12px; width: 100%; }
-      .page-header .filter-bar { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-      .page-header .filter-chip { text-align: center; justify-content: center; }
-      
-      /* Enrollment Status Filters */
+      .page-header .filter-bar { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .page-header .filter-chip { text-align: center; justify-content: center; padding: 8px 4px; font-size: 11px; }
       #enrollmentsView .filter-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; }
       #enrollmentsView .filter-chip { text-align: center; width: auto; margin: 0; }
-      
-      /* Course Filter Controls */
-      #coursesView div[style*="justify-content:space-between"] {
-        flex-direction: column;
-        align-items: stretch !important;
-      }
-      #coursesView div[style*="justify-content:space-between"] .section-title {
-        margin-bottom: 8px;
-      }
-      #coursesView div[style*="justify-content:space-between"] div[style*="display:flex"] {
-        flex-direction: column;
-        align-items: stretch !important;
-        width: 100%;
-        gap: 8px;
-      }
-      #coursesView div[style*="justify-content:space-between"] input,
-      #coursesView div[style*="justify-content:space-between"] select {
-        width: 100% !important;
-      }
-      
-      /* Image proofs stack on mobile */
       .req-images { flex-direction: column; align-items: center; }
       .req-img-box { width: 100%; }
       .req-img-box img, .no-img-placeholder { max-width: 100%; width: 100%; height: 160px; }
-      
-      /* Form Layouts stack */
-      #courseForm div[style*="display:grid"] {
-        grid-template-columns: 1fr !important;
-      }
-      #courseForm div[style*="display:flex"] {
-        flex-direction: column;
-        width: 100%;
-      }
-      #courseForm button {
-        width: 100% !important;
-      }
+      .user-card { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -152,7 +124,47 @@
       <!-- Tab Navigation -->
       <div class="filter-bar" style="margin-bottom:0; gap:8px;">
         <button class="filter-chip active" id="tabEnrollments" style="border-radius:8px; font-weight:700;">📋 Enrollments</button>
+        <button class="filter-chip" id="tabUsers" style="border-radius:8px; font-weight:700;">👥 Users Panel</button>
         <button class="filter-chip" id="tabCourses" style="border-radius:8px; font-weight:700;">🎓 Courses</button>
+      </div>
+    </div>
+
+    <!-- KPI STATS OVERVIEW CARDS -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:16px; margin:24px 0 28px;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; display:flex; align-items:center; gap:16px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:rgba(108,99,255,0.15); border:1px solid rgba(108,99,255,0.3); display:flex; align-items:center; justify-content:center; font-size:22px;">👥</div>
+        <div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">Registered Users</div>
+          <div style="font-family:var(--font-head); font-size:22px; font-weight:800; color:var(--text);" id="statUsers">0</div>
+          <div style="font-size:11px; color:var(--accent);" id="statUsersSub">Loading...</div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; display:flex; align-items:center; gap:16px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:rgba(245,166,35,0.15); border:1px solid rgba(245,166,35,0.3); display:flex; align-items:center; justify-content:center; font-size:22px;">📋</div>
+        <div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">Enrollments</div>
+          <div style="font-family:var(--font-head); font-size:22px; font-weight:800; color:var(--accent2);" id="statEnrollments">0</div>
+          <div style="font-size:11px; color:#f5a623;" id="statEnrollmentsSub">Loading...</div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; display:flex; align-items:center; gap:16px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); display:flex; align-items:center; justify-content:center; font-size:22px;">🎓</div>
+        <div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">Active Courses</div>
+          <div style="font-family:var(--font-head); font-size:22px; font-weight:800; color:#22c55e;" id="statCourses">0</div>
+          <div style="font-size:11px; color:var(--text-muted);" id="statCoursesSub">Loading...</div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; display:flex; align-items:center; gap:16px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.3); display:flex; align-items:center; justify-content:center; font-size:22px;">💰</div>
+        <div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">Total Revenue</div>
+          <div style="font-family:var(--font-head); font-size:22px; font-weight:800; color:#818cf8;" id="statRevenue">₹0</div>
+          <div style="font-size:11px; color:var(--text-muted);">Approved fee payments</div>
+        </div>
       </div>
     </div>
 
@@ -170,6 +182,35 @@
 
       <div class="req-grid" id="reqGrid">
         <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading enrollment requests…</p></div>
+      </div>
+    </div>
+
+    <!-- Users View -->
+    <div id="usersView" style="display:none;">
+      <div style="text-align:left;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:16px;">
+          <div>
+            <h2 class="section-title" style="font-family:var(--font-head); font-size:16px; font-weight:800; margin-bottom:4px; color:var(--text);">Registered Users (<span id="usersCount">0</span>)</h2>
+            <p style="font-size:11px; color:var(--text-muted); margin:0;">Directory of registered students, teachers, and system administrators with registration timestamp.</p>
+          </div>
+
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <input type="text" id="userSearch" placeholder="🔍 Search name or email..." style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:12px; color:var(--text); width:200px; box-sizing:border-box;" />
+            
+            <select id="filterUserRole" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--text); cursor:pointer;">
+              <option value="all">All Roles</option>
+              <option value="student">Students Only</option>
+              <option value="teacher">Teachers Only</option>
+              <option value="admin">Admins Only</option>
+            </select>
+
+            <button id="exportUsersBtn" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:6px;">📥 Export CSV</button>
+          </div>
+        </div>
+
+        <div id="usersContainer" style="display:flex; flex-direction:column; gap:12px;">
+          <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading registered users…</p></div>
+        </div>
       </div>
     </div>
 
@@ -421,27 +462,46 @@ document.getElementById('filterBar').addEventListener('click', e => {
    TAB SWITCHING LOGIC
 ══════════════════════════════════════════════ */
 const tabEnrollments = document.getElementById('tabEnrollments');
+const tabUsers = document.getElementById('tabUsers');
 const tabCourses = document.getElementById('tabCourses');
 const enrollmentsView = document.getElementById('enrollmentsView');
+const usersView = document.getElementById('usersView');
 const coursesView = document.getElementById('coursesView');
 const pageTitle = document.getElementById('pageTitle');
 const pageSubtitle = document.getElementById('pageSubtitle');
 
 tabEnrollments.addEventListener('click', () => {
   tabEnrollments.classList.add('active');
+  tabUsers.classList.remove('active');
   tabCourses.classList.remove('active');
   enrollmentsView.style.display = 'block';
+  usersView.style.display = 'none';
   coursesView.style.display = 'none';
   pageTitle.textContent = 'Enrollment Requests';
   pageSubtitle.textContent = 'Review student payment proofs and approve or reject enrollment requests.';
   hideAlerts();
 });
 
+tabUsers.addEventListener('click', () => {
+  tabUsers.classList.add('active');
+  tabEnrollments.classList.remove('active');
+  tabCourses.classList.remove('active');
+  usersView.style.display = 'block';
+  enrollmentsView.style.display = 'none';
+  coursesView.style.display = 'none';
+  pageTitle.textContent = 'Registered Users Directory';
+  pageSubtitle.textContent = 'Manage all registered students, teachers, and system administrators.';
+  hideAlerts();
+  loadUsers();
+});
+
 tabCourses.addEventListener('click', () => {
   tabCourses.classList.add('active');
   tabEnrollments.classList.remove('active');
-  enrollmentsView.style.display = 'none';
+  tabUsers.classList.remove('active');
   coursesView.style.display = 'block';
+  enrollmentsView.style.display = 'none';
+  usersView.style.display = 'none';
   pageTitle.textContent = 'Course Management';
   pageSubtitle.textContent = 'Add, edit, toggle, or delete academic courses offered to students.';
   hideAlerts();
@@ -452,6 +512,181 @@ function hideAlerts() {
   document.getElementById('dashAlert').style.display = 'none';
   document.getElementById('dashSuccess').style.display = 'none';
 }
+
+/* ══════════════════════════════════════════════
+   DASHBOARD STATS LOGIC
+══════════════════════════════════════════════ */
+async function loadDashboardStats() {
+  try {
+    const res = await fetch('/api/admin/stats', { headers: adminHeaders });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.success || !data.stats) return;
+
+    const { users, courses, enrollments, revenue } = data.stats;
+    document.getElementById('statUsers').textContent = users.total.toLocaleString();
+    document.getElementById('statUsersSub').textContent = `${users.students} Students · ${users.teachers} Teachers · ${users.admins} Admins`;
+
+    document.getElementById('statEnrollments').textContent = enrollments.total.toLocaleString();
+    document.getElementById('statEnrollmentsSub').textContent = `${enrollments.pending} Pending · ${enrollments.approved} Approved`;
+
+    document.getElementById('statCourses').textContent = courses.active.toLocaleString();
+    document.getElementById('statCoursesSub').textContent = `${courses.total} Total Courses`;
+
+    document.getElementById('statRevenue').textContent = '₹' + Number(revenue).toLocaleString('en-IN');
+  } catch (err) {
+    console.error('Stats loading error:', err);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   REGISTERED USERS PANEL LOGIC
+══════════════════════════════════════════════ */
+let allRegisteredUsers = [];
+
+async function loadUsers() {
+  try {
+    const res = await fetch('/api/admin/users', { headers: adminHeaders });
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      window.location.href = 'admin-login.html';
+      return;
+    }
+    const data = await res.json();
+    allRegisteredUsers = data.users || [];
+    renderUsers();
+  } catch (err) {
+    document.getElementById('usersContainer').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load users</div><p>${err.message || 'Error fetching user list'}</p></div>`;
+  }
+}
+
+function renderUsers() {
+  const container = document.getElementById('usersContainer');
+  const searchVal = document.getElementById('userSearch').value.toLowerCase().trim();
+  const roleVal = document.getElementById('filterUserRole').value;
+
+  const filtered = allRegisteredUsers.filter(u => {
+    const matchesSearch = !searchVal ||
+      (u.name && u.name.toLowerCase().includes(searchVal)) ||
+      (u.email && u.email.toLowerCase().includes(searchVal));
+
+    const matchesRole = roleVal === 'all' || (u.role && u.role.toLowerCase() === roleVal.toLowerCase());
+    return matchesSearch && matchesRole;
+  });
+
+  document.getElementById('usersCount').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">No registered users found</div><p>No user matches the current search/filter parameters.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(u => {
+    const initials = (u.name || u.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const regDate = u.createdAt ? new Date(u.createdAt).toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) : '—';
+
+    const roleClass = u.role === 'admin' ? 'role-badge-admin' : (u.role === 'teacher' ? 'role-badge-teacher' : 'role-badge-student');
+    const roleCapitalized = u.role ? (u.role.charAt(0).toUpperCase() + u.role.slice(1)) : 'Student';
+
+    return `
+      <div class="user-card">
+        <div style="display:flex; align-items:center; gap:14px; min-width:240px;">
+          <div style="width:42px; height:42px; border-radius:50%; background:rgba(108,99,255,0.15); border:1px solid rgba(108,99,255,0.3); color:var(--accent2); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">${escHtml(initials)}</div>
+          <div>
+            <div style="font-weight:700; font-size:15px; color:var(--text);">${escHtml(u.name || 'User')}</div>
+            <div style="font-size:12px; color:var(--text-muted);">${escHtml(u.email)}</div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+          <div>
+            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:3px;">Role</div>
+            <span class="status-badge ${roleClass}">${escHtml(roleCapitalized)}</span>
+          </div>
+
+          <div>
+            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:3px;">Time of Registration</div>
+            <div style="font-size:12px; font-weight:600; color:var(--text);">${escHtml(regDate)}</div>
+          </div>
+
+          ${u.role !== 'admin' ? `
+            <div style="display:flex; gap:8px; align-items:center; margin-left:auto;">
+              <select onchange="changeUserRole('${u._id}', this.value)" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:11px; font-weight:600; color:var(--text); cursor:pointer;">
+                <option value="student" ${u.role === 'student' ? 'selected' : ''}>Role: Student</option>
+                <option value="teacher" ${u.role === 'teacher' ? 'selected' : ''}>Role: Teacher</option>
+              </select>
+              <button onclick="deleteUserAccount('${u._id}')" class="btn-reject" style="padding:6px 12px; font-size:11px; width:auto;">🗑️ Delete</button>
+            </div>
+          ` : `
+            <div style="margin-left:auto; font-size:11px; color:var(--text-muted); font-weight:600; background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px;">System Admin</div>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('userSearch').addEventListener('input', renderUsers);
+document.getElementById('filterUserRole').addEventListener('change', renderUsers);
+
+document.getElementById('exportUsersBtn').addEventListener('click', () => {
+  if (!allRegisteredUsers.length) return alert('No users to export');
+  const headers = ['Name', 'Email', 'Role', 'Registration Date'];
+  const rows = allRegisteredUsers.map(u => [
+    `"${(u.name || '').replace(/"/g, '""')}"`,
+    `"${(u.email || '').replace(/"/g, '""')}"`,
+    `"${(u.role || '').replace(/"/g, '""')}"`,
+    `"${new Date(u.createdAt).toLocaleString('en-IN')}"`
+  ]);
+  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `implexedu_users_${Date.now()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
+async function changeUserRole(userId, newRole) {
+  try {
+    const res = await fetch(`/api/admin/users/${userId}/role`, {
+      method: 'PUT',
+      headers: adminHeaders,
+      body: JSON.stringify({ role: newRole })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to update role');
+    showDashAlert(`User role updated to ${newRole}.`, 'success');
+    await loadUsers();
+    await loadDashboardStats();
+  } catch (err) {
+    showDashAlert(err.message, 'error');
+  }
+}
+
+async function deleteUserAccount(userId) {
+  if (!confirm('Are you sure you want to delete this user account?')) return;
+  try {
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: adminHeaders
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to delete user');
+    showDashAlert('User deleted successfully.', 'success');
+    await loadUsers();
+    await loadDashboardStats();
+  } catch (err) {
+    showDashAlert(err.message, 'error');
+  }
+}
+
+loadRequests();
+loadDashboardStats();
 
 /* ══════════════════════════════════════════════
    COURSE MANAGEMENT LOGIC
