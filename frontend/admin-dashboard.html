@@ -211,15 +211,60 @@
 
     <!-- Enrollments View -->
     <div id="enrollmentsView">
-      <div class="filter-bar" id="filterBar" style="margin-bottom:20px;">
-        <button class="filter-chip active" data-status="all">All</button>
-        <button class="filter-chip" data-status="Pending">⏳ Pending</button>
-        <button class="filter-chip" data-status="Approved">✅ Approved</button>
-        <button class="filter-chip" data-status="Rejected">❌ Rejected</button>
+      <!-- Toolbar: status filter + view toggle + search -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+        <div class="filter-bar" id="filterBar" style="margin-bottom:0;">
+          <button class="filter-chip active" data-status="all">All</button>
+          <button class="filter-chip" data-status="Pending">⏳ Pending</button>
+          <button class="filter-chip" data-status="Approved">✅ Approved</button>
+          <button class="filter-chip" data-status="Rejected">❌ Rejected</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <input type="text" id="rosterSearch" placeholder="🔍 Search name, course, UTR…"
+            style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:12px; color:var(--text); width:210px; box-sizing:border-box;"
+            oninput="onRosterSearch()" />
+          <div style="display:flex; gap:6px;">
+            <button id="viewCards" onclick="setEnrollView('cards')" title="Card view"
+              style="background:rgba(108,99,255,0.15); border:1px solid rgba(108,99,255,0.4); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; color:var(--text);">⊞</button>
+            <button id="viewRoster" onclick="setEnrollView('roster')" title="Roster table view"
+              style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; color:var(--text-muted);">☰</button>
+          </div>
+        </div>
       </div>
 
+      <!-- Card view -->
       <div class="req-grid" id="reqGrid">
         <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading enrollment requests…</p></div>
+      </div>
+
+      <!-- Roster / table view -->
+      <div id="rosterView" style="display:none;">
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden;">
+          <div style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <span style="font-family:var(--font-head); font-size:14px; font-weight:800;">Enrollment Roster <span id="rosterCount" style="font-weight:500; color:var(--text-muted); font-size:12px;"></span></span>
+            <button onclick="exportRosterCSV()" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:7px 14px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">📥 Export CSV</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="pay-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Student</th>
+                  <th>Phone</th>
+                  <th>Course</th>
+                  <th>Medium</th>
+                  <th>Fee</th>
+                  <th>UTR No.</th>
+                  <th>Status</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody id="rosterBody">
+                <tr><td colspan="9" style="text-align:center; padding:32px; color:var(--text-muted);">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -561,6 +606,148 @@ function renderRequests() {
 }
 
 // "Ignore" makes no status change at all — request stays Pending.
+/* ══════════════════════════════════════════════
+   ROSTER VIEW (who enrolled for what)
+══════════════════════════════════════════════ */
+let enrollView = 'cards'; // 'cards' | 'roster'
+
+function setEnrollView(mode) {
+  enrollView = mode;
+  const cardGrid   = document.getElementById('reqGrid');
+  const rosterDiv  = document.getElementById('rosterView');
+  const btnCards   = document.getElementById('viewCards');
+  const btnRoster  = document.getElementById('viewRoster');
+
+  if (mode === 'roster') {
+    cardGrid.style.display  = 'none';
+    rosterDiv.style.display = 'block';
+    btnRoster.style.background = 'rgba(108,99,255,0.15)';
+    btnRoster.style.borderColor = 'rgba(108,99,255,0.4)';
+    btnRoster.style.color = 'var(--text)';
+    btnCards.style.background = 'var(--surface2)';
+    btnCards.style.borderColor = 'var(--border)';
+    btnCards.style.color = 'var(--text-muted)';
+    renderRoster();
+  } else {
+    cardGrid.style.display  = 'grid';
+    rosterDiv.style.display = 'none';
+    btnCards.style.background = 'rgba(108,99,255,0.15)';
+    btnCards.style.borderColor = 'rgba(108,99,255,0.4)';
+    btnCards.style.color = 'var(--text)';
+    btnRoster.style.background = 'var(--surface2)';
+    btnRoster.style.borderColor = 'var(--border)';
+    btnRoster.style.color = 'var(--text-muted)';
+  }
+}
+
+function onRosterSearch() {
+  if (enrollView === 'roster') renderRoster();
+}
+
+function renderRoster() {
+  const search = (document.getElementById('rosterSearch')?.value || '').toLowerCase().trim();
+  const status = activeStatus; // uses the same status filter chips
+
+  const filtered = allRequests.filter(r => {
+    const sd     = r.studentDetails || {};
+    const name   = (sd.fullName || r.userId?.name || '').toLowerCase();
+    const email  = (sd.email    || r.userId?.email || '').toLowerCase();
+    const course = (r.courseName || '').toLowerCase();
+    const utr    = (r.utrNumber  || '').toLowerCase();
+    const phone  = (sd.mobile    || '').toLowerCase();
+    const matchSearch = !search || name.includes(search) || email.includes(search) || course.includes(search) || utr.includes(search) || phone.includes(search);
+    const matchStatus = status === 'all' || r.status === status;
+    return matchSearch && matchStatus;
+  }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  document.getElementById('rosterCount').textContent = `(${filtered.length} student${filtered.length !== 1 ? 's' : ''})`;
+
+  const fmtINR  = n => '₹' + Number(n).toLocaleString('en-IN');
+  const fmtDate = d => new Date(d).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  document.getElementById('rosterBody').innerHTML = filtered.length ? filtered.map((r, i) => {
+    const sd      = r.studentDetails || {};
+    const name    = escHtml(sd.fullName || r.userId?.name  || '—');
+    const email   = escHtml(sd.email   || r.userId?.email  || '');
+    const phone   = escHtml(sd.mobile  || '—');
+    const pillCls = r.status === 'Approved' ? 'pay-pill-approved' : r.status === 'Rejected' ? 'pay-pill-rejected' : 'pay-pill-pending';
+
+    // Highlight search term
+    const hl = (str) => {
+      if (!search || !str) return str;
+      const idx = str.toLowerCase().indexOf(search);
+      if (idx < 0) return escHtml(str);
+      return escHtml(str.slice(0, idx)) +
+        `<mark style="background:rgba(108,99,255,0.3);color:var(--text);border-radius:3px;padding:0 2px;">${escHtml(str.slice(idx, idx + search.length))}</mark>` +
+        escHtml(str.slice(idx + search.length));
+    };
+
+    return `<tr>
+      <td style="color:var(--text-muted);font-size:11px;">${i + 1}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--accent2);flex-shrink:0;">
+            ${escHtml((sd.fullName || r.userId?.name || 'U').charAt(0).toUpperCase())}
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:13px;">${hl(sd.fullName || r.userId?.name || '—')}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${hl(sd.email || r.userId?.email || '')}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-size:12px;color:var(--text-muted);">${escHtml(sd.mobile || '—')}</td>
+      <td>
+        <div style="font-weight:700;font-size:13px;">${hl(r.courseName || '—')}</div>
+        <div style="font-size:11px;color:var(--text-muted);">${escHtml(r.level || '')}</div>
+      </td>
+      <td style="font-size:12px;color:var(--text-muted);">${escHtml(r.track || '—')}</td>
+      <td style="font-family:var(--font-head);font-weight:800;color:var(--accent2);">${fmtINR(r.fee || 0)}</td>
+      <td style="font-size:11px;color:var(--text-muted);font-family:monospace;">${escHtml(r.utrNumber || '—')}</td>
+      <td><span class="pay-pill ${pillCls}">● ${escHtml(r.status)}</span></td>
+      <td style="font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(r.createdAt)}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">
+    <div style="font-size:36px;margin-bottom:10px;">🎓</div>
+    <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px;">No enrollments found</div>
+    <div style="font-size:12px;">Try adjusting your search or status filter.</div>
+  </td></tr>`;
+}
+
+function exportRosterCSV() {
+  const search = (document.getElementById('rosterSearch')?.value || '').toLowerCase().trim();
+  const filtered = allRequests.filter(r => {
+    const sd = r.studentDetails || {};
+    const name = (sd.fullName || r.userId?.name || '').toLowerCase();
+    const course = (r.courseName || '').toLowerCase();
+    const matchSearch = !search || name.includes(search) || course.includes(search);
+    const matchStatus = activeStatus === 'all' || r.status === activeStatus;
+    return matchSearch && matchStatus;
+  }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const rows = filtered.map(r => {
+    const sd = r.studentDetails || {};
+    return [
+      sd.fullName || r.userId?.name || '',
+      sd.email    || r.userId?.email || '',
+      sd.mobile   || '',
+      r.courseName || '',
+      r.track      || '',
+      r.level      || '',
+      r.fee        || 0,
+      r.utrNumber  || '',
+      r.status,
+      new Date(r.createdAt).toLocaleString('en-IN')
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+  });
+
+  const csv = ['Student,Email,Phone,Course,Medium,Level,Fee,UTR,Status,Submitted', ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `enrollment-roster-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+}
+
 function ignoreRequest() {
   showDashAlert('Request left unchanged — status remains Pending.', 'success');
 }
