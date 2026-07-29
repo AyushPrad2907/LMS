@@ -1782,6 +1782,290 @@
       .categories-grid { grid-template-columns: 1fr; }
       .stats-inner { grid-template-columns: 1fr 1fr; }
       .form-row { grid-template-columns: 1fr; }
+    /* ── GURU PURNIMA FLASHY OFFER SECTION STYLES ── */
+    .guru-offer-section {
+      position: relative;
+      margin: 40px auto;
+      max-width: 1200px;
+      padding: 48px 32px;
+      background: radial-gradient(circle at 50% 0%, #2e1065 0%, #0f172a 70%, #05050a 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 24px;
+      box-shadow: 0 0 50px rgba(245, 158, 11, 0.3), inset 0 0 30px rgba(139, 92, 246, 0.2);
+      overflow: hidden;
+    }
+
+    .guru-offer-section::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 60%);
+      animation: rotateGlow 12s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes rotateGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .guru-card-wrap {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .guru-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 6px 18px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #fbbf24;
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+    }
+
+    .discount-sparkle {
+      background: #ef4444;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      animation: pulseSparkle 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulseSparkle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    .guru-offer-title {
+      font-family: var(--font-head);
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .gold-gradient {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f43f5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+    }
+
+    .guru-offer-subtitle {
+      font-size: 15px;
+      color: #cbd5e1;
+      max-width: 720px;
+      margin: 0 auto 32px auto;
+      line-height: 1.6;
+    }
+
+    .guru-deal-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      padding: 20px 36px;
+      border-radius: 18px;
+      max-width: 780px;
+      margin: 0 auto 32px auto;
+      flex-wrap: wrap;
+    }
+
+    .coupon-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .coupon-code-flex {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .code-box {
+      font-family: monospace;
+      font-size: 24px;
+      font-weight: 900;
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.15);
+      border: 2px dashed #f59e0b;
+      padding: 6px 16px;
+      border-radius: 8px;
+      letter-spacing: 0.1em;
+    }
+
+    .btn-copy-code {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-copy-code:hover {
+      background: #7dd3fc;
+      transform: translateY(-2px);
+    }
+
+    .deal-divider {
+      width: 1px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .timer-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .timer-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(30, 27, 75, 0.8);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      padding: 6px 12px;
+      border-radius: 8px;
+      min-width: 54px;
+    }
+
+    .time-block span {
+      font-family: var(--font-head);
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .time-block small {
+      font-size: 9px;
+      text-transform: uppercase;
+      color: #a78bfa;
+    }
+
+    .time-colon {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fbbf24;
+    }
+
+    .guru-highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto 32px auto;
+    }
+
+    .highlight-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 16px;
+      border-radius: 14px;
+      transition: all 0.25s ease;
+    }
+
+    .highlight-item:hover {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .hl-tag {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 6px;
+    }
+
+    .hl-prices {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .hl-old {
+      text-decoration: line-through;
+      opacity: 0.5;
+      font-size: 14px;
+      margin-right: 6px;
+    }
+
+    .hl-new {
+      color: #4ade80;
+    }
+
+    .hl-badge {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .guru-cta-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .guru-btn-cta {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #000000;
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 800;
+      padding: 14px 36px;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .guru-btn-cta:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(245, 158, 11, 0.6);
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    }
+
+    .guru-guarantee {
+      font-size: 12px;
+      color: #94a3b8;
     }
   </style>
 </head>
@@ -1790,12 +2074,15 @@
   <!-- ══════════════════════════════════════════ -->
   <!-- ADMISSION OPEN BANNER -->
   <!-- ══════════════════════════════════════════ -->
-  <div class="admission-banner" id="admissionBanner">
-    <div class="banner-live">
-      <span class="live-dot"></span>
-      <span class="live-text">Admissions Open</span>
+  <div class="admission-banner" id="admissionBanner" style="background: linear-gradient(90deg, #1e1b4b 0%, #431407 50%, #1e1b4b 100%); border-bottom: 1px solid rgba(245,158,11,0.5);">
+    <div class="banner-live" style="background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.5);">
+      <span class="live-dot" style="background:#fbbf24;box-shadow:0 0 10px #fbbf24;"></span>
+      <span class="live-text" style="color:#fbbf24;">🪔 GURU PURNIMA SPECIAL</span>
     </div>
-    <a href="courses.html" class="banner-cta">Enroll Now →</a>
+    <div class="banner-msg" style="color:#fef08a;">
+      <span>FLAT 50% OFF ON ALL COURSES!</span> Use Code: <strong style="background:#f59e0b;color:#000;padding:2px 8px;border-radius:4px;font-weight:900;letter-spacing:0.05em;margin-left:4px;">GURU50</strong>
+    </div>
+    <a href="courses.html" class="banner-cta" style="background:linear-gradient(135deg, #f59e0b, #ef4444);box-shadow:0 0 12px rgba(245,158,11,0.5);">Claim 50% Off →</a>
     <button class="banner-close" onclick="closeBanner()" aria-label="Close">✕</button>
   </div>
 
@@ -1864,9 +2151,9 @@
       🏛 IMPLEXEDU &nbsp;·&nbsp; 
     </div>
 
-    <div class="hero-admission-badge">
-      <span class="admission-live-dot"></span>
-      Admissions Open — 2026–27 Batch
+    <div class="hero-admission-badge" style="border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.12); color: #fbbf24; box-shadow: 0 0 20px rgba(245,158,11,0.25);">
+      <span class="admission-live-dot" style="background: #f59e0b; box-shadow: 0 0 10px #f59e0b;"></span>
+      🪔 Guru Purnima Special — Flat 50% OFF Applied on All Courses!
     </div>
 
     <h1 class="hero-title">
@@ -1885,8 +2172,8 @@
 
     <div class="hero-cta">
 
-  <a href="courses.html" class="btn-green-lg">
-    🟢 Enroll Now — Admissions Open
+  <a href="courses.html" class="btn-green-lg" style="background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b; color: #000; font-weight: 800;">
+    🪔 Enroll Now — Flat 50% OFF
   </a>
 
   <a href="register.html" class="btn-primary-lg">
@@ -1917,6 +2204,86 @@
       <div class="trust-item"><span class="trust-icon">🔬</span> Workshops Available</div>
       <div class="trust-divider"></div>
       <div class="trust-item"><span class="trust-icon">📞</span> student@implexedu.in</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- GURU PURNIMA 50% OFF FLASHY OFFER SECTION -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="guru-offer-section" id="guruPurnimaOffer">
+    <div class="guru-sparkles"></div>
+    <div class="guru-card-wrap">
+      <div class="guru-header-badge">
+        <span class="diya-icon">🪔</span>
+        <span>GURU PURNIMA MAHA FESTIVAL OF LEARNING</span>
+        <span class="discount-sparkle">FLAT 50% OFF</span>
+      </div>
+
+      <h2 class="guru-offer-title">
+        Honor Teachers & Empower Your Future<br />
+        <span class="gold-gradient">Get Flat 50% OFF On Every Course!</span>
+      </h2>
+
+      <p class="guru-offer-subtitle">
+        Celebrate Guru Purnima with IMPLEXEDU! Unlock half-price enrollments across all 80+ School, Competitive, Coaching & University programs today.
+      </p>
+
+      <!-- Coupon & Countdown Box -->
+      <div class="guru-deal-box">
+        <div class="deal-coupon">
+          <div class="coupon-label">Guru Purnima Coupon Code:</div>
+          <div class="coupon-code-flex">
+            <span class="code-box" id="couponCode">GURU50</span>
+            <button class="btn-copy-code" onclick="copyCouponCode()">
+              <span id="copyIcon">📋</span> <span id="copyText">Copy Code</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="deal-divider"></div>
+
+        <div class="deal-timer">
+          <div class="timer-label">⏰ Offer Ends In:</div>
+          <div class="timer-display">
+            <div class="time-block"><span id="gHours">11</span><small>Hours</small></div>
+            <div class="time-colon">:</div>
+            <div class="time-block"><span id="gMins">45</span><small>Mins</small></div>
+            <div class="time-colon">:</div>
+            <div class="time-block"><span id="gSecs">30</span><small>Secs</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Discount Grid -->
+      <div class="guru-highlights-grid">
+        <div class="highlight-item">
+          <div class="hl-tag">School (Class 5–10)</div>
+          <div class="hl-prices"><span class="hl-old">₹1,500</span> <span class="hl-new">₹750</span>/yr</div>
+          <div class="hl-badge">50% OFF</div>
+        </div>
+        <div class="highlight-item">
+          <div class="hl-tag">11th & 12th PCM/PCB</div>
+          <div class="hl-prices"><span class="hl-old">₹4,500</span> <span class="hl-new">₹2,250</span>/yr</div>
+          <div class="hl-badge">50% OFF</div>
+        </div>
+        <div class="highlight-item">
+          <div class="hl-tag">IIT JEE & NEET Integrated</div>
+          <div class="hl-prices"><span class="hl-old">₹5,500</span> <span class="hl-new">₹2,750</span>/yr</div>
+          <div class="hl-badge">50% OFF</div>
+        </div>
+        <div class="highlight-item">
+          <div class="hl-tag">UPSC & State PCS</div>
+          <div class="hl-prices"><span class="hl-old">₹15,000</span> <span class="hl-new">₹7,500</span>/yr</div>
+          <div class="hl-badge">50% OFF</div>
+        </div>
+      </div>
+
+      <div class="guru-cta-wrap">
+        <a href="courses.html" class="guru-btn-cta">
+          🪔 Claim Your 50% Discount Now →
+        </a>
+        <span class="guru-guarantee">✨ Discount automatically reflected on all course checkout cards</span>
+      </div>
     </div>
   </section>
 
@@ -2602,5 +2969,42 @@ FREE TRIAL CLASS MODAL
 </div>
 
 <script src="trial.js"></script>
+<script>
+  function copyCouponCode() {
+    navigator.clipboard.writeText('GURU50').then(() => {
+      const copyText = document.getElementById('copyText');
+      const copyIcon = document.getElementById('copyIcon');
+      if (copyText && copyIcon) {
+        copyText.textContent = 'Copied!';
+        copyIcon.textContent = '✅';
+        setTimeout(() => {
+          copyText.textContent = 'Copy Code';
+          copyIcon.textContent = '📋';
+        }, 2000);
+      }
+    }).catch(() => {
+      alert('Coupon code GURU50 copied!');
+    });
+  }
+
+  function updateGuruCountdown() {
+    const now = new Date();
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+    let diff = endOfDay - now;
+    if (diff < 0) diff = 0;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+    const hEl = document.getElementById('gHours');
+    const mEl = document.getElementById('gMins');
+    const sEl = document.getElementById('gSecs');
+    if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+    if (mEl) mEl.textContent = String(mins).padStart(2, '0');
+    if (sEl) sEl.textContent = String(secs).padStart(2, '0');
+  }
+  setInterval(updateGuruCountdown, 1000);
+  updateGuruCountdown();
+</script>
 </body>
 </html>
