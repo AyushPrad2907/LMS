@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=50off_v2" />
+  <link rel="stylesheet" href="style.css?v=50off_v3" />
   <style>
     /* ── COURSES PAGE EXTRAS ── */
     .courses-topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 40px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
@@ -171,7 +171,7 @@
       color: var(--text);
       margin-bottom: 14px;
     }
-    .card-price span { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+    .card-price > span:not([style]) { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 2px; }
 
     .card-details { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; flex: 1; }
     .card-detail { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
