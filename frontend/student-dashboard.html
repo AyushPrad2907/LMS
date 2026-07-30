@@ -323,7 +323,7 @@
     <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
       <div>
         <h1 class="page-title" id="pageTitle">Student Dashboard</h1>
-        <p class="page-subtitle" id="pageSubtitle">Your live classroom hub.</p>
+        <p class="page-subtitle" id="pageSubtitle">Your enrollment and learning hub.</p>
       </div>
       <!-- Tab Navigation -->
       <div class="filter-bar" style="margin-bottom:0; gap:8px;">
@@ -337,19 +337,6 @@
 
     <!-- Classroom View (Live Classes + Enrollments) -->
     <div id="classroomView">
-      <!-- LIVE CLASSES -->
-      <div style="margin-bottom:24px;">
-        <input class="form-input" type="text" id="searchInput" placeholder="🔍  Search live classes by title or teacher…" style="max-width:480px;" />
-      </div>
-      <div class="classes-section" style="margin-top:0; margin-bottom:40px;">
-        <div class="classes-header">
-          <h2 class="section-title" style="margin-bottom:0">🔴 Live Classes</h2>
-          <span class="classes-count" id="classesCount">Loading…</span>
-        </div>
-        <div class="classes-grid" id="classesGrid">
-          <div class="empty-state"><div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div><p>Loading classes…</p></div>
-        </div>
-      </div>
 
       <!-- MY ENROLLED COURSES -->
       <div class="classes-section" id="myEnrollmentsSection" style="margin-top:0;margin-bottom:40px;">
@@ -674,7 +661,7 @@ tabClassroom.addEventListener('click', () => {
   classroomView.style.display = 'block';
   catalogView.style.display = 'none';
   document.getElementById('pageTitle').textContent = 'Student Dashboard';
-  document.getElementById('pageSubtitle').textContent = 'Your live classroom hub.';
+  document.getElementById('pageSubtitle').textContent = 'Your enrollment and learning hub.';
 });
 
 tabCatalog.addEventListener('click', () => {
@@ -1362,7 +1349,6 @@ async function loadMyEnrollments() {
 async function initDashboard() {
   await loadServerCourses();
   await loadMyEnrollments();
-  await loadClasses();
 }
 
 initDashboard();
