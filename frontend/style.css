@@ -750,25 +750,25 @@ body::before {
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg: #f8fafc;
-  --surface: rgba(255, 255, 255, 0.85);
-  --surface2: rgba(241, 245, 249, 0.8);
-  --border: rgba(0, 0, 0, 0.08);
-  --accent: #6366f1;
-  --accent2: #a855f7;
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --font-head: 'Outfit', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-}
-
-[data-theme="dark"] {
   --bg: #0b0f19;
   --surface: rgba(20, 26, 40, 0.7);
   --surface2: rgba(30, 38, 56, 0.6);
   --border: rgba(255, 255, 255, 0.08);
+  --accent: #6366f1;
+  --accent2: #a855f7;
   --text: #f8fafc;
   --text-muted: #94a3b8;
+  --font-head: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg: #f8fafc;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface2: rgba(241, 245, 249, 0.8);
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #0f172a;
+  --text-muted: #64748b;
 }
 
 body {
@@ -785,23 +785,23 @@ body {
   background: var(--surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease;
 }
 
-[data-theme="dark"] .req-card, [data-theme="dark"] .user-card, [data-theme="dark"] .ana-kpi, [data-theme="dark"] .ana-card, [data-theme="dark"] .auth-box, [data-theme="dark"] .dashboard-page > main {
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+[data-theme="light"] .req-card, [data-theme="light"] .user-card, [data-theme="light"] .ana-kpi, [data-theme="light"] .ana-card, [data-theme="light"] .auth-box, [data-theme="light"] .dashboard-page > main {
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
 }
 
 .req-card:hover, .user-card:hover, .ana-kpi:hover {
   transform: translateY(-4px);
   border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
 }
 
-[data-theme="dark"] .req-card:hover, [data-theme="dark"] .user-card:hover, [data-theme="dark"] .ana-kpi:hover {
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+[data-theme="light"] .req-card:hover, [data-theme="light"] .user-card:hover, [data-theme="light"] .ana-kpi:hover {
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
 }
 
 .topbar, .navbar {
