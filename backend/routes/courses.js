@@ -80,7 +80,7 @@ router.post('/:id/materials', protect, restrictTo('teacher'), async (req, res) =
     if (!title || !type || !url) {
       return res.status(400).json({ success: false, message: 'Title, type, and URL/Base64 are required.' });
     }
-    if (!['youtube', 'pdf', 'doc', 'other'].includes(type)) {
+    if (!['youtube', 'pdf', 'doc', 'other', 'live'].includes(type)) {
       return res.status(400).json({ success: false, message: 'Invalid material type.' });
     }
 
