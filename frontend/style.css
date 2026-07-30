@@ -743,3 +743,53 @@ body::before {
     }
 
 }
+
+/* =========================================
+   ANTIGRAVITY PREMIUM GLASSMORPHISM UPGRADE
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #0b0f19;
+  --surface: rgba(20, 26, 40, 0.7);
+  --surface2: rgba(30, 38, 56, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #6366f1;
+  --accent2: #a855f7;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --font-head: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.12), transparent 25%);
+  background-attachment: fixed;
+}
+
+.req-card, .user-card, .ana-kpi, .ana-card, .auth-box, .dashboard-page > main {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.req-card:hover, .user-card:hover, .ana-kpi:hover {
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+.topbar {
+  background: rgba(11, 15, 25, 0.8) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+button {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+}
+button:active {
+  transform: scale(0.96);
+}
