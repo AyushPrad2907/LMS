@@ -11,9 +11,11 @@ const courseRoutes = require('./routes/courses');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payment');
 const trialRoutes = require('./routes/trial'); // NEW
+const demoAuthRoutes = require('./routes/demoAuth'); // NEW DEMO PANEL ROUTE
 
 const Course = require('./models/Course');
 const Admin = require('./models/Admin');
+const DemoManager = require('./models/DemoManager');
 
 const app = express();
 
@@ -42,6 +44,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/trial', trialRoutes); 
+app.use('/api/demo-auth', demoAuthRoutes);
 
 // ==========================================
 
@@ -50,6 +53,14 @@ app.all('/api/{*any}', (req, res) => {
     success: false,
     message: 'API endpoint not found.',
   });
+});
+
+app.get('/demo-login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/demo-login.html'));
+});
+
+app.get('/demo-dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/demo-dashboard.html'));
 });
 
 app.get('/{*any}', (req, res) => {
@@ -232,6 +243,30 @@ async function seedDefaultAdmin() {
   }
 }
 
+// Creates default demo manager
+async function seedDefaultDemoManager() {
+  const email = process.env.DEMO_MANAGER_EMAIL || 'demo@implexedu.com';
+  const password = process.env.DEMO_MANAGER_PASSWORD || 'demo1234';
+
+  const existing = await DemoManager.findOne({
+    email: email.toLowerCase().trim(),
+  });
+
+  if (!existing) {
+    await DemoManager.create({
+      name: 'Demo Manager',
+      email,
+      password,
+    });
+    console.log(`Default demo manager account created for ${email}`);
+  } else {
+    // Sync the password
+    existing.password = password;
+    await existing.save();
+    console.log(`Default demo manager account password updated/synced for ${email}`);
+  }
+}
+
 async function connectToMongoWithRetry(maxRetries = 5) {
   for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
     try {
@@ -278,6 +313,7 @@ connectToMongoWithRetry()
     Promise.all([
       seedDefaultCourses(),
       seedDefaultAdmin(),
+      seedDefaultDemoManager(),
     ])
   )
   .then(() => {

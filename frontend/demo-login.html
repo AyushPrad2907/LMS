@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Panel Login - IMPLEXEDU</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Premium aesthetics for login */
+    body { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--bg); font-family: var(--font-body); }
+    .login-container { background: var(--surface); padding: 40px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+    h2 { font-family: var(--font-head); color: var(--text); margin-bottom: 24px; font-weight: 800; font-size: 24px; }
+    .input-group { margin-bottom: 16px; text-align: left; }
+    .input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .input-group input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); outline: none; transition: border 0.3s ease; }
+    .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(108,99,255,0.2); }
+    button { width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(108,99,255,0.4); }
+    .error-msg { color: #f43f5e; font-size: 13px; font-weight: 600; margin-bottom: 16px; display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Demo Panel Portal</h2>
+    <div class="error-msg" id="errorMsg"></div>
+    <form id="loginForm">
+      <div class="input-group">
+        <label>Email Address</label>
+        <input type="email" id="email" required placeholder="manager@implexedu.com">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password" required placeholder="••••••••">
+      </div>
+      <button type="submit">Access Dashboard</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      try {
+        const res = await fetch('/api/demo-auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          localStorage.setItem('demo_token', data.token);
+          window.location.href = '/demo-dashboard';
+        } else {
+          errorMsg.textContent = data.message;
+          errorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Server connection failed.';
+        errorMsg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
