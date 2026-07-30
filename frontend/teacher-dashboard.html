@@ -204,16 +204,7 @@
     const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
     let allCourses = [];
 
-    function showAlert(id, msgId, msg) {
-      document.getElementById(id).style.display = 'flex';
-      document.getElementById(msgId).textContent = msg;
-    }
-    function hideAlerts() {
-      ['createAlert', 'createSuccess'].forEach(id => document.getElementById(id).style.display = 'none');
-    }
-    function hideCourseAlerts() {
-      ['courseAlert', 'courseSuccess'].forEach(id => document.getElementById(id).style.display = 'none');
-    }
+
 
 
 
@@ -514,7 +505,6 @@
     document.getElementById('userInitial').title = 'Click to manage your teaching courses';
     document.getElementById('userInitial').addEventListener('click', promptPasswordForOverlay);
 
-    loadClasses();
     loadCourses();
   </script>
 </body>
