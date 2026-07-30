@@ -49,6 +49,95 @@
       .material-modal-body { grid-template-columns: 1fr; }
       .material-form-section { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 20px; }
     }
+
+    /* ══════════════════════════════════════════════
+       MOBILE RESPONSIVE — Teacher Dashboard
+    ══════════════════════════════════════════════ */
+    body { overflow-x: hidden; }
+
+    /* Tablet */
+    @media (max-width: 900px) {
+      .topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 14px 16px;
+        gap: 12px;
+      }
+      .topbar-left { width: 100%; }
+      .topbar-right {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .user-chip { flex: 1; min-width: 0; }
+      .user-name { max-width: 50vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .btn-logout { margin-left: auto; }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .logo-text { font-size: 18px; }
+      .page-title { font-size: 22px; }
+      .page-subtitle { font-size: 13px; }
+
+      .classes-section { margin-top: 24px !important; }
+
+      .classes-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .classes-header > button,
+      .classes-header .btn-select-save {
+        width: 100% !important;
+        text-align: center;
+        justify-content: center;
+      }
+
+      .classes-grid { grid-template-columns: 1fr; }
+
+      /* Selection Overlay */
+      .selection-box { padding: 20px; border-radius: 14px; }
+      .selection-title { font-size: 18px; }
+      .selection-list { max-height: 220px; }
+      .selection-item { padding: 10px 12px; }
+
+      /* Material Modal */
+      .material-modal-backdrop { padding: 10px; }
+      .material-modal-box { max-width: 100%; border-radius: 14px; max-height: 90vh; overflow-y: auto; }
+      .material-modal-header { padding: 16px 20px; }
+      .material-modal-title { font-size: 15px; }
+      .material-modal-body { padding: 20px; grid-template-columns: 1fr; gap: 20px; }
+      .material-form-section { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 16px; }
+      .materials-list-section { max-height: 200px; }
+
+      /* Password Modal */
+      #pwdVerifyModal .material-modal-box { max-width: 100% !important; padding: 20px !important; }
+    }
+
+    /* Small phones */
+    @media (max-width: 420px) {
+      .topbar-right {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .role-tag { text-align: center; }
+      .user-chip { justify-content: center; }
+      .btn-logout { width: 100%; text-align: center; }
+      .user-name { max-width: 60vw; }
+
+      .page-title { font-size: 19px; }
+      .section-title { font-size: 16px; }
+
+      .class-card { padding: 18px; }
+      .card-title { font-size: 15px; }
+
+      .selection-box { padding: 16px; }
+      .selection-title { font-size: 16px; }
+      .selection-subtitle { font-size: 12px; }
+    }
   </style></head>
 <body>
   <div class="dashboard-page">
