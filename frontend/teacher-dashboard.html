@@ -75,54 +75,9 @@
     <main class="main">
       <div class="page-header">
         <h1 class="page-title">Teacher Dashboard</h1>
-        <p class="page-subtitle">Create and manage your virtual classes.</p>
+        <p class="page-subtitle">Manage your teaching courses and materials.</p>
       </div>
 
-      <!-- Create Class -->
-      <div class="create-section">
-        <h2 class="section-title">📝 Create New Class</h2>
-        <p class="section-subtitle">Fill in the details below to schedule a new class for your students.</p>
-
-        <div class="alert alert-error" id="createAlert" style="display:none">
-          <span>⚠️</span><span id="createAlertMsg"></span>
-        </div>
-        <div class="alert alert-success" id="createSuccess" style="display:none">
-          <span>✅</span><span id="createSuccessMsg"></span>
-        </div>
-
-        <form id="createForm" novalidate>
-          <div class="form-row">
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label" for="classTitle">Class Title</label>
-              <input class="form-input" type="text" id="classTitle" placeholder="e.g. Advanced Mathematics — Chapter 5" required />
-            </div>
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label" for="meetingLink">Meeting Link</label>
-              <input class="form-input" type="url" id="meetingLink" placeholder="https://meet.google.com/abc-defg-hij" required />
-            </div>
-          </div>
-          <button type="submit" class="btn-create" id="createBtn">
-            <span>＋</span> Create Class
-          </button>
-        </form>
-      </div>
-
-
-
-      <!-- Classes List -->
-      <div class="classes-section">
-        <div class="classes-header">
-          <h2 class="section-title" style="margin-bottom:0">My Classes</h2>
-          <span class="classes-count" id="classesCount">Loading…</span>
-        </div>
-
-        <div class="classes-grid" id="classesGrid">
-          <div class="empty-state">
-            <div class="loading-spinner" style="width:32px;height:32px;margin:0 auto 16px;border-width:3px"></div>
-            <p>Loading classes…</p>
-          </div>
-        </div>
-      </div>
 
       <!-- My Teaching Courses List -->
       <div class="classes-section" style="margin-top:40px;">
@@ -185,6 +140,7 @@
                 <div class="form-group">
                   <label class="form-label" for="matType">Type</label>
                   <select class="form-input" id="matType" onchange="updatePlaceholder()" required>
+                    <option value="live">🔴 Live Class Link (Meet/Zoom)</option>
                     <option value="pdf">📄 PDF Link (Drive/OneDrive)</option>
                     <option value="doc">📝 Word Document Link</option>
                     <option value="youtube">🎥 YouTube Video Link</option>
@@ -259,64 +215,9 @@
       ['courseAlert', 'courseSuccess'].forEach(id => document.getElementById(id).style.display = 'none');
     }
 
-    function timeAgo(date) {
-      const diff = (Date.now() - new Date(date)) / 1000;
-      if (diff < 60) return 'Just now';
-      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-      return `${Math.floor(diff / 86400)}d ago`;
-    }
 
-    // Fetch classes
-    async function loadClasses() {
-      try {
-        const res = await fetch('/api/classes/all', { headers: authHeaders });
-        if (res.status === 401) {
-          localStorage.removeItem('lms_token');
-          localStorage.removeItem('lms_user');
-          window.location.href = 'login.html';
-          return;
-        }
-        let data;
-        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
 
-        const grid = document.getElementById('classesGrid');
-        document.getElementById('classesCount').textContent =
-          `${data.count} ${data.count === 1 ? 'class' : 'classes'}`;
 
-        if (data.count === 0) {
-          grid.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-icon">🏫</div>
-              <div class="empty-title">No classes yet</div>
-              <div class="empty-desc">Create your first class above to get started.</div>
-            </div>`;
-          return;
-        }
-
-        grid.innerHTML = data.classes.map((cls, i) => `
-          <div class="class-card" style="animation-delay:${i * 0.05}s">
-            <div class="card-tag">CLASS</div>
-            <div class="card-title">${escapeHtml(cls.title)}</div>
-            <div class="card-teacher">🕒 Created ${timeAgo(cls.createdAt)}</div>
-            <div class="card-actions">
-              <a class="btn-join" href="${escapeHtml(cls.meetingLink)}" target="_blank" rel="noopener">
-                🔗 Join Meeting
-              </a>
-              <button class="btn-delete" onclick="deleteClass('${cls._id}')">🗑 Delete</button>
-            </div>
-          </div>
-        `).join('');
-
-      } catch (err) {
-        document.getElementById('classesGrid').innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">⚠️</div>
-            <div class="empty-title">Failed to load classes</div>
-            <div class="empty-desc">${err.message}</div>
-          </div>`;
-      }
-    }
 
     async function loadCourses() {
       try {
@@ -336,63 +237,6 @@
       }
     }
 
-    // Create class
-    document.getElementById('createForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideAlerts();
-      const btn = document.getElementById('createBtn');
-      const title = document.getElementById('classTitle').value.trim();
-      const meetingLink = document.getElementById('meetingLink').value.trim();
-
-      if (!title || !meetingLink) {
-        return showAlert('createAlert', 'createAlertMsg', 'Please fill in all fields.');
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loading-spinner"></span> Creating…';
-
-      try {
-        const res = await fetch('/api/classes/create', {
-          method: 'POST',
-          headers: authHeaders,
-          body: JSON.stringify({ title, meetingLink }),
-        });
-        let data;
-        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
-
-        if (!res.ok) throw new Error(data.message || 'Failed to create class.');
-
-        showAlert('createSuccess', 'createSuccessMsg', 'Class created successfully!');
-        document.getElementById('classTitle').value = '';
-        document.getElementById('meetingLink').value = '';
-        loadClasses();
-
-      } catch (err) {
-        showAlert('createAlert', 'createAlertMsg', err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>＋</span> Create Class';
-      }
-    });
-
-
-
-    // Delete class
-    async function deleteClass(id) {
-      if (!confirm('Delete this class? This cannot be undone.')) return;
-      try {
-        const res = await fetch(`/api/classes/${id}`, { method: 'DELETE', headers: authHeaders });
-        let data;
-        try { data = await res.json(); } catch { throw new Error('Server returned an invalid response.'); }
-        if (!res.ok) throw new Error(data.message);
-        loadClasses();
-      } catch (err) {
-        alert('Error: ' + err.message);
-      }
-    }
-
-
-
     function escapeHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
@@ -403,7 +247,9 @@
     function updatePlaceholder() {
       const type = document.getElementById('matType').value;
       const urlInput = document.getElementById('matUrl');
-      if (type === 'pdf') {
+      if (type === 'live') {
+        urlInput.placeholder = 'https://meet.google.com/abc-defg-hij or Zoom link';
+      } else if (type === 'pdf') {
         urlInput.placeholder = 'https://drive.google.com/file/d/... or OneDrive link';
       } else if (type === 'doc') {
         urlInput.placeholder = 'https://docs.google.com/document/d/... or OneDrive link';
