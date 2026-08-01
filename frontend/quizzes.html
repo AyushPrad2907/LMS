@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Quizzes — IMPLEXEDU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #05050a;
+      --surface: #0a0a1a;
+      --surface2: #12122b;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #6c63ff;
+      --accent2: #f5a623;
+      --accent3: #22d3ee;
+      --green: #22c55e;
+      --text: #ffffff;
+      --muted: #a0a0c0;
+      --accent-gradient: linear-gradient(135deg, #6c63ff 0%, #a855f7 100%);
+      --font-head: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(108, 99, 255, 0.12), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(34, 211, 238, 0.08), transparent 25%);
+      background-attachment: fixed;
+      font-family: var(--font-body);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* Navbar */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 48px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(7, 7, 15, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-icon {
+      width: 40px; height: 40px;
+      background: #ffffff;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+
+    .nav-logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .nav-logo-text {
+      font-family: var(--font-head);
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #ffffff 0%, #a89fff 50%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 24px rgba(108,99,255,0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+    .btn-nav-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 18px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-nav-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+
+    .btn-nav-primary {
+      background: linear-gradient(135deg, var(--accent), #8b80ff);
+      border: none;
+      border-radius: 8px;
+      padding: 9px 20px;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(108,99,255,0.3);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 24px 60px;
+    }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+
+    .section-tag::before { content: ''; display: block; width: 20px; height: 2px; background: var(--accent); }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+
+    .section-title span {
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent3) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-desc {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Boxes / Buttons Grid */
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      margin-bottom: 60px;
+    }
+
+    .quiz-card {
+      background: rgba(20, 20, 45, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 30px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+    }
+
+    .quiz-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.15) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .quiz-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(108, 99, 255, 0.4);
+      box-shadow: 0 15px 35px rgba(108, 99, 255, 0.15);
+    }
+
+    .quiz-card:hover::before { opacity: 1; }
+
+    .card-icon {
+      font-size: 32px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-title {
+      font-family: var(--font-head);
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #fff;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+      flex-grow: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      z-index: 2;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .meta-item i { color: var(--accent); }
+
+    .btn-card {
+      background: linear-gradient(135deg, var(--accent) 0%, #8b80ff 100%);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      color: white;
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(108,99,255,0.25);
+    }
+
+    /* Modal Styling */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(5, 5, 10, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+
+    .modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background: #0d0d21;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal.open .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .modal-icon {
+      font-size: 40px;
+    }
+
+    .modal-title {
+      font-family: var(--font-head);
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .instructions-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .instructions-box h4 {
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--accent2);
+    }
+
+    .instructions-box ul {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .instructions-box li {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .instructions-box li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .scholarship-highlight {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #86efac;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .scholarship-highlight i { font-size: 18px; color: var(--green); }
+
+    /* Terms checkbox */
+    .terms-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      padding: 8px 0;
+    }
+
+    .terms-checkbox {
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: var(--accent);
+      width: 18px;
+      height: 18px;
+    }
+
+    .terms-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      user-select: none;
+    }
+
+    .btn-start-quiz {
+      background: linear-gradient(135deg, var(--accent) 0%, #8b80ff 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 32px;
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s;
+      box-shadow: 0 10px 30px rgba(108, 99, 255, 0.3);
+      width: 100%;
+    }
+
+    .btn-start-quiz:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-start-quiz:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(108, 99, 255, 0.5);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      background: rgba(10, 10, 26, 0.95);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .container { padding-top: 100px; }
+      .modal-content { padding: 30px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><img src="images/implexedu-logo.jpg" alt="IMPLEXEDU" /></div>
+      <div>
+        <span class="nav-logo-text">IMPLEXEDU</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#how">How It Works</a></li>
+      <li><a href="index.html#features">Features</a></li>
+      <li><a href="courses.html">Courses</a></li>
+      <li><a href="quizzes.html" style="color: #fff;">Quizzes</a></li>
+      <li><a href="workshop.html">Workshop</a></li>
+      <li><a href="index.html#testimonials">Reviews</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-nav-ghost">Sign In</a>
+      <a href="register.html" class="btn-nav-primary">Get Started →</a>
+    </div>
+  </nav>
+
+  <!-- Container -->
+  <div class="container">
+    <div class="header-section">
+      <div class="section-tag">Mock Tests</div>
+      <h2 class="section-title">Scholarship <span>Quizzes Portal</span></h2>
+      <p class="section-desc">Select your target category, review the exam instructions, and claim your scholarship eligibility by scoring 80% or above!</p>
+    </div>
+
+    <!-- Quiz Category Boxes Grid -->
+    <div class="quiz-grid">
+      
+      <!-- Class 9 -->
+      <div class="quiz-card" onclick="openQuizModal('class9')">
+        <div>
+          <div class="card-icon">📚</div>
+          <h3 class="card-title">Class 9 Quiz</h3>
+          <p class="card-desc">Evaluate your foundations in Science, Mathematics, English, and Social Studies. Score 80%+ to win a scholarship.</p>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><i class="fa-solid fa-clock"></i> 45 Mins</div>
+          <button class="btn-card">Attempt Quiz <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Class 10 -->
+      <div class="quiz-card" onclick="openQuizModal('class10')">
+        <div>
+          <div class="card-icon">✏️</div>
+          <h3 class="card-title">Class 10 Quiz</h3>
+          <p class="card-desc">Board pattern preliminary test assessing Core Sciences, Mathematics, and General Aptitude.</p>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><i class="fa-solid fa-clock"></i> 45 Mins</div>
+          <button class="btn-card">Attempt Quiz <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Class 11 -->
+      <div class="quiz-card" onclick="openQuizModal('class11')">
+        <div>
+          <div class="card-icon">🔬</div>
+          <h3 class="card-title">Class 11 Quiz</h3>
+          <p class="card-desc">Test covering initial concepts in Physics, Chemistry, Mathematics, Biology, Commerce, or Arts streams.</p>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><i class="fa-solid fa-clock"></i> 60 Mins</div>
+          <button class="btn-card">Attempt Quiz <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Class 12 -->
+      <div class="quiz-card" onclick="openQuizModal('class12')">
+        <div>
+          <div class="card-icon">🎓</div>
+          <h3 class="card-title">Class 12 Quiz</h3>
+          <p class="card-desc">Advanced comprehensive mockup test geared towards board examinations and competitive concepts.</p>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><i class="fa-solid fa-clock"></i> 60 Mins</div>
+          <button class="btn-card">Attempt Quiz <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- IAS -->
+      <div class="quiz-card" onclick="openQuizModal('ias')">
+        <div>
+          <div class="card-icon">🏛️</div>
+          <h3 class="card-title">IAS (UPSC CSE)</h3>
+          <p class="card-desc">Prelims mockup test featuring History, Polity, Geography, Economy, Ecology, and General Science.</p>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><i class="fa-solid fa-clock"></i> 90 Mins</div>
+          <button class="btn-card">Attempt Quiz <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- PCS -->
+      <div class="quiz-card" onclick="openQuizModal('pcs')">
+        <div>
+          <div class="card-icon">🎖️</div>
+          <h3 class="card-title">PCS (State Services)</h3>
+          <p class="card-desc">State service examinations prelims mockup test evaluating General Studies & Aptitude parameters.</p>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><i class="fa-solid fa-clock"></i> 90 Mins</div>
+          <button class="btn-card">Attempt Quiz <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Quiz Instructions Modal -->
+  <div id="quizModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeQuizModal()">✕</button>
+      
+      <div class="modal-header">
+        <div class="modal-icon" id="modal-icon">📚</div>
+        <div>
+          <h3 class="modal-title" id="modal-title">Class 9 Quiz Instructions</h3>
+        </div>
+      </div>
+
+      <div class="instructions-box">
+        <h4>📋 Exam Guidelines & Rules</h4>
+        <ul>
+          <li>You will be redirected to the official Google Form mock test dashboard.</li>
+          <li>Ensure you have a stable high-speed internet connection before starting.</li>
+          <li>This mock test must be submitted within the allocated duration.</li>
+          <li>Do not refresh or exit the browser window during the test.</li>
+        </ul>
+      </div>
+
+      <div class="scholarship-highlight">
+        <i class="fa-solid fa-trophy"></i>
+        <div>
+          <strong>Scholarship Reward:</strong> <span id="scholarship-text">If a student secures 80+ marks, he/she is eligible for a ₹10,000 scholarship.</span>
+        </div>
+      </div>
+
+      <label class="terms-container">
+        <input type="checkbox" class="terms-checkbox" id="agreeCheckbox" onchange="toggleStartBtn()">
+        <span class="terms-text">I have read the guidelines and agree to abide by the terms and conditions of the scholarship assessment program.</span>
+      </label>
+
+      <button id="startTestBtn" class="btn-start-quiz" disabled onclick="startTestRedirect()">
+        Start Test <i class="fa-solid fa-up-right-from-square"></i>
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 IMPLEXEDU · All rights reserved. Structured learning from Class 5 to UPSC.</p>
+  </footer>
+
+  <script>
+    // Mock forms (to be filled with real Google forms by user)
+    const googleForms = {
+      class9: "https://docs.google.com/forms/d/e/1FAIpQLSfD3nZ08hW9aR19P5aD_ExampleClass9/viewform",
+      class10: "https://docs.google.com/forms/d/e/1FAIpQLSfD3nZ08hW9aR19P5aD_ExampleClass10/viewform",
+      class11: "https://docs.google.com/forms/d/e/1FAIpQLSfD3nZ08hW9aR19P5aD_ExampleClass11/viewform",
+      class12: "https://docs.google.com/forms/d/e/1FAIpQLSfD3nZ08hW9aR19P5aD_ExampleClass12/viewform",
+      ias: "https://docs.google.com/forms/d/e/1FAIpQLSfD3nZ08hW9aR19P5aD_ExampleIAS/viewform",
+      pcs: "https://docs.google.com/forms/d/e/1FAIpQLSfD3nZ08hW9aR19P5aD_ExamplePCS/viewform"
+    };
+
+    const quizDetails = {
+      class9: {
+        title: "Class 9 Scholarship Quiz",
+        icon: "📚",
+        scholarship: "If a student secures 80+ marks, he/she is eligible for a scholarship of ₹10,000.",
+        link: googleForms.class9
+      },
+      class10: {
+        title: "Class 10 Scholarship Quiz",
+        icon: "✏️",
+        scholarship: "If a student secures 80+ marks, he/she is eligible for a scholarship of ₹10,000.",
+        link: googleForms.class10
+      },
+      class11: {
+        title: "Class 11 Scholarship Quiz",
+        icon: "🔬",
+        scholarship: "If a student secures 80+ marks, he/she is eligible for a scholarship of ₹20,000.",
+        link: googleForms.class11
+      },
+      class12: {
+        title: "Class 12 Scholarship Quiz",
+        icon: "🎓",
+        scholarship: "If a student secures 80+ marks, he/she is eligible for a scholarship of ₹20,000.",
+        link: googleForms.class12
+      },
+      ias: {
+        title: "IAS Scholarship Quiz",
+        icon: "🏛️",
+        scholarship: "If a student secures 80+ marks, he/she is eligible for a full scholarship benefit.",
+        link: googleForms.ias
+      },
+      pcs: {
+        title: "PCS Scholarship Quiz",
+        icon: "🎖️",
+        scholarship: "If a student secures 80+ marks, he/she is eligible for a full scholarship benefit.",
+        link: googleForms.pcs
+      }
+    };
+
+    let selectedQuizKey = null;
+
+    function openQuizModal(key) {
+      selectedQuizKey = key;
+      const details = quizDetails[key];
+      
+      document.getElementById('modal-icon').textContent = details.icon;
+      document.getElementById('modal-title').textContent = details.title;
+      document.getElementById('scholarship-text').textContent = details.scholarship;
+      
+      // Reset checkbox & start button
+      document.getElementById('agreeCheckbox').checked = false;
+      document.getElementById('startTestBtn').disabled = true;
+      
+      document.getElementById('quizModal').classList.add('open');
+    }
+
+    function closeQuizModal() {
+      document.getElementById('quizModal').classList.remove('open');
+    }
+
+    function toggleStartBtn() {
+      const checkbox = document.getElementById('agreeCheckbox');
+      document.getElementById('startTestBtn').disabled = !checkbox.checked;
+    }
+
+    function startTestRedirect() {
+      if (selectedQuizKey && quizDetails[selectedQuizKey]) {
+        const url = quizDetails[selectedQuizKey].link;
+        window.open(url, '_blank');
+        closeQuizModal();
+      }
+    }
+
+    // Close modal on click outside content
+    window.onclick = function(event) {
+      const modal = document.getElementById('quizModal');
+      if (event.target == modal) {
+        closeQuizModal();
+      }
+    }
+  </script>
+</body>
+</html>
