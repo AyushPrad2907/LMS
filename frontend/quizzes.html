@@ -501,9 +501,55 @@
     @media (max-width: 768px) {
       nav { padding: 0 24px; }
       .nav-links { display: none; }
-      .container { padding-top: 100px; }
-      .modal-content { padding: 30px 20px; }
+      .container { padding-top: 100px; padding-bottom: 40px; }
+      .modal-content { padding: 24px 20px; border-radius: 18px; }
+      .modal-title { font-size: 22px; }
+      .modal-icon { font-size: 30px; }
+      .instructions-box { padding: 16px; max-height: 180px; }
+      .instructions-box li { font-size: 12.5px; }
+      .scholarship-highlight { padding: 10px 14px; font-size: 12px; }
+      .btn-start-quiz { padding: 14px 24px; font-size: 14px; }
+      .hamburger {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 4px;
+      }
+      .hamburger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--text);
+        border-radius: 2px;
+        transition: all 0.3s;
+      }
+      .mobile-menu {
+        display: none;
+        position: fixed;
+        top: 68px; left: 0; right: 0;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 24px;
+        flex-direction: column;
+        gap: 16px;
+        z-index: 99;
+      }
+      .mobile-menu.open { display: flex; }
+      .mobile-menu a {
+        color: var(--text);
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+      }
     }
+
+    /* Desktop hamburger hidden */
+    .hamburger { display: none; }
   </style>
 </head>
 <body>
@@ -528,7 +574,21 @@
       <a href="login.html" class="btn-nav-ghost">Sign In</a>
       <a href="register.html" class="btn-nav-primary">Get Started →</a>
     </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html#how" onclick="closeMobile()">How It Works</a>
+    <a href="index.html#features" onclick="closeMobile()">Features</a>
+    <a href="courses.html" onclick="closeMobile()">Courses</a>
+    <a href="quizzes.html" onclick="closeMobile()">Quizzes</a>
+    <a href="workshop.html" onclick="closeMobile()">Workshop</a>
+    <a href="login.html" onclick="closeMobile()" style="color:var(--text);font-weight:600;">Sign In</a>
+    <a href="register.html" onclick="closeMobile()" style="color:var(--accent);font-weight:700;border-bottom:none;">Get Started →</a>
+  </div>
 
   <!-- Container -->
   <div class="container">
@@ -755,6 +815,20 @@
       const modal = document.getElementById('quizModal');
       if (event.target == modal) {
         closeQuizModal();
+      }
+    }
+
+    // Mobile Hamburger Menu Controls
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+      });
+    }
+    function closeMobile() {
+      if (mobileMenu) {
+        mobileMenu.classList.remove('open');
       }
     }
   </script>
