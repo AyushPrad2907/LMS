@@ -86,6 +86,11 @@ router.get('/users', protectAdmin, async (req, res) => {
       email: u.email,
       role: u.role || 'student',
       contactNumber: u.contactNumber || '',
+      studentId: u.studentId || '',
+      bloodGroup: u.bloodGroup || '',
+      profilePhoto: u.profilePhoto || '',
+      guardianName: u.guardianName || '',
+      address: u.address || '',
       createdAt: u.createdAt,
       updatedAt: u.updatedAt,
       type: 'user'

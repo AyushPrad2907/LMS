@@ -8,6 +8,64 @@
   <meta http-equiv="Expires" content="0" />
   <title>Admin Dashboard — IMPLEXEDU</title>
   <link rel="stylesheet" href="style.css?v=50off_v2" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* ── ID CARD STYLES FOR ADMIN ── */
+    .id-card {
+      width: 370px; margin: 0 auto; background: #fff; border-radius: 16px;
+      overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.35); font-family: 'Segoe UI', sans-serif;
+      color: #222; text-align: left;
+    }
+    .id-header {
+      background: linear-gradient(135deg, #f5a623 0%, #e8920f 100%);
+      padding: 20px 24px; display: flex; align-items: center; gap: 14px;
+    }
+    .id-logo {
+      width: 52px; height: 52px; background: rgba(255,255,255,0.2); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 28px;
+    }
+    .id-brand { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 0.04em; }
+    .id-tagline { font-size: 12px; color: rgba(255,255,255,0.85); font-style: italic; font-weight: 500; }
+
+    .id-photo-wrap { display: flex; justify-content: center; padding: 24px 0 12px; }
+    .id-photo-hex {
+      width: 120px; height: 120px; background: #f0f0f0;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center; font-size: 48px;
+      overflow: hidden; border: 3px solid #f5a623;
+    }
+
+    .id-name { text-align: center; font-size: 22px; font-weight: 800; color: #1a1a1a; padding: 4px 20px 0; }
+    .id-designation {
+      text-align: center; margin: 10px auto 16px; background: #22c55e; color: #fff;
+      font-size: 14px; font-weight: 700; padding: 6px 28px; border-radius: 6px;
+      display: block; width: fit-content; letter-spacing: 0.02em;
+    }
+
+    .id-details { padding: 4px 28px 12px; }
+    .id-detail-row { display: flex; align-items: baseline; padding: 5px 0; border-bottom: 1px solid #f0f0f0; }
+    .id-detail-label { font-size: 12px; font-weight: 700; color: #333; min-width: 115px; }
+    .id-detail-sep { font-weight: 700; color: #333; margin: 0 8px; }
+    .id-detail-value { font-size: 12px; font-weight: 600; color: #555; word-break: break-all; }
+
+    .id-signature {
+      padding: 10px 28px 12px; display: flex; flex-direction: column; align-items: flex-end;
+    }
+    .id-sig-line { width: 100px; border-bottom: 1px solid #999; margin-bottom: 4px; }
+    .id-sig-name { font-size: 12px; font-weight: 700; color: #333; }
+    .id-sig-title { font-size: 9px; color: #777; text-align: right; font-style: italic; line-height: 1.3; }
+
+    .id-footer {
+      background: linear-gradient(135deg, #f5a623, #e8920f); text-align: center;
+      padding: 10px; font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.03em;
+    }
+
+    .btn-download-id {
+      display: block; width: 100%; background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 14px;
+      font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
+    }
+    .btn-download-id:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34,197,94,0.4); }
   <style>
     .logo-text { font-size: 20px; }
 
@@ -1111,7 +1169,8 @@ function renderUsers() {
           </div>
 
           ${u.role !== 'admin' ? `
-            <div style="display:flex; gap:8px; align-items:center; margin-left:auto;">
+            <div style="display:flex; gap:8px; align-items:center; margin-left:auto; flex-wrap:wrap;">
+              ${u.role === 'student' ? `<button onclick="viewStudentIdCard('${u._id}')" class="btn-primary" style="padding:6px 12px; font-size:11px; width:auto; background:linear-gradient(135deg, #f5a623, #e8920f); color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">🪪 ID Card</button>` : ''}
               <select onchange="changeUserRole('${u._id}', this.value)" style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:11px; font-weight:600; color:var(--text); cursor:pointer;">
                 <option value="student" ${u.role === 'student' ? 'selected' : ''}>Role: Student</option>
                 <option value="teacher" ${u.role === 'teacher' ? 'selected' : ''}>Role: Teacher</option>
@@ -1391,6 +1450,151 @@ async function deleteCourse(id) {
 }
 
 loadRequests();
+
+/* ── STUDENT ID CARD MODAL & DOWNLOAD LOGIC FOR ADMIN ── */
+function viewStudentIdCard(userId) {
+  const user = allRegisteredUsers.find(u => u._id === userId);
+  if (!user) return alert('Student not found.');
+
+  document.getElementById('adminIdCardName').textContent = user.name || 'Student Name';
+  document.getElementById('adminIdCardStudentId').textContent = user.studentId || '—';
+  document.getElementById('adminIdCardBlood').textContent = user.bloodGroup || '—';
+  document.getElementById('adminIdCardEmail').textContent = user.email || '—';
+  document.getElementById('adminIdCardContact').textContent = user.contactNumber || '—';
+  document.getElementById('adminIdCardGuardian').textContent = user.guardianName || '—';
+  document.getElementById('adminIdCardJoinDate').textContent = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '—';
+
+  const photoImg = document.getElementById('adminIdPhotoImg');
+  const photoPlaceholder = document.getElementById('adminIdPhotoPlaceholder');
+  if (user.profilePhoto) {
+    photoImg.src = user.profilePhoto;
+    photoImg.style.display = 'block';
+    photoPlaceholder.style.display = 'none';
+  } else {
+    photoImg.style.display = 'none';
+    photoPlaceholder.style.display = 'inline';
+  }
+
+  document.getElementById('adminIdModal').style.display = 'block';
+}
+
+function closeAdminIdModal() {
+  document.getElementById('adminIdModal').style.display = 'none';
+}
+
+async function downloadAdminIdCard() {
+  const card = document.getElementById('adminIdCardPreview');
+  const btn = document.getElementById('adminDownloadIdBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+  try {
+    const canvas = await html2canvas(card, {
+      scale: 3,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+    });
+    const studentName = document.getElementById('adminIdCardName').textContent.replace(/\s+/g, '_');
+    const link = document.createElement('a');
+    link.download = `IMPLEXEDU_ID_Card_${studentName}_${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    alert('Could not generate ID card image. Please try again.');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📥 Download ID Card as Image';
+  }
+}
 </script>
+
+<!-- STUDENT ID CARD MODAL FOR ADMIN -->
+<div class="modal-backdrop" id="adminIdModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:1000; overflow-y:auto;">
+  <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:20px; width:100%; max-width:440px; padding:24px; position:relative; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <h3 style="font-family:var(--font-head); font-size:16px; font-weight:800; color:var(--text); margin:0;">🪪 Student ID Card</h3>
+        <button onclick="closeAdminIdModal()" style="background:rgba(255,255,255,0.1); border:none; color:var(--text); width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+      </div>
+
+      <!-- THE ID CARD -->
+      <div class="id-card" id="adminIdCardPreview">
+        <!-- Header -->
+        <div class="id-header">
+          <div class="id-logo">🎓</div>
+          <div>
+            <div class="id-brand">IMPLEXEDU</div>
+            <div class="id-tagline">Your Success, Our Mission</div>
+          </div>
+        </div>
+
+        <!-- Photo Hexagon -->
+        <div class="id-photo-wrap">
+          <div class="id-photo-hex">
+            <span class="id-photo-placeholder" id="adminIdPhotoPlaceholder">👤</span>
+            <img id="adminIdPhotoImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;" />
+          </div>
+        </div>
+
+        <!-- Name & Designation -->
+        <div class="id-name" id="adminIdCardName">Student Name</div>
+        <div class="id-designation">Student</div>
+
+        <!-- Details Table -->
+        <div class="id-details">
+          <div class="id-detail-row">
+            <span class="id-detail-label">ID No</span>
+            <span class="id-detail-sep">:</span>
+            <span class="id-detail-value" id="adminIdCardStudentId">—</span>
+          </div>
+          <div class="id-detail-row">
+            <span class="id-detail-label">Blood Group</span>
+            <span class="id-detail-sep">:</span>
+            <span class="id-detail-value" id="adminIdCardBlood">—</span>
+          </div>
+          <div class="id-detail-row">
+            <span class="id-detail-label">Email Id</span>
+            <span class="id-detail-sep">:</span>
+            <span class="id-detail-value" id="adminIdCardEmail">—</span>
+          </div>
+          <div class="id-detail-row">
+            <span class="id-detail-label">Contact No</span>
+            <span class="id-detail-sep">:</span>
+            <span class="id-detail-value" id="adminIdCardContact">—</span>
+          </div>
+          <div class="id-detail-row">
+            <span class="id-detail-label">Guardian</span>
+            <span class="id-detail-sep">:</span>
+            <span class="id-detail-value" id="adminIdCardGuardian">—</span>
+          </div>
+          <div class="id-detail-row">
+            <span class="id-detail-label">Date of Joining</span>
+            <span class="id-detail-sep">:</span>
+            <span class="id-detail-value" id="adminIdCardJoinDate">—</span>
+          </div>
+        </div>
+
+        <!-- Signature -->
+        <div class="id-signature">
+          <div class="id-sig-line"></div>
+          <div class="id-sig-name">P. K. Giri</div>
+          <div class="id-sig-title">Signature of issuing authority<br/>Central Admin</div>
+        </div>
+
+        <!-- Footer -->
+        <div class="id-footer">www.implexedu.in</div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button class="btn-download-id" id="adminDownloadIdBtn" onclick="downloadAdminIdCard()" style="margin:0; width:100%;">
+          📥 Download ID Card as Image
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="theme.js"></script></body>
 </html>
