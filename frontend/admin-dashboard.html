@@ -257,10 +257,11 @@
                   <th>UTR No.</th>
                   <th>Status</th>
                   <th>Submitted</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="rosterBody">
-                <tr><td colspan="9" style="text-align:center; padding:32px; color:var(--text-muted);">Loading…</td></tr>
+                <tr><td colspan="10" style="text-align:center; padding:32px; color:var(--text-muted);">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -530,6 +531,7 @@ async function loadRequests() {
     const data = await res.json();
     allRequests = data.enrollments || [];
     renderRequests();
+    renderRoster();
   } catch {
     document.getElementById('reqGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load requests</div><p>Check your connection and refresh.</p></div>`;
   }
@@ -705,8 +707,19 @@ function renderRoster() {
       <td style="font-size:11px;color:var(--text-muted);font-family:monospace;">${escHtml(r.utrNumber || '—')}</td>
       <td><span class="pay-pill ${pillCls}">● ${escHtml(r.status)}</span></td>
       <td style="font-size:11px;color:var(--text-muted);white-space:nowrap;">${fmtDate(r.createdAt)}</td>
+      <td>
+        <div style="display:flex; gap:6px; align-items:center;">
+          ${r.status === 'Pending' ? `
+            <button class="btn-approve" style="padding:4px 8px; font-size:11px; width:auto; flex:none; height:26px; line-height:1; display:inline-flex; align-items:center; justify-content:center; border-radius:6px;" onclick="updateStatus('${r._id}', 'Approved')">✅ Approve</button>
+            <button class="btn-reject" style="padding:4px 8px; font-size:11px; width:auto; flex:none; height:26px; line-height:1; display:inline-flex; align-items:center; justify-content:center; border-radius:6px;" onclick="updateStatus('${r._id}', 'Rejected')">❌ Reject</button>
+            <button class="btn-ignore" style="padding:4px 8px; font-size:11px; width:auto; flex:none; height:26px; line-height:1; display:inline-flex; align-items:center; justify-content:center; border-radius:6px;" onclick="ignoreRequest()">🙈 Ignore</button>
+          ` : `
+            <button class="btn-undo" style="padding:4px 8px; font-size:11px; width:auto; flex:none; height:26px; line-height:1; display:inline-flex; align-items:center; justify-content:center; border-radius:6px;" onclick="updateStatus('${r._id}', 'Pending')">🔄 Undo</button>
+          `}
+        </div>
+      </td>
     </tr>`;
-  }).join('') : `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">
+  }).join('') : `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">
     <div style="font-size:36px;margin-bottom:10px;">🎓</div>
     <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px;">No enrollments found</div>
     <div style="font-size:12px;">Try adjusting your search or status filter.</div>
@@ -776,6 +789,7 @@ document.getElementById('filterBar').addEventListener('click', e => {
   chip.classList.add('active');
   activeStatus = chip.dataset.status;
   renderRequests();
+  renderRoster();
 });
 
 /* ══════════════════════════════════════════════
