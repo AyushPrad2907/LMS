@@ -72,6 +72,11 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label" for="contactNumber">Contact Number</label>
+            <input class="form-input" type="tel" id="contactNumber" placeholder="9876543210" required />
+          </div>
+
+          <div class="form-group">
             <label class="form-label">I am a…</label>
             <div class="role-selector">
               <button type="button" class="role-btn active" data-role="student" id="roleStudent">
@@ -138,9 +143,13 @@
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+      const contactNumber = document.getElementById('contactNumber').value.trim();
       const role = roleInput.value;
 
-      if (!name || !email || !password) return showError('Please fill in all fields.');
+      if (!name || !email || !password || !contactNumber) return showError('Please fill in all fields.');
+      if (contactNumber.length !== 10 || !/^\d+$/.test(contactNumber)) {
+        return showError('Please enter a valid 10-digit contact number.');
+      }
       if (password.length < 6) return showError('Password must be at least 6 characters.');
 
       btn.disabled = true;
@@ -150,7 +159,7 @@
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password, role }),
+          body: JSON.stringify({ name, email, password, role, contactNumber }),
         });
         let data;
         try { data = await res.json(); } catch { throw new Error('Server returned an invalid response. Please try again.'); }

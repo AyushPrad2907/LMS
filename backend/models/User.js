@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema(
       }],
       default: []
     },
+    contactNumber: {
+      type: String,
+      trim: true,
+      default: '',
+    },
 
     // ── NEW: forgot / reset password support ──
     // Never store the raw token — only its SHA256 hash. select:false keeps it

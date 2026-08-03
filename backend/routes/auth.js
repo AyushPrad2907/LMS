@@ -15,10 +15,10 @@ const generateToken = (id) => {
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, contactNumber } = req.body;
 
     // Validation
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password || !role || !contactNumber) {
       return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
     if (!['student', 'teacher'].includes(role)) {
@@ -32,14 +32,14 @@ router.post('/register', async (req, res) => {
     }
 
     // Create user (password hashed in model pre-save)
-    const user = await User.create({ name, email, password, role });
+    const user = await User.create({ name, email, password, role, contactNumber });
     const token = generateToken(user._id);
 
     res.status(201).json({
       success: true,
       message: 'Registration successful.',
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, coursesTaught: user.coursesTaught || [] },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, contactNumber: user.contactNumber, coursesTaught: user.coursesTaught || [] },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -59,10 +59,10 @@ router.post('/register', async (req, res) => {
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, contactNumber } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password are required.' });
+    if (!email || !password || !contactNumber) {
+      return res.status(400).json({ success: false, message: 'Email, password, and contact number are required.' });
     }
 
     // Find user
@@ -77,13 +77,17 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
+    // Save/update contact number
+    user.contactNumber = contactNumber;
+    await user.save();
+
     const token = generateToken(user._id);
 
     res.json({
       success: true,
       message: 'Login successful.',
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, coursesTaught: user.coursesTaught || [] },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, contactNumber: user.contactNumber, coursesTaught: user.coursesTaught || [] },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });

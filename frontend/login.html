@@ -66,6 +66,11 @@
             <input class="form-input" type="password" id="password" placeholder="Your password" autocomplete="current-password" required />
           </div>
 
+          <div class="form-group">
+            <label class="form-label" for="contactNumber">Contact Number</label>
+            <input class="form-input" type="tel" id="contactNumber" placeholder="9876543210" required />
+          </div>
+
           <button class="btn-primary" type="submit" id="submitBtn">
             Sign In
           </button>
@@ -109,8 +114,12 @@
       const btn = document.getElementById('submitBtn');
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+      const contactNumber = document.getElementById('contactNumber').value.trim();
 
-      if (!email || !password) return showError('Please fill in all fields.');
+      if (!email || !password || !contactNumber) return showError('Please fill in all fields.');
+      if (contactNumber.length !== 10 || !/^\d+$/.test(contactNumber)) {
+        return showError('Please enter a valid 10-digit contact number.');
+      }
 
       btn.disabled = true;
       btn.innerHTML = '<span class="loading-spinner"></span> Signing in…';
@@ -119,7 +128,7 @@
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, contactNumber }),
         });
         let data;
         try {
