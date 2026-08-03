@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
       success: true,
       message: 'Registration successful.',
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, contactNumber: user.contactNumber, coursesTaught: user.coursesTaught || [] },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, contactNumber: user.contactNumber, studentId: user.studentId || '', bloodGroup: user.bloodGroup || '', profilePhoto: user.profilePhoto || '', guardianName: user.guardianName || '', address: user.address || '', coursesTaught: user.coursesTaught || [], createdAt: user.createdAt },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -87,7 +87,7 @@ router.post('/login', async (req, res) => {
       success: true,
       message: 'Login successful.',
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, contactNumber: user.contactNumber, coursesTaught: user.coursesTaught || [] },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, contactNumber: user.contactNumber, studentId: user.studentId || '', bloodGroup: user.bloodGroup || '', profilePhoto: user.profilePhoto || '', guardianName: user.guardianName || '', address: user.address || '', coursesTaught: user.coursesTaught || [], createdAt: user.createdAt },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });
@@ -235,6 +235,45 @@ router.post('/verify-password', protect, async (req, res) => {
 
     res.json({ success: true, message: 'Password verified.' });
   } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+});
+
+// PUT /api/auth/update-profile — update profile fields for ID card
+router.put('/update-profile', protect, async (req, res) => {
+  try {
+    const { bloodGroup, profilePhoto, guardianName, address, name } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+
+    if (bloodGroup !== undefined) user.bloodGroup = bloodGroup;
+    if (profilePhoto !== undefined) user.profilePhoto = profilePhoto;
+    if (guardianName !== undefined) user.guardianName = guardianName;
+    if (address !== undefined) user.address = address;
+    if (name !== undefined && name.trim().length >= 2) user.name = name.trim();
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully.',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        contactNumber: user.contactNumber,
+        studentId: user.studentId || '',
+        bloodGroup: user.bloodGroup || '',
+        profilePhoto: user.profilePhoto || '',
+        guardianName: user.guardianName || '',
+        address: user.address || '',
+        coursesTaught: user.coursesTaught || [],
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });
   }
 });

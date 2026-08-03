@@ -8,7 +8,88 @@
   <meta http-equiv="Expires" content="0" />
   <title>Student Dashboard — IMPLEXEDU</title>
   <link rel="stylesheet" href="style.css?v=50off_v2" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
+    /* ── ID CARD STYLES ── */
+    .profile-form-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; 
+    }
+    .photo-preview {
+      width: 80px; height: 80px; border-radius: 50%; background: rgba(108,99,255,0.1);
+      border: 2px dashed rgba(108,99,255,0.3); display: flex; align-items: center;
+      justify-content: center; font-size: 28px; overflow: hidden; flex-shrink: 0;
+    }
+    .btn-upload {
+      background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.3);
+      color: var(--accent); border-radius: 8px; padding: 8px 16px; font-size: 12px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
+    }
+    .btn-upload:hover { background: rgba(108,99,255,0.2); }
+
+    /* ID Card */
+    .id-card {
+      width: 370px; margin: 0 auto; background: #fff; border-radius: 16px;
+      overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.35); font-family: 'Segoe UI', sans-serif;
+      color: #222;
+    }
+    .id-header {
+      background: linear-gradient(135deg, #f5a623 0%, #e8920f 100%);
+      padding: 20px 24px; display: flex; align-items: center; gap: 14px;
+    }
+    .id-logo {
+      width: 52px; height: 52px; background: rgba(255,255,255,0.2); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 28px;
+    }
+    .id-brand { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 0.04em; }
+    .id-tagline { font-size: 12px; color: rgba(255,255,255,0.85); font-style: italic; font-weight: 500; }
+
+    .id-photo-wrap { display: flex; justify-content: center; padding: 24px 0 12px; }
+    .id-photo-hex {
+      width: 120px; height: 120px; background: #f0f0f0;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center; font-size: 48px;
+      overflow: hidden; border: 3px solid #f5a623;
+    }
+
+    .id-name { text-align: center; font-size: 22px; font-weight: 800; color: #1a1a1a; padding: 4px 20px 0; }
+    .id-designation {
+      text-align: center; margin: 10px auto 16px; background: #22c55e; color: #fff;
+      font-size: 14px; font-weight: 700; padding: 6px 28px; border-radius: 6px;
+      display: inline-block; letter-spacing: 0.02em;
+    }
+    /* center the designation div */
+    .id-card > .id-designation { display: block; width: fit-content; margin-left: auto; margin-right: auto; }
+
+    .id-details { padding: 4px 28px 12px; }
+    .id-detail-row { display: flex; align-items: baseline; padding: 5px 0; border-bottom: 1px solid #f0f0f0; }
+    .id-detail-label { font-size: 12px; font-weight: 700; color: #333; min-width: 115px; }
+    .id-detail-sep { font-weight: 700; color: #333; margin: 0 8px; }
+    .id-detail-value { font-size: 12px; font-weight: 600; color: #555; word-break: break-all; }
+
+    .id-signature {
+      padding: 10px 28px 12px; display: flex; flex-direction: column; align-items: flex-end;
+    }
+    .id-sig-line { width: 100px; border-bottom: 1px solid #999; margin-bottom: 4px; }
+    .id-sig-name { font-size: 12px; font-weight: 700; color: #333; }
+    .id-sig-title { font-size: 9px; color: #777; text-align: right; font-style: italic; line-height: 1.3; }
+
+    .id-footer {
+      background: linear-gradient(135deg, #f5a623, #e8920f); text-align: center;
+      padding: 10px; font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.03em;
+    }
+
+    .btn-download-id {
+      display: block; width: 100%; max-width: 370px; margin: 16px auto 0; background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 14px;
+      font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
+    }
+    .btn-download-id:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34,197,94,0.4); }
+
+    @media (max-width: 860px) {
+      #profileView > div { grid-template-columns: 1fr !important; }
+      .id-card { width: 100%; max-width: 370px; }
+    }
     /* ── EXTRA DASHBOARD STYLES ── */
     .logo-text { font-size: 22px; background: linear-gradient(135deg,#fff 0%,#a89fff 50%,#f5a623 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 
@@ -329,6 +410,7 @@
       <div class="filter-bar" style="margin-bottom:0; gap:8px;">
         <button class="filter-chip active" id="tabClassroom" style="border-radius:8px; font-weight:700;">🎓 My Classroom</button>
         <button class="filter-chip" id="tabCatalog" style="border-radius:8px; font-weight:700;">🔍 Browse Courses</button>
+        <button class="filter-chip" id="tabProfile" style="border-radius:8px; font-weight:700;">🪪 My Profile & ID</button>
       </div>
     </div>
 
@@ -369,6 +451,158 @@
         </div>
 
         <div class="courses-grid" id="coursesGrid"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PROFILE & ID CARD VIEW                     -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="profileView" style="display:none;">
+      <div style="display:grid; grid-template-columns:1fr 400px; gap:32px; align-items:start;">
+
+        <!-- LEFT: Profile Form -->
+        <div class="profile-form-card">
+          <h2 style="font-family:var(--font-head); font-size:18px; font-weight:800; margin-bottom:20px; color:var(--text);">📝 Complete Your Profile</h2>
+          <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">Fill in the details below to generate your official IMPLEXEDU Student ID Card.</p>
+
+          <form id="profileForm" novalidate>
+            <!-- Photo Upload -->
+            <div class="form-group" style="margin-bottom:20px;">
+              <label class="form-label">Passport Photo</label>
+              <div style="display:flex; align-items:center; gap:16px;">
+                <div class="photo-preview" id="photoPreview">
+                  <span id="photoPlaceholder">📷</span>
+                  <img id="photoPreviewImg" src="" alt="Preview" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;" />
+                </div>
+                <div>
+                  <input type="file" id="photoUpload" accept="image/*" style="display:none;" />
+                  <button type="button" class="btn-upload" onclick="document.getElementById('photoUpload').click()">📁 Upload Photo</button>
+                  <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">Max 2MB · JPG/PNG</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Name -->
+            <div class="form-group">
+              <label class="form-label" for="profileName">Full Name</label>
+              <input class="form-input" type="text" id="profileName" placeholder="Your full name" />
+            </div>
+
+            <!-- Blood Group -->
+            <div class="form-group">
+              <label class="form-label" for="profileBloodGroup">Blood Group</label>
+              <select class="form-input" id="profileBloodGroup">
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A−</option>
+                <option value="B+">B+</option>
+                <option value="B-">B−</option>
+                <option value="O+">O+</option>
+                <option value="O-">O−</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB−</option>
+              </select>
+            </div>
+
+            <!-- Guardian Name -->
+            <div class="form-group">
+              <label class="form-label" for="profileGuardian">Father's / Guardian's Name</label>
+              <input class="form-input" type="text" id="profileGuardian" placeholder="Guardian's full name" />
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+              <label class="form-label" for="profileAddress">Address</label>
+              <textarea class="form-input" id="profileAddress" rows="3" placeholder="Your full address" style="resize:vertical;"></textarea>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:8px;">
+              <button type="submit" class="btn-primary" id="saveProfileBtn" style="flex:1;">💾 Save Profile</button>
+            </div>
+            <div class="alert alert-success" id="profileSuccessAlert" style="display:none; margin-top:12px;"><span>✅</span><span id="profileSuccessMsg">Profile saved!</span></div>
+            <div class="alert alert-error" id="profileErrorAlert" style="display:none; margin-top:12px;"><span>⚠️</span><span id="profileErrorMsg"></span></div>
+          </form>
+        </div>
+
+        <!-- RIGHT: ID Card Preview + Download -->
+        <div>
+          <div style="text-align:center; margin-bottom:16px;">
+            <h3 style="font-family:var(--font-head); font-size:16px; font-weight:700; color:var(--text);">🪪 Your Student ID Card</h3>
+            <p style="font-size:12px; color:var(--text-muted);">Preview updates live as you fill the form</p>
+          </div>
+
+          <!-- THE ID CARD -->
+          <div class="id-card" id="idCardPreview">
+            <!-- Header -->
+            <div class="id-header">
+              <div class="id-logo">🎓</div>
+              <div>
+                <div class="id-brand">IMPLEXEDU</div>
+                <div class="id-tagline">Your Success, Our Mission</div>
+              </div>
+            </div>
+
+            <!-- Photo Hexagon -->
+            <div class="id-photo-wrap">
+              <div class="id-photo-hex" id="idCardPhoto">
+                <span class="id-photo-placeholder" id="idPhotoPlaceholder">👤</span>
+                <img id="idPhotoImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;" />
+              </div>
+            </div>
+
+            <!-- Name & Designation -->
+            <div class="id-name" id="idCardName">Student Name</div>
+            <div class="id-designation">Student</div>
+
+            <!-- Details Table -->
+            <div class="id-details">
+              <div class="id-detail-row">
+                <span class="id-detail-label">ID No</span>
+                <span class="id-detail-sep">:</span>
+                <span class="id-detail-value" id="idCardStudentId">—</span>
+              </div>
+              <div class="id-detail-row">
+                <span class="id-detail-label">Blood Group</span>
+                <span class="id-detail-sep">:</span>
+                <span class="id-detail-value" id="idCardBlood">—</span>
+              </div>
+              <div class="id-detail-row">
+                <span class="id-detail-label">Email Id</span>
+                <span class="id-detail-sep">:</span>
+                <span class="id-detail-value" id="idCardEmail">—</span>
+              </div>
+              <div class="id-detail-row">
+                <span class="id-detail-label">Contact No</span>
+                <span class="id-detail-sep">:</span>
+                <span class="id-detail-value" id="idCardContact">—</span>
+              </div>
+              <div class="id-detail-row">
+                <span class="id-detail-label">Guardian</span>
+                <span class="id-detail-sep">:</span>
+                <span class="id-detail-value" id="idCardGuardian">—</span>
+              </div>
+              <div class="id-detail-row">
+                <span class="id-detail-label">Date of Joining</span>
+                <span class="id-detail-sep">:</span>
+                <span class="id-detail-value" id="idCardJoinDate">—</span>
+              </div>
+            </div>
+
+            <!-- Signature -->
+            <div class="id-signature">
+              <div class="id-sig-line"></div>
+              <div class="id-sig-name">P. K. Giri</div>
+              <div class="id-sig-title">Signature of issuing authority<br/>Central Admin</div>
+            </div>
+
+            <!-- Footer -->
+            <div class="id-footer">www.implexedu.in</div>
+          </div>
+
+          <button class="btn-download-id" id="downloadIdBtn" onclick="downloadIdCard()">
+            📥 Download ID Card as Image
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -652,26 +886,203 @@ const authHeaders = { 'Content-Type':'application/json', Authorization:`Bearer $
    ══════════════════════════════════════════════ */
 const tabClassroom = document.getElementById('tabClassroom');
 const tabCatalog   = document.getElementById('tabCatalog');
+const tabProfile   = document.getElementById('tabProfile');
 const classroomView = document.getElementById('classroomView');
 const catalogView   = document.getElementById('catalogView');
+const profileView   = document.getElementById('profileView');
+
+const allTabs  = [tabClassroom, tabCatalog, tabProfile];
+const allViews = [classroomView, catalogView, profileView];
+
+function switchTab(activeTab, activeView, title, subtitle) {
+  allTabs.forEach(t => t.classList.remove('active'));
+  allViews.forEach(v => v.style.display = 'none');
+  activeTab.classList.add('active');
+  activeView.style.display = 'block';
+  document.getElementById('pageTitle').textContent = title;
+  document.getElementById('pageSubtitle').textContent = subtitle;
+}
 
 tabClassroom.addEventListener('click', () => {
-  tabClassroom.classList.add('active');
-  tabCatalog.classList.remove('active');
-  classroomView.style.display = 'block';
-  catalogView.style.display = 'none';
-  document.getElementById('pageTitle').textContent = 'Student Dashboard';
-  document.getElementById('pageSubtitle').textContent = 'Your enrollment and learning hub.';
+  switchTab(tabClassroom, classroomView, 'Student Dashboard', 'Your enrollment and learning hub.');
 });
 
 tabCatalog.addEventListener('click', () => {
-  tabCatalog.classList.add('active');
-  tabClassroom.classList.remove('active');
-  classroomView.style.display = 'none';
-  catalogView.style.display = 'block';
-  document.getElementById('pageTitle').textContent = 'Course Catalog';
-  document.getElementById('pageSubtitle').textContent = 'Browse 80+ courses and submit enrollment applications.';
+  switchTab(tabCatalog, catalogView, 'Course Catalog', 'Browse 80+ courses and submit enrollment applications.');
 });
+
+tabProfile.addEventListener('click', () => {
+  switchTab(tabProfile, profileView, 'My Profile & ID Card', 'Complete your profile and download your student ID card.');
+  loadProfile();
+});
+
+/* ══════════════════════════════════════════════
+   PROFILE & ID CARD LOGIC
+   ══════════════════════════════════════════════ */
+let profilePhotoBase64 = '';
+
+// Photo upload handler
+document.getElementById('photoUpload').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Photo must be under 2MB');
+    return;
+  }
+  profilePhotoBase64 = await fileToBase64(file);
+  document.getElementById('photoPreviewImg').src = profilePhotoBase64;
+  document.getElementById('photoPreviewImg').style.display = 'block';
+  document.getElementById('photoPlaceholder').style.display = 'none';
+  // Update ID card preview live
+  document.getElementById('idPhotoImg').src = profilePhotoBase64;
+  document.getElementById('idPhotoImg').style.display = 'block';
+  document.getElementById('idPhotoPlaceholder').style.display = 'none';
+});
+
+// Live preview updates
+document.getElementById('profileName').addEventListener('input', (e) => {
+  document.getElementById('idCardName').textContent = e.target.value || 'Student Name';
+});
+document.getElementById('profileBloodGroup').addEventListener('change', (e) => {
+  document.getElementById('idCardBlood').textContent = e.target.value || '—';
+});
+document.getElementById('profileGuardian').addEventListener('input', (e) => {
+  document.getElementById('idCardGuardian').textContent = e.target.value || '—';
+});
+
+// Load profile from backend
+async function loadProfile() {
+  try {
+    const token = localStorage.getItem('lms_token');
+    const res = await fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } });
+    const data = await res.json();
+    if (!data.success) return;
+    const u = data.user;
+
+    document.getElementById('profileName').value = u.name || '';
+    document.getElementById('profileBloodGroup').value = u.bloodGroup || '';
+    document.getElementById('profileGuardian').value = u.guardianName || '';
+    document.getElementById('profileAddress').value = u.address || '';
+
+    // Photo
+    if (u.profilePhoto) {
+      profilePhotoBase64 = u.profilePhoto;
+      document.getElementById('photoPreviewImg').src = u.profilePhoto;
+      document.getElementById('photoPreviewImg').style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+      document.getElementById('idPhotoImg').src = u.profilePhoto;
+      document.getElementById('idPhotoImg').style.display = 'block';
+      document.getElementById('idPhotoPlaceholder').style.display = 'none';
+    }
+
+    // ID Card preview
+    document.getElementById('idCardName').textContent = u.name || 'Student Name';
+    document.getElementById('idCardStudentId').textContent = u.studentId || '—';
+    document.getElementById('idCardBlood').textContent = u.bloodGroup || '—';
+    document.getElementById('idCardEmail').textContent = u.email || '—';
+    document.getElementById('idCardContact').textContent = u.contactNumber || '—';
+    document.getElementById('idCardGuardian').textContent = u.guardianName || '—';
+    document.getElementById('idCardJoinDate').textContent = u.createdAt
+      ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+  } catch (err) {
+    console.error('Load profile error:', err);
+  }
+}
+
+// Save profile
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('saveProfileBtn');
+  const successAlert = document.getElementById('profileSuccessAlert');
+  const errorAlert = document.getElementById('profileErrorAlert');
+  successAlert.style.display = 'none';
+  errorAlert.style.display = 'none';
+
+  const payload = {
+    name: document.getElementById('profileName').value.trim(),
+    bloodGroup: document.getElementById('profileBloodGroup').value,
+    guardianName: document.getElementById('profileGuardian').value.trim(),
+    address: document.getElementById('profileAddress').value.trim(),
+  };
+  if (profilePhotoBase64) payload.profilePhoto = profilePhotoBase64;
+
+  if (!payload.name) {
+    errorAlert.style.display = 'flex';
+    document.getElementById('profileErrorMsg').textContent = 'Name is required.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></span> Saving…';
+
+  try {
+    const token = localStorage.getItem('lms_token');
+    const res = await fetch('/api/auth/update-profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to save');
+
+    // Update local storage
+    const lmsUser = JSON.parse(localStorage.getItem('lms_user') || '{}');
+    Object.assign(lmsUser, data.user);
+    localStorage.setItem('lms_user', JSON.stringify(lmsUser));
+
+    // Update ID card preview
+    const u = data.user;
+    document.getElementById('idCardName').textContent = u.name || 'Student Name';
+    document.getElementById('idCardStudentId').textContent = u.studentId || '—';
+    document.getElementById('idCardBlood').textContent = u.bloodGroup || '—';
+    document.getElementById('idCardEmail').textContent = u.email || '—';
+    document.getElementById('idCardContact').textContent = u.contactNumber || '—';
+    document.getElementById('idCardGuardian').textContent = u.guardianName || '—';
+    document.getElementById('idCardJoinDate').textContent = u.createdAt
+      ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+
+    // Update header name
+    document.getElementById('userName').textContent = u.name;
+    document.getElementById('userInitial').textContent = (u.name || 'U')[0].toUpperCase();
+
+    successAlert.style.display = 'flex';
+    document.getElementById('profileSuccessMsg').textContent = 'Profile saved successfully! Your ID card has been updated.';
+  } catch (err) {
+    errorAlert.style.display = 'flex';
+    document.getElementById('profileErrorMsg').textContent = err.message || 'Could not save profile.';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '💾 Save Profile';
+  }
+});
+
+// Download ID card as PNG
+async function downloadIdCard() {
+  const card = document.getElementById('idCardPreview');
+  const btn = document.getElementById('downloadIdBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+  try {
+    const canvas = await html2canvas(card, {
+      scale: 3,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+    });
+    const link = document.createElement('a');
+    link.download = `IMPLEXEDU_ID_Card_${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    alert('Could not generate ID card image. Please try again.');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📥 Download ID Card as Image';
+  }
+}
 
 // NEW: converts a File (from a <input type="file">) into a base64 data URL for storage
 function fileToBase64(file) {
@@ -1275,6 +1686,10 @@ async function loadMyEnrollments() {
 async function initDashboard() {
   await loadServerCourses();
   await loadMyEnrollments();
+  // Auto-load profile if hash indicates
+  if (window.location.hash === '#profile') {
+    tabProfile.click();
+  }
 }
 
 initDashboard();

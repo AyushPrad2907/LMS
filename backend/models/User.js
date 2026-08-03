@@ -40,6 +40,32 @@ const userSchema = new mongoose.Schema(
       default: '',
     },
 
+    // ── Profile / ID Card fields ──
+    studentId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    bloodGroup: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    profilePhoto: {
+      type: String,
+      default: '',
+    },
+    guardianName: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    address: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+
     // ── NEW: forgot / reset password support ──
     // Never store the raw token — only its SHA256 hash. select:false keeps it
     // out of normal query results so it's never accidentally sent to the client.
@@ -60,6 +86,19 @@ userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Auto-generate studentId for students
+userSchema.pre('save', async function () {
+  if (this.role === 'student' && !this.studentId) {
+    const User = mongoose.model('User');
+    const count = await User.countDocuments({ role: 'student', studentId: { $exists: true, $ne: null } });
+    const seq = String(count + 1).padStart(4, '0');
+    const now = new Date();
+    const fy = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+    const fyShort = `${String(fy).slice(-2)}-${String(fy + 1).slice(-2)}`;
+    this.studentId = `IMPLEX-STU-${seq}/${fyShort}`;
+  }
 });
 
 // Compare password method
