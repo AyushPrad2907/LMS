@@ -89,6 +89,48 @@
     @media (max-width: 860px) {
       #profileView > div { grid-template-columns: 1fr !important; }
       .id-card { width: 100%; max-width: 370px; }
+      .btn-download-id { max-width: 100%; }
+    }
+
+    @media (max-width: 768px) {
+      /* Fix 3-tab grid — use 3 columns instead of 2 */
+      .page-header .filter-bar { grid-template-columns: 1fr 1fr 1fr !important; }
+
+      .profile-form-card { padding: 20px; }
+      .id-card { width: 100%; max-width: 340px; }
+      .id-header { padding: 16px 18px; }
+      .id-brand { font-size: 18px; }
+      .id-name { font-size: 18px; }
+      .id-details { padding: 4px 18px 10px; }
+      .id-detail-label { min-width: 95px; font-size: 11px; }
+      .id-detail-value { font-size: 11px; }
+      .id-photo-hex { width: 100px; height: 100px; }
+    }
+
+    @media (max-width: 480px) {
+      /* Stack tabs vertically on very small screens */
+      .page-header .filter-bar { grid-template-columns: 1fr !important; }
+
+      .profile-form-card { padding: 16px; }
+      .profile-form-card h2 { font-size: 16px; }
+      .photo-preview { width: 64px; height: 64px; font-size: 22px; }
+      .btn-upload { padding: 6px 12px; font-size: 11px; }
+
+      .id-card { max-width: 100%; border-radius: 12px; }
+      .id-header { padding: 14px 16px; gap: 10px; }
+      .id-logo { width: 40px; height: 40px; font-size: 22px; }
+      .id-brand { font-size: 16px; }
+      .id-tagline { font-size: 10px; }
+      .id-photo-hex { width: 88px; height: 88px; font-size: 36px; }
+      .id-name { font-size: 16px; padding: 4px 14px 0; }
+      .id-designation { font-size: 12px; padding: 5px 20px; }
+      .id-details { padding: 4px 14px 8px; }
+      .id-detail-label { min-width: 85px; font-size: 10px; }
+      .id-detail-value { font-size: 10px; }
+      .id-detail-sep { margin: 0 4px; }
+      .id-signature { padding: 8px 14px 10px; }
+      .id-footer { padding: 8px; font-size: 11px; }
+      .btn-download-id { font-size: 12px; padding: 10px; border-radius: 8px; }
     }
     /* ── EXTRA DASHBOARD STYLES ── */
     .logo-text { font-size: 22px; background: linear-gradient(135deg,#fff 0%,#a89fff 50%,#f5a623 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
