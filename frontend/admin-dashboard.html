@@ -1061,7 +1061,8 @@ function renderUsers() {
   const filtered = allRegisteredUsers.filter(u => {
     const matchesSearch = !searchVal ||
       (u.name && u.name.toLowerCase().includes(searchVal)) ||
-      (u.email && u.email.toLowerCase().includes(searchVal));
+      (u.email && u.email.toLowerCase().includes(searchVal)) ||
+      (u.contactNumber && u.contactNumber.toLowerCase().includes(searchVal));
 
     const matchesRole = roleVal === 'all' || (u.role && u.role.toLowerCase() === roleVal.toLowerCase());
     return matchesSearch && matchesRole;
@@ -1100,6 +1101,11 @@ function renderUsers() {
           </div>
 
           <div>
+            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:3px;">Mobile Number</div>
+            <div style="font-size:12px; font-weight:600; color:var(--text);">${escHtml(u.contactNumber || '—')}</div>
+          </div>
+
+          <div>
             <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:3px;">Time of Registration</div>
             <div style="font-size:12px; font-weight:600; color:var(--text);">${escHtml(regDate)}</div>
           </div>
@@ -1126,11 +1132,12 @@ document.getElementById('filterUserRole').addEventListener('change', renderUsers
 
 document.getElementById('exportUsersBtn').addEventListener('click', () => {
   if (!allRegisteredUsers.length) return alert('No users to export');
-  const headers = ['Name', 'Email', 'Role', 'Registration Date'];
+  const headers = ['Name', 'Email', 'Role', 'Mobile Number', 'Registration Date'];
   const rows = allRegisteredUsers.map(u => [
     `"${(u.name || '').replace(/"/g, '""')}"`,
     `"${(u.email || '').replace(/"/g, '""')}"`,
     `"${(u.role || '').replace(/"/g, '""')}"`,
+    `"${(u.contactNumber || '').replace(/"/g, '""')}"`,
     `"${new Date(u.createdAt).toLocaleString('en-IN')}"`
   ]);
   const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');

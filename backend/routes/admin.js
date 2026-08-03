@@ -85,6 +85,7 @@ router.get('/users', protectAdmin, async (req, res) => {
       name: u.name,
       email: u.email,
       role: u.role || 'student',
+      contactNumber: u.contactNumber || '',
       createdAt: u.createdAt,
       updatedAt: u.updatedAt,
       type: 'user'
@@ -95,6 +96,7 @@ router.get('/users', protectAdmin, async (req, res) => {
       name: a.name,
       email: a.email,
       role: 'admin',
+      contactNumber: '',
       createdAt: a.createdAt,
       updatedAt: a.updatedAt,
       type: 'admin'
