@@ -1215,13 +1215,158 @@
       position: relative;
     }
 
+    .hr-header-wrapper {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .hr-section-heading {
+      font-family: var(--font-head);
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 800;
+      margin-top: 8px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hr-tabs-container {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px;
+      gap: 4px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .hr-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hr-tab-btn:hover {
+      color: var(--text);
+    }
+
+    .hr-tab-btn.active {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+    }
+
+    .tab-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .hr-tab-btn.active .tab-status-dot {
+      background: #4ade80;
+      box-shadow: 0 0 10px #4ade80, 0 0 4px #4ade80;
+    }
+
+    .hr-email {
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .hr-email-link {
+      color: var(--accent3);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .hr-email-link:hover {
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .hr-email-link i {
+      font-size: 14px;
+    }
+
+    [data-theme="light"] .hr-tabs-container {
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="light"] .hr-tab-btn {
+      color: var(--text-muted);
+    }
+
+    [data-theme="light"] .hr-tab-btn:hover {
+      color: var(--text);
+    }
+
+    [data-theme="light"] .hr-tab-btn.active {
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    [data-theme="light"] .hr-email-link {
+      color: var(--accent);
+    }
+
+    [data-theme="light"] .hr-email-link:hover {
+      color: #5b54db;
+    }
+
     .hr-panel {
       max-width: 1120px;
       margin: 0 auto;
-      display: grid;
+      display: none;
       grid-template-columns: 320px 1fr;
       gap: 24px;
       align-items: stretch;
+    }
+
+    .hr-panel.active {
+      display: grid;
+    }
+
+    /* Staggered slide up animation */
+    .hr-panel.active .hr-photo-card {
+      animation: hrSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .hr-panel.active .hr-message-card {
+      animation: hrSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+    }
+
+    @keyframes hrSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .hr-photo-card,
@@ -1668,6 +1813,7 @@
 
       /* HR message */
       .hr-section { padding: 48px 18px 56px; }
+      .hr-header-wrapper { margin-bottom: 32px; }
       .hr-panel { gap: 16px; }
       .hr-photo-card {
         max-width: 360px;
@@ -1682,16 +1828,16 @@
       .hr-photo-meta { text-align: center; }
       .hr-message-card {
         padding: 22px 18px;
-        background: #ffffff;
-        border-color: rgba(0,0,0,0.08);
+        background: var(--surface);
+        border-color: var(--border);
         box-shadow: 0 14px 28px rgba(0,0,0,0.12);
       }
-      .hr-message-card .section-tag { color: #6c63ff; }
-      .hr-message-title { color: #111111; font-size: clamp(24px, 7vw, 32px); }
-      .hr-message-copy { color: #111111; font-size: 15px; line-height: 1.7; }
-      .hr-signature { border-top-color: rgba(0,0,0,0.12); }
-      .hr-signature strong { color: #111111; }
-      .hr-signature span { color: #444444; }
+      .hr-message-card .section-tag { color: var(--accent); }
+      .hr-message-title { color: var(--text); font-size: clamp(24px, 7vw, 32px); }
+      .hr-message-copy { color: var(--text); font-size: 15px; line-height: 1.7; }
+      .hr-signature { border-top-color: var(--border); }
+      .hr-signature strong { color: var(--text); }
+      .hr-signature span { color: var(--muted); }
 
       /* CTA */
       .cta-section { padding: 56px 18px 64px; }
@@ -2666,29 +2812,78 @@
   <!-- HR MESSAGE -->
   <!-- ══════════════════════════════════════════ -->
   <section class="hr-section" id="hr-message">
-    <div class="hr-panel">
-      <div class="hr-photo-card">
-        <div class="hr-photo-frame">
-          <img src="images/hr-shraddha-singh.jpg" alt="Shraddha Singh, Human Resource Manager at ImplexEdu" />
+    <div class="hr-header-wrapper">
+      <div class="section-tag">HR Department</div>
+      <h2 class="hr-section-heading">Connect with our HR Team</h2>
+      <div class="hr-tabs-container">
+        <button class="hr-tab-btn active" data-target="shraddha" onclick="switchHR('shraddha', true)">
+          <span class="tab-status-dot"></span>
+          Shraddha Singh
+        </button>
+        <button class="hr-tab-btn" data-target="aradhya" onclick="switchHR('aradhya', true)">
+          <span class="tab-status-dot"></span>
+          Aradhya Gupta
+        </button>
+      </div>
+    </div>
+
+    <div class="hr-panels-wrapper">
+      <!-- Profile 1: Shraddha Singh -->
+      <div class="hr-panel active" id="hr-panel-shraddha">
+        <div class="hr-photo-card">
+          <div class="hr-photo-frame">
+            <img src="images/hr-shraddha-singh.jpg" alt="Shraddha Singh, Human Resource Manager at ImplexEdu" />
+          </div>
+          <div class="hr-photo-meta">
+            <div class="hr-role">Human Resource Manager</div>
+            <div class="hr-name">Shraddha Singh</div>
+          </div>
         </div>
-        <div class="hr-photo-meta">
-          <div class="hr-role">Human Resource Manager</div>
-          <div class="hr-name">Shraddha Singh</div>
-          
+
+        <div class="hr-message-card">
+          <div class="section-tag">Message from HR</div>
+          <h2 class="hr-message-title">A note from the HR team at ImplexEdu</h2>
+          <div class="hr-message-copy">
+            <p>I am Shraddha Singh, Human Resource Manager at ImplexEdu. My responsibilities include overseeing recruitment, onboarding, and addressing employee-related matters.</p>
+            <p>At ImplexEdu, we are committed to fostering a transparent, professional, and supportive work environment for both employees and students. We place strong emphasis on growth, learning, and organizational development.</p>
+            <p>Please feel free to reach out to me directly for any HR-related assistance.</p>
+          </div>
+          <div class="hr-signature">
+            <strong>Shraddha Singh</strong>
+            <span>HR Manager</span>
+          </div>
         </div>
       </div>
 
-      <div class="hr-message-card">
-        <div class="section-tag">Message from HR</div>
-        <h2 class="hr-message-title">A note from the HR team at ImplexEdu</h2>
-        <div class="hr-message-copy">
-          <p>I am Shraddha Singh, Human Resource Manager at ImplexEdu. My responsibilities include overseeing recruitment, onboarding, and addressing employee-related matters.</p>
-          <p>At ImplexEdu, we are committed to fostering a transparent, professional, and supportive work environment for both employees and students. We place strong emphasis on growth, learning, and organizational development.</p>
-          <p>Please feel free to reach out to me directly for any HR-related assistance.</p>
+      <!-- Profile 2: Aradhya Gupta -->
+      <div class="hr-panel" id="hr-panel-aradhya">
+        <div class="hr-photo-card">
+          <div class="hr-photo-frame">
+            <img src="images/hr-aradhya-gupta.jpeg" alt="Aradhya Gupta, HR Manager at ImplexEdu" />
+          </div>
+          <div class="hr-photo-meta">
+            <div class="hr-role">HR Manager</div>
+            <div class="hr-name">Aradhya Gupta</div>
+            <div class="hr-email">
+              <a href="mailto:Hrm@implexedu.online" class="hr-email-link">
+                <i class="fa-regular fa-envelope"></i> Hrm@implexedu.online
+              </a>
+            </div>
+          </div>
         </div>
-        <div class="hr-signature">
-          <span>Shraddha Singh</span>
-          <span>HR Manager</span>
+
+        <div class="hr-message-card">
+          <div class="section-tag">Message from HR</div>
+          <h2 class="hr-message-title">Fostering collaboration & growth</h2>
+          <div class="hr-message-copy">
+            <p>As the HR Manager at ImplexEdu, I am committed to building a positive and productive workplace where talent can thrive.</p>
+            <p>I focus on recruiting skilled professionals, supporting employee growth, and fostering a culture of collaboration and excellence.</p>
+            <p>My goal is to align people with the company's vision and contribute to its continued success.</p>
+          </div>
+          <div class="hr-signature">
+            <strong>Aradhya Gupta</strong>
+            <span>HR Manager</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2986,6 +3181,76 @@ FREE TRIAL CLASS MODAL
   }
   setInterval(updateGuruCountdown, 1000);
   updateGuruCountdown();
+
+  let hrInterval;
+  let currentHR = 'shraddha';
+  let isPaused = false;
+
+  function switchHR(profileId, isManual = false) {
+    // Hide all panels and deactivate buttons
+    document.querySelectorAll('.hr-panel').forEach(p => {
+      p.classList.remove('active');
+    });
+    document.querySelectorAll('.hr-tab-btn').forEach(b => {
+      b.classList.remove('active');
+    });
+
+    // Show selected panel
+    const panel = document.getElementById('hr-panel-' + profileId);
+    if (panel) {
+      panel.classList.add('active');
+    }
+
+    // Set active button
+    const btn = document.querySelector(`.hr-tab-btn[data-target="${profileId}"]`);
+    if (btn) {
+      btn.classList.add('active');
+    }
+
+    // Update current tracker
+    currentHR = profileId;
+
+    // If click was manual, reset timer to give user a full 5s view
+    if (isManual) {
+      startHRAutoCycle();
+    }
+  }
+
+  function startHRAutoCycle() {
+    clearInterval(hrInterval);
+    hrInterval = setInterval(() => {
+      if (!isPaused) {
+        currentHR = currentHR === 'shraddha' ? 'aradhya' : 'shraddha';
+        switchHR(currentHR, false);
+      }
+    }, 5000);
+  }
+
+  // Add event listeners to pause the cycling on hover/touch
+  const hrSection = document.getElementById('hr-message');
+  if (hrSection) {
+    // Desktop hover controls
+    hrSection.addEventListener('mouseenter', () => {
+      isPaused = true;
+    });
+    hrSection.addEventListener('mouseleave', () => {
+      isPaused = false;
+    });
+
+    // Mobile touch controls
+    hrSection.addEventListener('touchstart', () => {
+      isPaused = true;
+    }, { passive: true });
+    hrSection.addEventListener('touchend', () => {
+      // Delay resuming the auto cycle so the user has time to read
+      setTimeout(() => {
+        isPaused = false;
+      }, 1500);
+    }, { passive: true });
+  }
+
+  // Initialize the auto-cycling process
+  startHRAutoCycle();
 </script>
 </body>
 </html>
