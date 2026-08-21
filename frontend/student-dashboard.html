@@ -1140,6 +1140,8 @@ function fileToBase64(file) {
    COURSE DATA (80+ courses)
 ══════════════════════════════════════════════ */
 const COURSES = [
+  /* ── FEATURED / NEW COURSES ── */
+  {id:'c00',cat:'competitive',name:'TRE 4 BPSC',medium:'General',fee:6999,payLater:true,downPayment:51,isNew:true,acc:'acc-rose',days:'6 days/week',cls:'3–4 classes/day',dur:'Full Batch'},
   /* ── SCHOOL 5-8 Hindi ── */
   {id:'s01',cat:'school',name:'5th Fundamental',medium:'Hindi',fee:500,acc:'acc-purple',days:'6 days/week',cls:'2–4 classes/day',dur:'Monthly'},
   {id:'s02',cat:'school',name:'5th Advance',medium:'Hindi',fee:750,acc:'acc-orange',days:'6 days/week',cls:'4–6 classes/day',dur:'Monthly'},
@@ -1275,19 +1277,28 @@ function renderCourses() {
     return;
   }
 
-  grid.innerHTML = filtered.map(c => `
-    <div class="course-card ${c.acc}" onclick="openEnroll('${c.id}')">
-      <div class="cc-cat" style="color:${catColor(c.cat)}">${CAT_LABELS[c.cat]}</div>
+  grid.innerHTML = filtered.map(c => {
+    const isPayLater = c.payLater && c.downPayment;
+    const isNew = c.isNew;
+    return `
+    <div class="course-card ${c.acc}" onclick="openEnroll('${c.id}')" style="${isNew ? 'border:2px solid var(--accent); position:relative;' : ''}">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="cc-cat" style="color:${catColor(c.cat)}">${CAT_LABELS[c.cat]}</div>
+        ${isNew ? `<span style="background:linear-gradient(135deg, #ef4444, #f59e0b);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:12px;letter-spacing:0.04em;">🔥 NEW BATCH</span>` : ''}
+      </div>
       <div class="cc-name">${escHtml(c.name)}</div>
       <div class="cc-medium ${MED_CLASS[c.medium]||'medium-gen'}">${c.medium}</div>
       <div class="cc-details">
         <div class="cc-detail">📅 ${c.days} · ${c.cls}</div>
         <div class="cc-detail">⏱ 45 min/class · ${c.dur}</div>
       </div>
-      <div class="cc-price">₹${c.fee.toLocaleString('en-IN')}</div>
+      <div class="cc-price">
+        ₹${c.fee.toLocaleString('en-IN')}
+        ${isPayLater ? `<div style="font-size:11px; color:#4ade80; font-weight:700; margin-top:2px;">⚡ Pay Only ₹${c.downPayment} Starting (Pay Later: ₹${(c.fee - c.downPayment).toLocaleString('en-IN')})</div>` : ''}
+      </div>
       <button class="cc-enroll-btn" onclick="event.stopPropagation();openEnroll('${c.id}')">Enroll Now →</button>
     </div>
-  `).join('');
+  `;}).join('');
 }
 
 function catColor(cat) {
@@ -1323,11 +1334,18 @@ function openEnroll(courseId) {
 
   document.getElementById('mCourseName').textContent = c.name;
   document.getElementById('mCourseMeta').textContent = `${c.medium} · ${CAT_LABELS[c.cat]} · ${c.dur}`;
-  document.getElementById('mPrice').textContent = `₹${c.fee.toLocaleString('en-IN')}`;
+  
+  if (c.payLater && c.downPayment) {
+    document.getElementById('mPrice').innerHTML = `₹${c.downPayment} <span style="font-size:11px;color:#4ade80;font-weight:600;display:block;">(Pay ₹${c.downPayment} Now · Total: ₹${c.fee.toLocaleString('en-IN')})</span>`;
+    document.getElementById('sumFee').innerHTML = `₹${c.downPayment} <span style="font-size:11px;color:var(--text-muted);display:block;">(Pay Later Balance: ₹${(c.fee - c.downPayment).toLocaleString('en-IN')})</span>`;
+  } else {
+    document.getElementById('mPrice').textContent = `₹${c.fee.toLocaleString('en-IN')}`;
+    document.getElementById('sumFee').textContent = `₹${c.fee.toLocaleString('en-IN')}`;
+  }
+
   document.getElementById('sumCourse').textContent = c.name;
   document.getElementById('sumMedium').textContent = c.medium;
   document.getElementById('sumCat').textContent = CAT_LABELS[c.cat];
-  document.getElementById('sumFee').textContent = `₹${c.fee.toLocaleString('en-IN')}`;
 
   // Pre-fill
   document.getElementById('eFullName').value = user.name || '';
@@ -1354,17 +1372,19 @@ async function loadPaymentQR(course) {
   const payBtn = document.getElementById('payUpiBtn');
   const amountEl = document.getElementById('qrAmount');
 
+  const chargeAmount = (course.payLater && course.downPayment) ? course.downPayment : course.fee;
+
   img.style.display = 'none';
   loading.style.display = 'flex';
   loading.textContent = 'Loading QR…';
-  amountEl.textContent = `₹${course.fee.toLocaleString('en-IN')}`;
+  amountEl.textContent = `₹${chargeAmount.toLocaleString('en-IN')}`;
   payBtn.href = '#';
 
   try {
     const res = await fetch('/api/payment/generate-qr', {
       method: 'POST',
       headers: authHeaders,
-      body: JSON.stringify({ courseId: course.id, courseName: course.name, fee: course.fee }),
+      body: JSON.stringify({ courseId: course.id, courseName: course.name, fee: chargeAmount }),
     });
     const data = await res.json();
     if (!res.ok || !data.success) throw new Error(data.message || 'Could not load QR.');

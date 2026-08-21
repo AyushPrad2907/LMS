@@ -28,6 +28,18 @@ const courseSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    payLater: {
+      type: Boolean,
+      default: false,
+    },
+    downPayment: {
+      type: Number,
+      default: 0,
+    },
+    isNew: {
+      type: Boolean,
+      default: false,
+    },
     isActive: {
       type: Boolean,
       default: true,

@@ -17,7 +17,7 @@ router.get('/all', protectUserOrAdmin, async (req, res) => {
 
 router.post('/create', protectAdmin, async (req, res) => {
   try {
-    const { courseId, name, track, level, fee } = req.body;
+    const { courseId, name, track, level, fee, payLater, downPayment, isNew } = req.body;
 
     if (!courseId || !name || !track || !level || fee === undefined) {
       return res.status(400).json({ success: false, message: 'All course fields are required.' });
@@ -29,6 +29,9 @@ router.post('/create', protectAdmin, async (req, res) => {
       track,
       level,
       fee,
+      payLater: payLater || false,
+      downPayment: downPayment || 0,
+      isNew: isNew || false,
       isActive: true,
     });
 
@@ -43,10 +46,10 @@ router.post('/create', protectAdmin, async (req, res) => {
 
 router.put('/:id', protectAdmin, async (req, res) => {
   try {
-    const { name, track, level, fee, isActive } = req.body;
+    const { name, track, level, fee, isActive, payLater, downPayment, isNew } = req.body;
     const course = await Course.findByIdAndUpdate(
       req.params.id,
-      { $set: { name, track, level, fee, isActive } },
+      { $set: { name, track, level, fee, isActive, payLater, downPayment, isNew } },
       { new: true, runValidators: true }
     );
 
