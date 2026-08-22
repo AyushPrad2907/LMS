@@ -1911,235 +1911,242 @@
 
       .hero-title { font-size: 26px; }
       .hero-tagline { line-height: 2; }
-
-    /* ── FEATURED COURSE SECTION (TRE 4 BPSC) ── */
-    .featured-course-section {
-      max-width: 1200px;
-      margin: 36px auto;
-      padding: 0 20px;
+      .categories-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
     }
 
-    .featured-course-card {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(245, 158, 11, 0.12));
+    /* ── TRE 4 BPSC FEATURED OFFER BOX STYLES ── */
+    .tre-offer-section {
+      position: relative;
+      margin: 40px auto;
+      max-width: 1200px;
+      padding: 40px 32px;
+      background: linear-gradient(160deg, #1f0b0b 0%, #150808 40%, #0f0f0f 70%, #1a0a00 100%);
       border: 2px solid #ef4444;
       border-radius: 24px;
-      padding: 32px 36px;
-      position: relative;
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.25), 0 0 30px rgba(245, 158, 11, 0.15);
       overflow: hidden;
-      box-shadow: 0 12px 36px rgba(239, 68, 68, 0.18);
     }
 
-    .featured-course-badge {
+    /* Gradient top stripe */
+    .tre-offer-section::after {
+      content: '';
       position: absolute;
-      top: 0;
-      right: 0;
-      background: linear-gradient(135deg, #ef4444, #f59e0b);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 900;
-      padding: 6px 20px;
-      border-bottom-left-radius: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #ef4444 100%);
+      border-radius: 24px 24px 0 0;
+    }
+
+    .tre-offer-section::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background:
+        radial-gradient(circle at 20% 40%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 60%, rgba(245, 158, 11, 0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .tre-card-wrap {
+      position: relative;
       z-index: 2;
+      text-align: center;
     }
 
-    .featured-course-flex {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 24px;
-    }
-
-    .featured-course-info {
-      flex: 1;
-      min-width: 300px;
-    }
-
-    .featured-course-tag {
+    .tre-header-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(239, 68, 68, 0.18);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #f87171;
-      padding: 4px 14px;
+      gap: 10px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      padding: 6px 18px;
       border-radius: 100px;
       font-size: 12px;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
+      color: #f87171;
+      margin-bottom: 20px;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+    }
+
+    .tre-discount-sparkle {
+      background: linear-gradient(135deg, #ef4444, #f59e0b);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    .tre-offer-title {
+      font-family: var(--font-head);
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1.25;
+      color: #ffffff;
       margin-bottom: 14px;
     }
 
-    .featured-course-tag .tag-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ef4444;
-      display: inline-block;
+    .tre-gold-gradient {
+      background: linear-gradient(135deg, #f87171 0%, #ffffff 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .featured-course-title {
-      font-family: var(--font-head);
-      font-size: 28px;
-      font-weight: 900;
-      color: #ffffff;
-      margin-bottom: 10px;
-      line-height: 1.2;
-    }
-
-    .featured-course-desc {
-      color: #cbd5e1;
+    .tre-offer-subtitle {
       font-size: 15px;
-      max-width: 720px;
-      margin-bottom: 20px;
+      color: #cbd5e1;
+      max-width: 760px;
+      margin: 0 auto 28px auto;
       line-height: 1.6;
     }
 
-    .featured-course-chips {
+    .tre-deal-box {
       display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      backdrop-filter: blur(16px);
+      padding: 20px 36px;
+      border-radius: 18px;
+      max-width: 780px;
+      margin: 0 auto 28px auto;
       flex-wrap: wrap;
+    }
+
+    .tre-price-block {
+      text-align: center;
+    }
+
+    .tre-price-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .tre-price-val {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .tre-price-val del {
+      font-size: 14px;
+      color: #64748b;
+      margin-right: 6px;
+    }
+
+    .tre-paylater-badge {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tre-highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto 28px auto;
+    }
+
+    .tre-highlight-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 16px;
+      border-radius: 14px;
+      transition: all 0.25s ease;
+      text-align: left;
+    }
+
+    .tre-highlight-item:hover {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.35);
+      transform: translateY(-3px);
+    }
+
+    .tre-hl-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .tre-hl-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    .tre-cta-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 10px;
     }
 
-    .chip-green {
-      background: rgba(34, 197, 94, 0.15);
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      color: #4ade80;
-      padding: 6px 14px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .chip-glass {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #e2e8f0;
-      padding: 6px 14px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .featured-course-pricing {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 24px;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      min-width: 240px;
-      text-align: right;
-    }
-
-    .featured-course-price-label {
-      font-size: 12px;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 700;
-    }
-
-    .featured-course-price-val {
-      font-size: 32px;
-      font-weight: 900;
-      color: #ffffff;
-      margin: 4px 0;
-    }
-
-    .featured-course-price-val del {
-      font-size: 15px;
-      color: #64748b;
-      font-weight: 500;
-    }
-
-    .featured-course-paylater {
-      font-size: 13px;
-      color: #4ade80;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    .featured-course-btn {
-      background: linear-gradient(135deg, #ef4444, #f59e0b);
-      border: none;
+    .tre-btn-cta {
+      background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
       color: #ffffff;
       font-family: var(--font-head);
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 800;
-      padding: 12px 24px;
+      padding: 14px 36px;
       border-radius: 12px;
       text-decoration: none;
-      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
-      display: inline-block;
-      text-align: center;
-      width: 100%;
+      box-shadow: 0 4px 24px rgba(239, 68, 68, 0.4);
       transition: all 0.25s ease;
+      display: inline-block;
     }
 
-    .featured-course-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(239, 68, 68, 0.6);
+    .tre-btn-cta:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 36px rgba(239, 68, 68, 0.6);
+    }
+
+    .tre-guarantee {
+      font-size: 12px;
+      color: #94a3b8;
     }
 
     @media (max-width: 768px) {
-      .featured-course-section {
-        padding: 0 16px;
-        margin: 24px auto;
-      }
-      .featured-course-card {
-        padding: 24px 18px 20px;
+      .tre-offer-section {
+        padding: 28px 18px;
+        margin: 24px 16px;
         border-radius: 18px;
       }
-      .featured-course-badge {
-        position: relative;
-        top: auto;
-        right: auto;
-        display: inline-block;
-        border-radius: 8px;
-        margin-bottom: 14px;
-        font-size: 10px;
-        padding: 4px 12px;
-        box-shadow: none;
-      }
-      .featured-course-flex {
-        flex-direction: column;
-        gap: 18px;
-        align-items: stretch;
-      }
-      .featured-course-info {
-        min-width: 0;
-        width: 100%;
-      }
-      .featured-course-title {
+      .tre-offer-title {
         font-size: 22px;
       }
-      .featured-course-desc {
+      .tre-offer-subtitle {
         font-size: 13.5px;
-        margin-bottom: 16px;
       }
-      .featured-course-chips {
-        gap: 8px;
+      .tre-deal-box {
+        flex-direction: column;
+        gap: 14px;
+        padding: 16px 20px;
       }
-      .chip-green, .chip-glass {
-        font-size: 11.5px;
-        padding: 6px 12px;
+      .tre-highlights-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .tre-btn-cta {
         width: 100%;
         text-align: center;
-        border-radius: 10px;
-      }
-      .featured-course-pricing {
-        width: 100%;
-        min-width: 0;
-        align-items: center;
-        text-align: center;
-        padding: 18px 16px;
+        padding: 13px 20px;
+        font-size: 14.5px;
       }
     }
   </style>
@@ -2288,48 +2295,63 @@
   </section>
 
   <!-- ══════════════════════════════════════════ -->
-  <!-- HIGHLIGHTED NEW COURSE BANNER: TRE 4 BPSC -->
+  <!-- HIGHLIGHTED FEATURED COURSE BOX: TRE 4 BPSC -->
   <!-- ══════════════════════════════════════════ -->
-  <section class="featured-course-section">
-    <div class="featured-course-card">
-      <div class="featured-course-badge">
-        🔥 NEW RELEASED BATCH
+  <section class="tre-offer-section" id="tre4BpscBanner">
+    <div class="tre-card-wrap">
+      <div class="tre-header-badge">
+        <span>🔥 NEW FEATURED COURSE</span>
+        <span class="tre-discount-sparkle">BPSC TRE 4.0</span>
       </div>
-      <div class="featured-course-flex">
-        <div class="featured-course-info">
-          <div class="featured-course-tag">
-            <span class="tag-dot"></span> BPSC Teacher Recruitment (TRE 4.0)
-          </div>
-          <h2 class="featured-course-title">
-            TRE 4 BPSC — Special Preparation Batch
-          </h2>
-          <p class="featured-course-desc">
-            Complete examination strategy and live interactive coverage for BPSC TRE 4.0. Includes Preliminary + Mains syllabus, subject-wise expert notes, doubt resolution, and practice test series.
-          </p>
-          <div class="featured-course-chips">
-            <div class="chip-green">
-              ✨ Read First, Pay Later: Starting Fee ₹51 Only
-            </div>
-            <div class="chip-glass">
-              📖 Subject Notes Provided
-            </div>
-            <div class="chip-glass">
-              🏆 Mock Test Series
-            </div>
+
+      <h2 class="tre-offer-title">
+        BPSC Teacher Recruitment (TRE 4.0)<br />
+        <span class="tre-gold-gradient">TRE 4 BPSC — Special Preparation Batch</span>
+      </h2>
+
+      <p class="tre-offer-subtitle">
+        Complete examination strategy and live interactive coverage for BPSC TRE 4.0. Includes Preliminary + Mains syllabus, subject-wise expert notes, doubt resolution, and practice test series.
+      </p>
+
+      <!-- Deal & Pay Later Box -->
+      <div class="tre-deal-box">
+        <div class="tre-price-block">
+          <div class="tre-price-label">Special Course Fee</div>
+          <div class="tre-price-val">
+            <del>₹15,000</del> ₹6,999
           </div>
         </div>
-        <div class="featured-course-pricing">
-          <div class="featured-course-price-label">Special Price</div>
-          <div class="featured-course-price-val">
-            ₹6,999 <del>₹15,000</del>
-          </div>
-          <div class="featured-course-paylater">
-            ⚡ Start with ₹51 Down Payment
-          </div>
-          <a href="courses.html#tre4bpsc" class="featured-course-btn">
-            Enroll in TRE 4 BPSC →
-          </a>
+
+        <div class="tre-paylater-badge">
+          ⚡ Read First, Pay Later — Start with just ₹51 Down Payment!
         </div>
+      </div>
+
+      <!-- Highlights Grid -->
+      <div class="tre-highlights-grid">
+        <div class="tre-highlight-item">
+          <div class="tre-hl-title">📘 Classes 0–5 & 6–8</div>
+          <div class="tre-hl-desc">Primary & Middle Teacher complete Preliminary & General Studies syllabus.</div>
+        </div>
+        <div class="tre-highlight-item">
+          <div class="tre-hl-title">🎓 Classes 9–10 & 11–12</div>
+          <div class="tre-hl-desc">Secondary & Higher Secondary specialized subject prep & pedagogy.</div>
+        </div>
+        <div class="tre-highlight-item">
+          <div class="tre-hl-title">📝 Notes & Study Material</div>
+          <div class="tre-hl-desc">Full PDF notes provided in Hindi & English medium for quick revision.</div>
+        </div>
+        <div class="tre-highlight-item">
+          <div class="tre-hl-title">🏆 Mock Test Series</div>
+          <div class="tre-hl-desc">Weekly test series, PYQs practice, and speed tests for top score.</div>
+        </div>
+      </div>
+
+      <div class="tre-cta-wrap">
+        <a href="courses.html#tre4bpsc" class="tre-btn-cta">
+          🔥 Enroll in TRE 4 BPSC Special Batch (Pay ₹51 Only) →
+        </a>
+        <span class="tre-guarantee">✨ Read First, Pay Later — Start learning immediately after enrolling</span>
       </div>
     </div>
   </section>
