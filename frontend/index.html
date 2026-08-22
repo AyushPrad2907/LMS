@@ -1915,326 +1915,7 @@
       .categories-grid { grid-template-columns: 1fr; }
       .stats-inner { grid-template-columns: 1fr 1fr; }
       .form-row { grid-template-columns: 1fr; }
-    /* ── INDEPENDENCE DAY OFFER SECTION STYLES ── */
-    .guru-offer-section {
-      position: relative;
-      margin: 40px auto;
-      max-width: 1200px;
-      padding: 48px 32px;
-      background: linear-gradient(160deg, #0a1a0d 0%, #051008 40%, #0f0f0f 70%, #1a0a00 100%);
-      border: 2px solid transparent;
-      border-radius: 24px;
-      box-shadow: 0 0 60px rgba(255, 153, 51, 0.25), 0 0 40px rgba(19, 136, 8, 0.15);
-      overflow: hidden;
-    }
 
-    /* Tricolor top stripe */
-    .guru-offer-section::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 5px;
-      background: linear-gradient(90deg, #FF9933 33.33%, #ffffff 33.33%, #ffffff 66.66%, #138808 66.66%);
-      border-radius: 24px 24px 0 0;
-    }
-
-    .guru-offer-section::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background:
-        radial-gradient(circle at 20% 40%, rgba(255, 153, 51, 0.06) 0%, transparent 50%),
-        radial-gradient(circle at 80% 60%, rgba(19, 136, 8, 0.06) 0%, transparent 50%);
-      animation: rotateGlow 16s linear infinite;
-      pointer-events: none;
-    }
-
-    @keyframes rotateGlow {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .guru-card-wrap {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-    }
-
-    /* Tricolor bottom stripe */
-    .indep-bottom-stripe {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 5px;
-      background: linear-gradient(90deg, #FF9933 33.33%, #ffffff 33.33%, #ffffff 66.66%, #138808 66.66%);
-      border-radius: 0 0 24px 24px;
-    }
-
-    .guru-header-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255, 153, 51, 0.12);
-      border: 1px solid rgba(255, 153, 51, 0.45);
-      padding: 6px 18px;
-      border-radius: 100px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: #FF9933;
-      margin-bottom: 20px;
-      box-shadow: 0 0 16px rgba(255, 153, 51, 0.2);
-    }
-
-    .discount-sparkle {
-      background: linear-gradient(135deg, #138808, #22c55e);
-      color: #fff;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      animation: pulseSparkle 1.2s ease-in-out infinite;
-    }
-
-    @keyframes pulseSparkle {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-
-    .guru-offer-title {
-      font-family: var(--font-head);
-      font-size: 36px;
-      font-weight: 800;
-      line-height: 1.25;
-      color: #ffffff;
-      margin-bottom: 14px;
-    }
-
-    .gold-gradient {
-      background: linear-gradient(135deg, #FF9933 0%, #ffffff 50%, #138808 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .guru-offer-subtitle {
-      font-size: 15px;
-      color: #cbd5e1;
-      max-width: 720px;
-      margin: 0 auto 32px auto;
-      line-height: 1.6;
-    }
-
-    .guru-deal-box {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-      background: rgba(5, 16, 8, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(16px);
-      padding: 20px 36px;
-      border-radius: 18px;
-      max-width: 780px;
-      margin: 0 auto 32px auto;
-      flex-wrap: wrap;
-    }
-
-    .coupon-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-
-    .coupon-code-flex {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .code-box {
-      font-family: monospace;
-      font-size: 24px;
-      font-weight: 900;
-      color: #FF9933;
-      background: rgba(255, 153, 51, 0.12);
-      border: 2px dashed #FF9933;
-      padding: 6px 16px;
-      border-radius: 8px;
-      letter-spacing: 0.1em;
-    }
-
-    .btn-copy-code {
-      background: linear-gradient(135deg, #138808, #16a34a);
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-copy-code:hover {
-      background: linear-gradient(135deg, #16a34a, #22c55e);
-      transform: translateY(-2px);
-    }
-
-    .deal-divider {
-      width: 1px;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    .timer-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-
-    .timer-display {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .time-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(10, 26, 13, 0.9);
-      border: 1px solid rgba(19, 136, 8, 0.5);
-      padding: 6px 12px;
-      border-radius: 8px;
-      min-width: 54px;
-    }
-
-    .time-block span {
-      font-family: var(--font-head);
-      font-size: 20px;
-      font-weight: 800;
-      color: #ffffff;
-    }
-
-    .time-block small {
-      font-size: 9px;
-      text-transform: uppercase;
-      color: #4ade80;
-    }
-
-    .time-colon {
-      font-size: 20px;
-      font-weight: 800;
-      color: #FF9933;
-    }
-
-    .guru-highlights-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      max-width: 960px;
-      margin: 0 auto 32px auto;
-    }
-
-    .highlight-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 16px;
-      border-radius: 14px;
-      transition: all 0.25s ease;
-    }
-
-    .highlight-item:nth-child(odd):hover {
-      background: rgba(255, 153, 51, 0.07);
-      border-color: rgba(255, 153, 51, 0.35);
-      transform: translateY(-3px);
-    }
-
-    .highlight-item:nth-child(even):hover {
-      background: rgba(19, 136, 8, 0.07);
-      border-color: rgba(19, 136, 8, 0.35);
-      transform: translateY(-3px);
-    }
-
-    .hl-tag {
-      font-size: 13px;
-      font-weight: 600;
-      color: #e2e8f0;
-      margin-bottom: 6px;
-    }
-
-    .hl-prices {
-      font-size: 18px;
-      font-weight: 800;
-      color: #ffffff;
-    }
-
-    .hl-old {
-      text-decoration: line-through;
-      opacity: 0.5;
-      font-size: 14px;
-      margin-right: 6px;
-    }
-
-    .hl-new {
-      color: #4ade80;
-    }
-
-    .hl-badge {
-      display: inline-block;
-      margin-top: 6px;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      background: rgba(19, 136, 8, 0.25);
-      color: #4ade80;
-      padding: 2px 8px;
-      border-radius: 10px;
-    }
-
-    .guru-cta-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .guru-btn-cta {
-      background: linear-gradient(135deg, #FF9933 0%, #e67e00 50%, #138808 100%);
-      color: #ffffff;
-      font-family: var(--font-head);
-      font-size: 16px;
-      font-weight: 800;
-      padding: 14px 36px;
-      border-radius: 12px;
-      text-decoration: none;
-      box-shadow: 0 4px 24px rgba(255, 153, 51, 0.35), 0 4px 24px rgba(19, 136, 8, 0.2);
-      transition: all 0.25s ease;
-    }
-
-    .guru-btn-cta:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 36px rgba(255, 153, 51, 0.5), 0 8px 36px rgba(19, 136, 8, 0.3);
-    }
-
-    .guru-guarantee {
-      font-size: 12px;
-      color: #94a3b8;
-    }
-
-    /* Chakra animation for the Ashoka Chakra icon */
-    @keyframes spinChakra {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .spin-chakra {
-      display: inline-block;
-      animation: spinChakra 8s linear infinite;
-    }
   </style>
 </head>
 <body>
@@ -2242,15 +1923,15 @@
   <!-- ══════════════════════════════════════════ -->
   <!-- ADMISSION OPEN BANNER -->
   <!-- ══════════════════════════════════════════ -->
-  <div class="admission-banner" id="admissionBanner" style="background: linear-gradient(90deg, #0a1a0d 0%, #1a0a00 25%, #0f0f0f 50%, #1a0a00 75%, #0a1a0d 100%); border-bottom: 3px solid transparent; border-image: linear-gradient(90deg, #FF9933 33%, #ffffff 33%, #ffffff 66%, #138808 66%) 1;">
-    <div class="banner-live" style="background: rgba(255,153,51,0.15); border-color: rgba(255,153,51,0.5);">
-      <span class="live-dot" style="background:#FF9933;box-shadow:0 0 10px #FF9933;"></span>
-      <span class="live-text" style="color:#FF9933;">🇮🇳 INDEPENDENCE DAY SPECIAL</span>
+  <div class="admission-banner" id="admissionBanner">
+    <div class="banner-live">
+      <span class="live-dot"></span>
+      <span class="live-text">ADMISSIONS OPEN 2026-27</span>
     </div>
-    <div class="banner-msg" style="color:#ffffff;">
-      <span>FLAT 75% OFF ON ALL COURSES!</span> Use Code: <strong style="background:linear-gradient(135deg,#FF9933,#138808);color:#fff;padding:2px 8px;border-radius:4px;font-weight:900;letter-spacing:0.05em;margin-left:4px;">AZADI75</strong>
+    <div class="banner-msg">
+      <span>Enrollments are live for Class 5 to IAS batch.</span>
     </div>
-    <a href="courses.html" class="banner-cta" style="background:linear-gradient(135deg, #FF9933, #138808);box-shadow:0 0 12px rgba(255,153,51,0.5);">Claim 75% Off →</a>
+    <a href="courses.html" class="banner-cta">Explore Courses →</a>
     <button class="banner-close" onclick="closeBanner()" aria-label="Close">✕</button>
   </div>
 
@@ -2319,9 +2000,9 @@
       🏛 IMPLEXEDU &nbsp;·&nbsp; 
     </div>
 
-    <div class="hero-admission-badge" style="border-color: rgba(255,153,51,0.5); background: rgba(255,153,51,0.10); color: #FF9933; box-shadow: 0 0 20px rgba(255,153,51,0.2);">
-      <span class="admission-live-dot" style="background: #FF9933; box-shadow: 0 0 10px #FF9933;"></span>
-      🇮🇳 Independence Day Special — Flat 75% OFF Applied on All Courses!
+    <div class="hero-admission-badge">
+      <span class="admission-live-dot"></span>
+      Admissions Open — Session 2026–27
     </div>
 
     <h1 class="hero-title">
@@ -2340,8 +2021,8 @@
 
     <div class="hero-cta">
 
-  <a href="courses.html" class="btn-green-lg" style="background: linear-gradient(135deg, #FF9933, #138808); border-color: #FF9933; color: #fff; font-weight: 800;">
-    🇮🇳 Enroll Now — Flat 75% OFF
+  <a href="courses.html" class="btn-green-lg">
+    Explore All Courses →
   </a>
 
   <a href="register.html" class="btn-primary-lg">
@@ -2375,86 +2056,7 @@
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════ -->
-  <!-- INDEPENDENCE DAY 75% OFF FLASHY OFFER SECTION -->
-  <!-- ══════════════════════════════════════════ -->
-  <section class="guru-offer-section" id="independenceDayOffer">
-    <div class="indep-bottom-stripe"></div>
-    <div class="guru-sparkles"></div>
-    <div class="guru-card-wrap">
-      <div class="guru-header-badge">
-        <span class="spin-chakra">☸️</span>
-        <span>INDEPENDENCE DAY FREEDOM FESTIVAL OF LEARNING</span>
-        <span class="discount-sparkle">FLAT 75% OFF</span>
-      </div>
 
-      <h2 class="guru-offer-title">
-        Celebrate Freedom. Invest in Your Future.<br />
-        <span class="gold-gradient">Get Flat 75% OFF On Every Course!</span>
-      </h2>
-
-      <p class="guru-offer-subtitle">
-        This Independence Day, IMPLEXEDU salutes every learner! Unlock massive savings across all 80+ School, Competitive, Coaching &amp; University programs. Jai Hind! 🇮🇳
-      </p>
-
-      <!-- Coupon & Countdown Box -->
-      <div class="guru-deal-box">
-        <div class="deal-coupon">
-          <div class="coupon-label">Independence Day Coupon Code:</div>
-          <div class="coupon-code-flex">
-            <span class="code-box" id="couponCode">AZADI75</span>
-            <button class="btn-copy-code" onclick="copyCouponCode()">
-              <span id="copyIcon">📋</span> <span id="copyText">Copy Code</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="deal-divider"></div>
-
-        <div class="deal-timer">
-          <div class="timer-label">⏰ Offer Ends In:</div>
-          <div class="timer-display">
-            <div class="time-block"><span id="gHours">11</span><small>Hours</small></div>
-            <div class="time-colon">:</div>
-            <div class="time-block"><span id="gMins">45</span><small>Mins</small></div>
-            <div class="time-colon">:</div>
-            <div class="time-block"><span id="gSecs">30</span><small>Secs</small></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Featured Discount Grid (75% off = 25% of original) -->
-      <div class="guru-highlights-grid">
-        <div class="highlight-item">
-          <div class="hl-tag">School (Class 5–10)</div>
-          <div class="hl-prices"><span class="hl-old">₹1,500</span> <span class="hl-new">₹375</span>/yr</div>
-          <div class="hl-badge">75% OFF</div>
-        </div>
-        <div class="highlight-item">
-          <div class="hl-tag">11th &amp; 12th PCM/PCB</div>
-          <div class="hl-prices"><span class="hl-old">₹4,500</span> <span class="hl-new">₹1,125</span>/yr</div>
-          <div class="hl-badge">75% OFF</div>
-        </div>
-        <div class="highlight-item">
-          <div class="hl-tag">IIT JEE &amp; NEET Integrated</div>
-          <div class="hl-prices"><span class="hl-old">₹5,500</span> <span class="hl-new">₹1,375</span>/yr</div>
-          <div class="hl-badge">75% OFF</div>
-        </div>
-        <div class="highlight-item">
-          <div class="hl-tag">UPSC &amp; State PCS</div>
-          <div class="hl-prices"><span class="hl-old">₹15,000</span> <span class="hl-new">₹3,750</span>/yr</div>
-          <div class="hl-badge">75% OFF</div>
-        </div>
-      </div>
-
-      <div class="guru-cta-wrap">
-        <a href="courses.html" class="guru-btn-cta">
-          🇮🇳 Claim Your 75% Discount Now →
-        </a>
-        <span class="guru-guarantee">✨ Discount automatically reflected on all course checkout cards</span>
-      </div>
-    </div>
-  </section>
 
   <!-- ══════════════════════════════════════════ -->
   <!-- AUTO-SLIDING IMAGE BANNER -->
@@ -3143,43 +2745,6 @@ FREE TRIAL CLASS MODAL
 </div>
 
 <script src="trial.js"></script>
-<script>
-  function copyCouponCode() {
-    navigator.clipboard.writeText('GURU50').then(() => {
-      const copyText = document.getElementById('copyText');
-      const copyIcon = document.getElementById('copyIcon');
-      if (copyText && copyIcon) {
-        copyText.textContent = 'Copied!';
-        copyIcon.textContent = '✅';
-        setTimeout(() => {
-          copyText.textContent = 'Copy Code';
-          copyIcon.textContent = '📋';
-        }, 2000);
-      }
-    }).catch(() => {
-      alert('Coupon code GURU50 copied!');
-    });
-  }
 
-  function updateGuruCountdown() {
-    const now = new Date();
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-    let diff = endOfDay - now;
-    if (diff < 0) diff = 0;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const secs = Math.floor((diff % (1000 * 60)) / 1000);
-    const hEl = document.getElementById('gHours');
-    const mEl = document.getElementById('gMins');
-    const sEl = document.getElementById('gSecs');
-    if (hEl) hEl.textContent = String(hours).padStart(2, '0');
-    if (mEl) mEl.textContent = String(mins).padStart(2, '0');
-    if (sEl) sEl.textContent = String(secs).padStart(2, '0');
-  }
-  setInterval(updateGuruCountdown, 1000);
-  updateGuruCountdown();
-
-</script>
 </body>
 </html>
