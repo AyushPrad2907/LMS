@@ -159,7 +159,7 @@ const defaultCourses = [
   { courseId: 'c06', level: 'competitive', name: 'UPSC Mains GS+Optional', track: 'English', fee: 10000 },
   { courseId: 'c07', level: 'competitive', name: 'UPSC & State PCS', track: 'English', fee: 10000 },
   // FEATURED / NEW COURSES
-  { courseId: 'c00', level: 'competitive', name: 'TRE 4 BPSC', track: 'General', fee: 6999, payLater: true, downPayment: 51, isNew: true },
+  { courseId: 'c00', level: 'competitive', name: 'TRE 4 BPSC', track: 'General', fee: 699, payLater: true, downPayment: 51, isNew: true },
   // BPSC
   { courseId: 'c08', level: 'competitive', name: 'BPSC Pre — Hindi Medium', track: 'Hindi', fee: 3000 },
   { courseId: 'c09', level: 'competitive', name: 'BPSC Pre — English Medium', track: 'English', fee: 7500 },
