@@ -3047,5 +3047,362 @@ FREE TRIAL CLASS MODAL
 
 <script src="trial.js"></script>
 
+<!-- ╔══════════════════════════════════════════════════════════╗
+     ║  🔒 LOCKDOWN MODE — ALL INTERACTIONS DISABLED            ║
+     ║  Remove this entire block (down to END LOCKDOWN) to      ║
+     ║  re-enable full site functionality.                      ║
+     ╚══════════════════════════════════════════════════════════╝ -->
+<style id="lockdown-styles">
+  /* ── LOCKDOWN: Kill page scroll and interactions ── */
+  html, body {
+    overflow: hidden !important;
+    height: 100vh !important;
+  }
+
+  /* ── Full-screen unskippable overlay ── */
+  .lockdown-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    background: #05050a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    overflow-y: auto;
+    font-family: 'Instrument Sans', 'Segoe UI', sans-serif;
+  }
+
+  /* Animated background gradient */
+  .lockdown-fullscreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 50% 40%, rgba(239, 68, 68, 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 20% 80%, rgba(108, 99, 255, 0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 60% at 80% 20%, rgba(245, 158, 11, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    animation: lockdownBgPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes lockdownBgPulse {
+    0% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  /* Grid background */
+  .lockdown-fullscreen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .lockdown-card {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    width: 100%;
+    background: rgba(10, 10, 26, 0.9);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 24px;
+    padding: 48px 44px;
+    box-shadow: 
+      0 0 80px rgba(239, 68, 68, 0.08),
+      0 24px 64px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px);
+    text-align: center;
+  }
+
+  /* Red warning bar at top of card */
+  .lockdown-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 32px;
+    right: 32px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ef4444, #f59e0b, #ef4444, transparent);
+    border-radius: 0 0 4px 4px;
+  }
+
+  .lockdown-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+    display: block;
+    animation: lockdownIconPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes lockdownIconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .lockdown-title {
+    font-family: 'Syne', 'Segoe UI', sans-serif;
+    font-size: clamp(24px, 4.5vw, 38px);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .lockdown-title .red {
+    color: #ef4444;
+  }
+
+  .lockdown-subtitle {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #f59e0b;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .lockdown-subtitle .dot {
+    width: 8px; height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: lockdownDotPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  }
+
+  @keyframes lockdownDotPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  }
+
+  .lockdown-divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.4), transparent);
+    margin: 0 auto 28px;
+  }
+
+  .lockdown-message {
+    font-size: clamp(15px, 2.2vw, 17px);
+    color: #c4c4e0;
+    line-height: 1.85;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+
+  .lockdown-message strong {
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .lockdown-message .highlight-name {
+    color: #ef4444;
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-color: rgba(239, 68, 68, 0.4);
+    text-underline-offset: 3px;
+  }
+
+  .lockdown-message .highlight-months {
+    color: #f59e0b;
+    font-weight: 800;
+  }
+
+  /* Stats row */
+  .lockdown-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .lockdown-stat {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    border-radius: 12px;
+    padding: 16px 12px;
+  }
+
+  .lockdown-stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #ef4444;
+    margin-bottom: 4px;
+  }
+
+  .lockdown-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #6b6b8a;
+  }
+
+  /* Footer note */
+  .lockdown-footer-note {
+    font-size: 12px;
+    color: #4a4a6a;
+    line-height: 1.6;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 20px;
+    font-style: italic;
+  }
+
+  .lockdown-footer-note strong {
+    color: #6b6b8a;
+  }
+
+  /* Prevent ANY right-click / selection / copy */
+  .lockdown-fullscreen * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
+  /* ── Mobile responsive ── */
+  @media (max-width: 640px) {
+    .lockdown-card {
+      padding: 32px 24px;
+      border-radius: 18px;
+    }
+    .lockdown-icon {
+      font-size: 44px;
+    }
+    .lockdown-stats {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .lockdown-stat {
+      padding: 12px;
+    }
+    .lockdown-message {
+      font-size: 14px;
+      text-align: left;
+    }
+  }
+</style>
+
+<script id="lockdown-script">
+(function() {
+  'use strict';
+
+  // ── Create the full-screen unskippable overlay ──
+  const overlay = document.createElement('div');
+  overlay.className = 'lockdown-fullscreen';
+  overlay.innerHTML = `
+    <div class="lockdown-card">
+      <span class="lockdown-icon">⚠️</span>
+
+      <div class="lockdown-subtitle">
+        <span class="dot"></span>
+        Website Taken Down by Developer
+        <span class="dot"></span>
+      </div>
+
+      <h1 class="lockdown-title">
+        This Website Is <span class="red">Temporarily Down</span>
+      </h1>
+
+      <div class="lockdown-divider"></div>
+
+      <div class="lockdown-message">
+        <p>
+          This entire website — every page, every feature, every line of code — was <strong>designed, developed, and maintained by a single dedicated, hardworking employee</strong> who poured months of effort into building this platform from scratch.
+        </p>
+        <br>
+        <p>
+          Unfortunately, the company manager <span class="highlight-name">KN JHA</span> has <strong>not paid the developer any salary for the past <span class="highlight-months">5 months</span></strong> despite repeated requests and follow-ups.
+        </p>
+        <br>
+        <p>
+          Since the developer has not received any compensation for their work, <strong>this website has been taken down</strong> and all functionality has been disabled until the pending dues are cleared.
+        </p>
+      </div>
+
+      <div class="lockdown-stats">
+        <div class="lockdown-stat">
+          <div class="lockdown-stat-value">5</div>
+          <div class="lockdown-stat-label">Months Unpaid</div>
+        </div>
+        <div class="lockdown-stat">
+          <div class="lockdown-stat-value">₹0</div>
+          <div class="lockdown-stat-label">Salary Received</div>
+        </div>
+        <div class="lockdown-stat">
+          <div class="lockdown-stat-value">100%</div>
+          <div class="lockdown-stat-label">Built by Developer</div>
+        </div>
+      </div>
+
+      <div class="lockdown-footer-note">
+        <strong>Note:</strong> The website will remain in this state until the developer receives their rightful pending salary. This page cannot be closed, skipped, or bypassed.
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // ── Block ALL interactions on the page ──
+  document.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+
+  document.addEventListener('submit', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+
+  document.addEventListener('keydown', function(e) {
+    // Block Escape, Tab, and any navigation keys
+    if (['Escape', 'Tab', 'F5', 'F12'].includes(e.key)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Block Ctrl+A, Ctrl+C, Ctrl+U (view source), Ctrl+S
+    if (e.ctrlKey && ['a','c','u','s','p'].includes(e.key.toLowerCase())) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
+  // Block right-click context menu
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  }, true);
+
+  // Block scrolling on the page behind
+  document.addEventListener('wheel', function(e) {
+    if (!e.target.closest('.lockdown-fullscreen')) {
+      e.preventDefault();
+    }
+  }, { passive: false, capture: true });
+
+  // Block touch scrolling
+  document.addEventListener('touchmove', function(e) {
+    if (!e.target.closest('.lockdown-fullscreen')) {
+      e.preventDefault();
+    }
+  }, { passive: false, capture: true });
+
+  // Override trial modal
+  window.openTrialModal = function() {};
+  window.closeTrialModal = function() {};
+
+  console.log('%c⚠️ WEBSITE TAKEN DOWN — Developer unpaid for 5 months by manager KN JHA.', 'color: #ef4444; font-weight: bold; font-size: 16px;');
+})();
+</script>
+<!-- ╔══════════════════════════════════════════════════════════╗
+     ║  🔒 END LOCKDOWN MODE                                   ║
+     ╚══════════════════════════════════════════════════════════╝ -->
+
 </body>
 </html>
